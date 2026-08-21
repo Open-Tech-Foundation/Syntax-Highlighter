@@ -24,6 +24,7 @@ export interface LexDefinition {
   operators?: string[];
   punctuation?: string[];
   regex?: boolean;
+  regexAfterParenKeywords?: string[];
   shebang?: boolean;
   scanNumber?: ScanNumberFn;
 }
@@ -58,6 +59,7 @@ export interface RawTokenDetail {
   kind?: "line" | "block";
   templateOpen?: boolean;
   templateClose?: boolean;
+  controlClose?: boolean;
   unknown?: boolean;
 }
 
@@ -99,6 +101,15 @@ function isWhitespaceChar(ch: string): boolean {
     ch === "\u00a0" ||
     ch === "\ufeff"
   );
+}
+
+function codePointWidthAt(source: string, pos: number): number {
+  return (source.codePointAt(pos) ?? 0) > 0xffff ? 2 : 1;
+}
+
+function matches(re: RegExp, value: string): boolean {
+  re.lastIndex = 0;
+  return re.test(value);
 }
 
 export function defaultScanNumber(source: string, pos: number): number {
@@ -164,16 +175,19 @@ export class Lexer {
   operators: string[];
   punctuation: string[];
   regexEnabled: boolean;
+  regexAfterParenKeywords: Set<string>;
   shebang: boolean;
   scanNumber: ScanNumberFn;
   regexKeywords: Set<string>;
-  stringOpeners: Map<string, StringDef>;
+  stringOpeners: Map<string, StringDef[]>;
 
   source = "";
   length = 0;
   tokens: RawToken[] = [];
   prev: RawToken | null = null;
   pos = 0;
+  parenControls: boolean[] = [];
+  lastClosedControlParen = false;
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
@@ -188,11 +202,20 @@ export class Lexer {
       lex.punctuation ?? language.punctuation ?? [],
     );
     this.regexEnabled = lex.regex !== false;
+    this.regexAfterParenKeywords = new Set(lex.regexAfterParenKeywords ?? []);
     this.shebang = lex.shebang === true;
     this.scanNumber = lex.scanNumber ?? defaultScanNumber;
     this.regexKeywords = new Set(language.regexKeywords ?? []);
     this.stringOpeners = new Map();
-    for (const def of this.strings) this.stringOpeners.set(def.open[0], def);
+    for (const def of this.strings) {
+      if (!def.open) continue;
+      const defs = this.stringOpeners.get(def.open[0]);
+      if (defs) defs.push(def);
+      else this.stringOpeners.set(def.open[0], [def]);
+    }
+    for (const defs of this.stringOpeners.values()) {
+      defs.sort((a, b) => b.open.length - a.open.length);
+    }
   }
 
   tokenize(source: string): RawToken[] {
@@ -201,6 +224,8 @@ export class Lexer {
     this.tokens = [];
     this.prev = null;
     this.pos = 0;
+    this.parenControls = [];
+    this.lastClosedControlParen = false;
 
     if (this.shebang && source.startsWith("#!")) {
       let end = source.indexOf("\n");
@@ -221,7 +246,13 @@ export class Lexer {
       value: this.source.slice(start, end),
       detail,
     };
-    if (type !== "whitespace") this.prev = token;
+    if (type !== "whitespace") {
+      this.prev = token;
+      this.lastClosedControlParen =
+        type === "punctuation" &&
+        token.value === ")" &&
+        detail?.controlClose === true;
+    }
     this.tokens.push(token);
   }
 
@@ -252,7 +283,8 @@ export class Lexer {
       case "operator":
         return true;
       case "punctuation":
-        return p.value !== ")" && p.value !== "]" && p.value !== "}";
+        if (p.value === ")") return this.lastClosedControlParen;
+        return p.value !== "]" && p.value !== "}";
       default:
         return true;
     }
@@ -290,10 +322,12 @@ export class Lexer {
     const s = this.source;
     const start = this.pos;
     this.pos += def.open.length;
+    const escape = def.escape ?? "\\";
     while (this.pos < this.length) {
       const c = s[this.pos];
-      if (c === "\\") {
-        this.pos += 2;
+      if (escape && s.startsWith(escape, this.pos)) {
+        this.pos += escape.length;
+        if (this.pos < this.length) this.pos += 1;
         continue;
       }
       if (!def.multiline && c === "\n") break;
@@ -311,14 +345,16 @@ export class Lexer {
     const s = this.source;
     let start = this.pos;
     this.pos += def.open.length;
+    const escape = def.escape ?? "\\";
     for (;;) {
       if (this.pos >= this.length) {
         this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
         return;
       }
       const c = s[this.pos];
-      if (c === "\\") {
-        this.pos += 2;
+      if (escape && s.startsWith(escape, this.pos)) {
+        this.pos += escape.length;
+        if (this.pos < this.length) this.pos += 1;
         continue;
       }
       if (s.startsWith(def.close, this.pos)) {
@@ -365,6 +401,8 @@ export class Lexer {
     while (this.pos < this.length) {
       const start = this.pos;
       const ch = s[this.pos];
+      const width = codePointWidthAt(s, this.pos);
+      const codePoint = s.slice(this.pos, this.pos + width);
 
       if (isWhitespaceChar(ch)) {
         let i = this.pos + 1;
@@ -374,9 +412,13 @@ export class Lexer {
         continue;
       }
 
-      if (this.identifierStart.test(ch)) {
-        let i = this.pos + 1;
-        while (i < this.length && this.identifierPart.test(s[i])) i += 1;
+      if (matches(this.identifierStart, codePoint)) {
+        let i = this.pos + width;
+        while (i < this.length) {
+          const partWidth = codePointWidthAt(s, i);
+          if (!matches(this.identifierPart, s.slice(i, i + partWidth))) break;
+          i += partWidth;
+        }
         this.emit("identifier", start, i);
         this.pos = i;
         continue;
@@ -391,7 +433,8 @@ export class Lexer {
         }
       }
 
-      const strDef = this.stringOpeners.get(ch);
+      const strDefs = this.stringOpeners.get(ch);
+      const strDef = strDefs?.find((def) => s.startsWith(def.open, this.pos));
       if (strDef) {
         if (strDef.template) this.scanTemplate(strDef);
         else this.scanString(strDef);
@@ -409,9 +452,20 @@ export class Lexer {
         continue;
       }
 
-      if (ch === "@" && this.identifierStart.test(s[this.pos + 1] ?? "")) {
-        let i = this.pos + 1;
-        while (i < this.length && this.identifierPart.test(s[i])) i += 1;
+      const decoratorWidth = codePointWidthAt(s, this.pos + 1);
+      if (
+        ch === "@" &&
+        matches(
+          this.identifierStart,
+          s.slice(this.pos + 1, this.pos + 1 + decoratorWidth),
+        )
+      ) {
+        let i = this.pos + 1 + decoratorWidth;
+        while (i < this.length) {
+          const partWidth = codePointWidthAt(s, i);
+          if (!matches(this.identifierPart, s.slice(i, i + partWidth))) break;
+          i += partWidth;
+        }
         this.emit("decorator", start, i);
         this.pos = i;
         continue;
@@ -433,6 +487,20 @@ export class Lexer {
         if (untilTemplateClose) depth -= 1;
         this.pos += 1;
         this.emit("punctuation", start, this.pos);
+        continue;
+      }
+
+      if (ch === "(") {
+        this.parenControls.push(
+          this.prev?.type === "identifier" &&
+            this.regexAfterParenKeywords.has(this.prev.value),
+        );
+      }
+
+      if (ch === ")") {
+        const controlClose = this.parenControls.pop() ?? false;
+        this.pos += 1;
+        this.emit("punctuation", start, this.pos, { controlClose });
         continue;
       }
 

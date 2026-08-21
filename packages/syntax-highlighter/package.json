@@ -20,6 +20,10 @@
     "test": "esdev test",
     "typecheck": "tsc --noEmit"
   },
+  "devDependencies": {
+    "@opentf/esrun-types": "latest",
+    "typescript": "^5.9.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Open-Tech-Foundation/Syntax-Highlighter.git"

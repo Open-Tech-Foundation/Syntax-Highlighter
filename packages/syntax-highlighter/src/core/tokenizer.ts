@@ -30,6 +30,14 @@ const OBJECT_STARTERS = new Set([
   "var",
 ]);
 
+const CONTROL_HEADER_KEYWORDS = new Set([
+  "if",
+  "for",
+  "while",
+  "switch",
+  "with",
+]);
+
 export class Tokenizer {
   language: LanguageDefinition;
   lexer: Lexer;
@@ -52,9 +60,21 @@ export class Tokenizer {
     const ctx = createState();
     const out: Token[] = [];
     const parens = this.#matchParens(raws);
+    const parameterBindings = this.#findParameterBindings(raws, parens);
 
     for (let i = 0; i < raws.length; i++) {
-      out.push(this.#process(raws[i], i, raws, ctx, out, source, parens));
+      out.push(
+        this.#process(
+          raws[i],
+          i,
+          raws,
+          ctx,
+          out,
+          source,
+          parens,
+          parameterBindings,
+        ),
+      );
     }
 
     return out;
@@ -68,6 +88,7 @@ export class Tokenizer {
     out: Token[],
     src: string,
     parens: Map<number, number>,
+    parameterBindings: Set<number>,
   ): Token {
     if (raw.type === "whitespace") {
       return createToken(WHITESPACE, raw.start, raw.end);
@@ -87,7 +108,7 @@ export class Tokenizer {
     let tok: Token;
     switch (raw.type) {
       case "identifier":
-        tok = this.#identifier(raw, idx, raws, ctx, src);
+        tok = this.#identifier(raw, idx, raws, ctx, src, parameterBindings);
         break;
       case "operator":
         tok = this.#operator(raw, ctx, out, src);
@@ -130,8 +151,16 @@ export class Tokenizer {
     raws: RawToken[],
     ctx: HighlightState,
     src: string,
+    parameterBindings: Set<number>,
   ): Token {
     const val = src.slice(raw.start, raw.end);
+
+    if (parameterBindings.has(idx)) {
+      const params = this.#nearestParameterContext(ctx);
+      if (params) params.names.push(val);
+      ctx.expectation = Expectation.NONE;
+      return createToken(TokenType.PARAMETER, raw.start, raw.end);
+    }
 
     if (ctx.expectation === Expectation.PROPERTY) {
       ctx.expectation = Expectation.NONE;
@@ -240,6 +269,10 @@ export class Tokenizer {
 
     switch (ch) {
       case ".":
+        ctx.expectation = Expectation.PROPERTY;
+        break;
+
+      case "#":
         ctx.expectation = Expectation.PROPERTY;
         break;
 
@@ -498,6 +531,7 @@ export class Tokenizer {
 
   #isParam(val: string, ctx: HighlightState): boolean {
     if (ctx.globalParams.has(val)) return true;
+    if (ctx.pendingParams?.includes(val)) return true;
     for (let i = ctx.contexts.length - 1; i >= 0; i--) {
       if (ctx.contexts[i].params?.has(val)) return true;
     }
@@ -511,6 +545,193 @@ export class Tokenizer {
   #nextSig(raws: RawToken[], idx: number): RawToken | null {
     for (let i = idx + 1; i < raws.length; i++) {
       if (raws[i].type !== WHITESPACE) return raws[i];
+    }
+    return null;
+  }
+
+  #nextSigIndex(raws: RawToken[], idx: number): number {
+    for (let i = idx; i < raws.length; i++) {
+      if (raws[i].type !== WHITESPACE) return i;
+    }
+    return raws.length;
+  }
+
+  #findParameterBindings(
+    raws: RawToken[],
+    parens: Map<number, number>,
+  ): Set<number> {
+    const bindings = new Set<number>();
+    for (let open = 0; open < raws.length; open++) {
+      if (raws[open].type !== "punctuation" || raws[open].value !== "(") continue;
+      const close = parens.get(open);
+      if (close == null) continue;
+      const after = this.#nextSig(raws, close);
+      const previousIndex = this.#previousSigIndex(raws, open - 1);
+      const previous = previousIndex >= 0 ? raws[previousIndex] : null;
+      const isArrow = after?.value === "=>";
+      const isBodyHeader =
+        after?.value === "{" &&
+        previous?.type === "identifier" &&
+        !CONTROL_HEADER_KEYWORDS.has(previous.value);
+      if (isArrow || isBodyHeader) {
+        this.#collectBindings(raws, open + 1, close, bindings);
+      }
+    }
+    return bindings;
+  }
+
+  #collectBindings(
+    raws: RawToken[],
+    start: number,
+    end: number,
+    bindings: Set<number>,
+  ): void {
+    let i = this.#nextSigIndex(raws, start);
+    while (i < end) {
+      i = this.#parseBinding(raws, i, end, bindings);
+      i = this.#nextSigIndex(raws, i);
+      if (raws[i]?.value === ",") i = this.#nextSigIndex(raws, i + 1);
+      else if (i < end) i += 1;
+    }
+  }
+
+  #parseBinding(
+    raws: RawToken[],
+    index: number,
+    end: number,
+    bindings: Set<number>,
+  ): number {
+    let i = this.#nextSigIndex(raws, index);
+    if (i >= end) return i;
+    const token = raws[i];
+
+    if (token.type === "operator" && token.value === "...") {
+      return this.#parseBinding(raws, i + 1, end, bindings);
+    }
+    if (token.type === "punctuation" && token.value === "{") {
+      return this.#parseObjectBinding(raws, i, end, bindings);
+    }
+    if (token.type === "punctuation" && token.value === "[") {
+      return this.#parseArrayBinding(raws, i, end, bindings);
+    }
+    if (token.type === "identifier") {
+      bindings.add(i);
+      const next = this.#nextSigIndex(raws, i + 1);
+      if (raws[next]?.value === "=") {
+        return this.#skipDefault(raws, next + 1, end, new Set([",", ")"]));
+      }
+      return next;
+    }
+    return this.#skipDefault(raws, i + 1, end, new Set([",", ")"]));
+  }
+
+  #parseObjectBinding(
+    raws: RawToken[],
+    open: number,
+    end: number,
+    bindings: Set<number>,
+  ): number {
+    let i = this.#nextSigIndex(raws, open + 1);
+    while (i < end && raws[i].value !== "}") {
+      if (raws[i].type === "operator" && raws[i].value === "...") {
+        i = this.#parseBinding(raws, i + 1, end, bindings);
+      } else if (raws[i].value === "[") {
+        i = this.#skipBalanced(raws, i, end, "[", "]");
+        i = this.#nextSigIndex(raws, i);
+        if (raws[i]?.value === ":") {
+          i = this.#parseBinding(raws, i + 1, end, bindings);
+        }
+      } else if (raws[i].type === "identifier") {
+        const key = i;
+        const next = this.#nextSigIndex(raws, i + 1);
+        if (raws[next]?.value === ":") {
+          i = this.#parseBinding(raws, next + 1, end, bindings);
+        } else {
+          bindings.add(key);
+          i = raws[next]?.value === "="
+            ? this.#skipDefault(raws, next + 1, end, new Set([",", "}"]))
+            : next;
+        }
+      } else {
+        i += 1;
+      }
+      i = this.#nextSigIndex(raws, i);
+      if (raws[i]?.value === ",") i = this.#nextSigIndex(raws, i + 1);
+    }
+    return i < end ? i + 1 : i;
+  }
+
+  #parseArrayBinding(
+    raws: RawToken[],
+    open: number,
+    end: number,
+    bindings: Set<number>,
+  ): number {
+    let i = this.#nextSigIndex(raws, open + 1);
+    while (i < end && raws[i].value !== "]") {
+      if (raws[i].value === ",") {
+        i = this.#nextSigIndex(raws, i + 1);
+        continue;
+      }
+      i = this.#parseBinding(raws, i, end, bindings);
+      i = this.#nextSigIndex(raws, i);
+      if (raws[i]?.value === ",") i = this.#nextSigIndex(raws, i + 1);
+    }
+    return i < end ? i + 1 : i;
+  }
+
+  #skipDefault(
+    raws: RawToken[],
+    index: number,
+    end: number,
+    stops: Set<string>,
+  ): number {
+    let i = this.#nextSigIndex(raws, index);
+    let depth = 0;
+    while (i < end) {
+      const value = raws[i].value;
+      if (value === "(" || value === "[" || value === "{") depth += 1;
+      else if (value === ")" || value === "]" || value === "}") {
+        if (depth === 0 && stops.has(value)) return i;
+        depth = Math.max(0, depth - 1);
+      } else if (depth === 0 && stops.has(value)) {
+        return i;
+      }
+      i = this.#nextSigIndex(raws, i + 1);
+    }
+    return i;
+  }
+
+  #skipBalanced(
+    raws: RawToken[],
+    open: number,
+    end: number,
+    opening: string,
+    closing: string,
+  ): number {
+    let depth = 0;
+    let i = open;
+    while (i < end) {
+      if (raws[i].value === opening) depth += 1;
+      else if (raws[i].value === closing) {
+        depth -= 1;
+        if (depth === 0) return i + 1;
+      }
+      i += 1;
+    }
+    return i;
+  }
+
+  #previousSigIndex(raws: RawToken[], idx: number): number {
+    for (let i = idx; i >= 0; i--) {
+      if (raws[i].type !== WHITESPACE) return i;
+    }
+    return -1;
+  }
+
+  #nearestParameterContext(ctx: HighlightState): Context | null {
+    for (let i = ctx.contexts.length - 1; i >= 0; i--) {
+      if (ctx.contexts[i].kind === ContextKind.PARAMETERS) return ctx.contexts[i];
     }
     return null;
   }

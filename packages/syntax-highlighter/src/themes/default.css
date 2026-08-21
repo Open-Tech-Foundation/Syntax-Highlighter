@@ -1,0 +1,126 @@
+/* The default syntax theme — one file, both modes.
+ *
+ * Colors are declared as custom properties on :root and consumed by the
+ * ::highlight() rules below, so a mode switch is a property change, not a
+ * second stylesheet.
+ *
+ * Mode selection:
+ *   - automatic: follows `prefers-color-scheme`
+ *   - forced: set `data-sh-theme="light"` or `data-sh-theme="dark"` on <html>;
+ *     these rules come after the media query, so they win over it.
+ */
+
+:root {
+  --sh-comment: #6e7781;
+  --sh-keyword: #cf222e;
+  --sh-string: #0a3069;
+  --sh-number: #0550ae;
+  --sh-regex: #116329;
+  --sh-function: #8250df;
+  --sh-class: #953800;
+  --sh-variable: #24292f;
+  --sh-identifier: #24292f;
+  --sh-constant: #0550ae;
+  --sh-property: #116329;
+  --sh-parameter: #953800;
+  --sh-type: #953800;
+  --sh-operator: #0550ae;
+  --sh-punctuation: #24292f;
+  --sh-decorator: #953800;
+  --sh-boolean: #0550ae;
+  --sh-null: #0550ae;
+  --sh-tag: #116329;
+  --sh-attribute: #0550ae;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sh-comment: #7f848e;
+    --sh-keyword: #c678dd;
+    --sh-string: #98c379;
+    --sh-number: #d19a66;
+    --sh-regex: #56b6c2;
+    --sh-function: #61afef;
+    --sh-class: #e5c07b;
+    --sh-variable: #abb2bf;
+    --sh-identifier: #abb2bf;
+    --sh-constant: #d19a66;
+    --sh-property: #e06c75;
+    --sh-parameter: #d19a66;
+    --sh-type: #e5c07b;
+    --sh-operator: #56b6c2;
+    --sh-punctuation: #abb2bf;
+    --sh-decorator: #d19a66;
+    --sh-boolean: #d19a66;
+    --sh-null: #d19a66;
+    --sh-tag: #e06c75;
+    --sh-attribute: #d19a66;
+  }
+}
+
+:root[data-sh-theme="light"] {
+  --sh-comment: #6e7781;
+  --sh-keyword: #cf222e;
+  --sh-string: #0a3069;
+  --sh-number: #0550ae;
+  --sh-regex: #116329;
+  --sh-function: #8250df;
+  --sh-class: #953800;
+  --sh-variable: #24292f;
+  --sh-identifier: #24292f;
+  --sh-constant: #0550ae;
+  --sh-property: #116329;
+  --sh-parameter: #953800;
+  --sh-type: #953800;
+  --sh-operator: #0550ae;
+  --sh-punctuation: #24292f;
+  --sh-decorator: #953800;
+  --sh-boolean: #0550ae;
+  --sh-null: #0550ae;
+  --sh-tag: #116329;
+  --sh-attribute: #0550ae;
+}
+
+:root[data-sh-theme="dark"] {
+  --sh-comment: #7f848e;
+  --sh-keyword: #c678dd;
+  --sh-string: #98c379;
+  --sh-number: #d19a66;
+  --sh-regex: #56b6c2;
+  --sh-function: #61afef;
+  --sh-class: #e5c07b;
+  --sh-variable: #abb2bf;
+  --sh-identifier: #abb2bf;
+  --sh-constant: #d19a66;
+  --sh-property: #e06c75;
+  --sh-parameter: #d19a66;
+  --sh-type: #e5c07b;
+  --sh-operator: #56b6c2;
+  --sh-punctuation: #abb2bf;
+  --sh-decorator: #d19a66;
+  --sh-boolean: #d19a66;
+  --sh-null: #d19a66;
+  --sh-tag: #e06c75;
+  --sh-attribute: #d19a66;
+}
+
+::highlight(sh-comment) { color: var(--sh-comment); }
+::highlight(sh-keyword) { color: var(--sh-keyword); }
+::highlight(sh-string) { color: var(--sh-string); }
+::highlight(sh-number) { color: var(--sh-number); }
+::highlight(sh-regex) { color: var(--sh-regex); }
+::highlight(sh-function) { color: var(--sh-function); }
+::highlight(sh-class) { color: var(--sh-class); }
+::highlight(sh-variable) { color: var(--sh-variable); }
+::highlight(sh-identifier) { color: var(--sh-identifier); }
+::highlight(sh-constant) { color: var(--sh-constant); }
+::highlight(sh-property) { color: var(--sh-property); }
+::highlight(sh-parameter) { color: var(--sh-parameter); }
+::highlight(sh-type) { color: var(--sh-type); }
+::highlight(sh-operator) { color: var(--sh-operator); }
+::highlight(sh-punctuation) { color: var(--sh-punctuation); }
+::highlight(sh-decorator) { color: var(--sh-decorator); }
+::highlight(sh-boolean) { color: var(--sh-boolean); }
+::highlight(sh-null) { color: var(--sh-null); }
+::highlight(sh-tag) { color: var(--sh-tag); }
+::highlight(sh-attribute) { color: var(--sh-attribute); }

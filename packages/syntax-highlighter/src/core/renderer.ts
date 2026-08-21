@@ -1,11 +1,20 @@
 import { TokenType, WHITESPACE, type Token } from "./tokens.ts";
 
 const HIGHLIGHTABLE = new Set<string>(Object.values(TokenType));
+export const HIGHLIGHT_PREFIX = "sh-";
+
+const instances = new Set<HighlightRenderer>();
+const ownedHighlights = new Map<string, Highlight>();
+
+function highlightName(type: string): string {
+  return `${HIGHLIGHT_PREFIX}${type}`;
+}
 
 export class HighlightRenderer {
   element: HTMLElement;
   textNode: Text | null = null;
   supported: boolean;
+  #ranges = new Map<string, AbstractRange[]>();
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -14,9 +23,12 @@ export class HighlightRenderer {
       typeof CSS !== "undefined" &&
       !!CSS.highlights &&
       typeof globalThis.Highlight !== "undefined";
+    instances.add(this);
   }
 
   setText(text: string): void {
+    this.#ranges = new Map();
+    this.#apply();
     const node = document.createTextNode(text);
     this.element.textContent = "";
     this.element.appendChild(node);
@@ -38,14 +50,43 @@ export class HighlightRenderer {
       ranges.push(this.#range(token.start, token.end));
     }
 
-    CSS.highlights.clear();
-    for (const [type, ranges] of byType) {
-      CSS.highlights.set(type, new Highlight(...ranges));
-    }
+    this.#ranges = byType;
+    this.#apply();
   }
 
   clear(): void {
-    if (this.supported) CSS.highlights.clear();
+    this.#ranges = new Map();
+    this.#apply();
+  }
+
+  dispose(): void {
+    instances.delete(this);
+    this.#ranges = new Map();
+    this.#apply();
+  }
+
+  #apply(): void {
+    if (!this.supported) return;
+
+    const merged = new Map<string, AbstractRange[]>();
+    for (const instance of instances) {
+      for (const [type, ranges] of instance.#ranges) {
+        const combined = merged.get(type);
+        if (combined) combined.push(...ranges);
+        else merged.set(type, [...ranges]);
+      }
+    }
+
+    for (const [name, highlight] of ownedHighlights) {
+      if (CSS.highlights.get(name) === highlight) CSS.highlights.delete(name);
+      ownedHighlights.delete(name);
+    }
+    for (const [type, ranges] of merged) {
+      const name = highlightName(type);
+      const highlight = new Highlight(...ranges);
+      CSS.highlights.set(name, highlight);
+      ownedHighlights.set(name, highlight);
+    }
   }
 
   #range(start: number, end: number): AbstractRange {

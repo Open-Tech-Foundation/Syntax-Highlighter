@@ -112,6 +112,7 @@ const javascript: LanguageDefinition = {
     identifierStart: /[$_\p{ID_Start}]/u,
     identifierPart: /[$_\u200C\u200D\p{ID_Continue}]/u,
     regex: true,
+    regexAfterParenKeywords: ["if", "for", "while", "with", "switch", "catch"],
     shebang: true,
   },
 };

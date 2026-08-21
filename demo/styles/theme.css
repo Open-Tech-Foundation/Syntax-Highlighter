@@ -30,3 +30,26 @@
     --accent: #a5b4fc;
   }
 }
+
+/* Forced modes — set data-sh-theme on <html>. Declared after the media query,
+   so they win over it; same contract as the syntax theme's default.css. */
+
+:root[data-sh-theme="light"] {
+  color-scheme: light;
+
+  --paper: #fbfbfd;
+  --ink: #1a1a20;
+  --muted: #61616b;
+  --line: #e4e4e9;
+  --accent: #4f46e5;
+}
+
+:root[data-sh-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #111116;
+  --ink: #ededf2;
+  --muted: #9a9aa6;
+  --line: #2b2b35;
+  --accent: #a5b4fc;
+}

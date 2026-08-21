@@ -1,5 +1,5 @@
 import { assert, assertEquals, test } from "runtime:test";
-import { LEDE, LINKS, editHint } from "./page.ts";
+import { LEDE, LINKS, SAMPLES, editHint } from "./page.ts";
 
 test("the hint names the file it is pointing at", () => {
   assertEquals(editHint("src/main.ts"), "Edit src/main.ts and save.");
@@ -13,6 +13,13 @@ test("every link is absolute", () => {
   }
 });
 
-test("the page says what it was built with", () => {
-  assert(LEDE.includes("ES Runtime"), LEDE);
+test("the page says what it is for", () => {
+  assert(LEDE.includes("Playground"), LEDE);
+});
+
+test("every sample has a name and non-empty source", () => {
+  for (const sample of SAMPLES) {
+    assert(sample.name.length > 0, sample.name);
+    assert(sample.source.includes("\n"), sample.name);
+  }
 });

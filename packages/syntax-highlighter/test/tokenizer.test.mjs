@@ -1,4 +1,5 @@
 import { test, assert, assertEquals } from "runtime:test";
+import { Lexer } from "../src/core/lexer.ts";
 import { Tokenizer } from "../src/core/tokenizer.ts";
 import javascript from "../src/languages/javascript.ts";
 
@@ -189,6 +190,55 @@ test("call arguments are not mistaken for parameter names", () => {
   const src = "widget.render(target); log(count);";
   assertEquals(findToken(src, "target").type, "variable");
   assertEquals(findToken(src, "count").type, "variable");
+});
+
+test("destructured parameters and aliases are classified", () => {
+  const src = "function f({a, b: c = 1, ...rest}, [x]) { return a + c + rest.x + x; }";
+  assertEquals(findToken(src, "a", 0).type, "parameter");
+  assertEquals(findToken(src, "b").type, "property");
+  assertEquals(findToken(src, "c", 0).type, "parameter");
+  assertEquals(findToken(src, "rest", 0).type, "parameter");
+  assertEquals(findToken(src, "x", 0).type, "parameter");
+  assertEquals(findToken(src, "a", 1).type, "parameter");
+  assertEquals(findToken(src, "c", 1).type, "parameter");
+  assertEquals(findToken(src, "rest", 1).type, "parameter");
+  assertEquals(findToken(src, "x", 1).type, "property");
+  assertEquals(findToken(src, "x", 2).type, "parameter");
+});
+
+test("arrow functions with destructured parameters are classified", () => {
+  const src = "const f = ({value: v}, [first]) => v + first;";
+  assertEquals(findToken(src, "value").type, "property");
+  assertEquals(findToken(src, "v", 0).type, "parameter");
+  assertEquals(findToken(src, "first", 0).type, "parameter");
+  assertEquals(findToken(src, "v", 1).type, "parameter");
+  assertEquals(findToken(src, "first", 1).type, "parameter");
+});
+
+test("regex literals can follow control headers", () => {
+  assertEquals(findToken("if (ready) /re/.test(value);", "/re/").type, "regex");
+});
+
+test("private fields are treated as properties", () => {
+  const src = "class Counter { #count = 0; read() { return this.#count; } }";
+  assertEquals(findToken(src, "count", 0).type, "property");
+  assertEquals(findToken(src, "count", 1).type, "property");
+});
+
+test("custom string escape delimiters are honored", () => {
+  const lexer = new Lexer({
+    lex: { strings: [{ open: "'", close: "'", escape: "%" }] },
+  });
+  const source = "'left%\'right'";
+  const [token] = lexer.tokenize(source);
+  assertEquals(token.type, "string");
+  assertEquals(token.end, source.length);
+});
+
+test("unicode identifiers are scanned as complete code points", () => {
+  const src = "const 𝒜 = 1; 𝒜;";
+  assertEquals(findToken(src, "𝒜", 0).type, "variable");
+  assertEquals(findToken(src, "𝒜", 1).type, "variable");
 });
 
 test("multi-parameter arrow functions", () => {

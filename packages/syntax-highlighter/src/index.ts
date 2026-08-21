@@ -13,6 +13,7 @@ export type {
 } from "./core/lexer.ts";
 export { Highlighter } from "./core/highlighter.ts";
 export { HighlightRenderer } from "./core/renderer.ts";
+export { HIGHLIGHT_PREFIX } from "./core/renderer.ts";
 export { Tokenizer } from "./core/tokenizer.ts";
 export { Lexer } from "./core/lexer.ts";
 export {
@@ -29,6 +30,7 @@ export interface HighlightHandle {
   highlighter: Highlighter;
   renderer: HighlightRenderer;
   refresh(nextSource: string): void;
+  dispose(): void;
 }
 
 export async function createHighlighter({
@@ -49,15 +51,24 @@ export async function highlightElement(
   renderer.render(highlighter.highlight(source));
 
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let disposed = false;
   return {
     highlighter,
     renderer,
     refresh(nextSource: string) {
+      if (disposed) return;
       clearTimeout(timer);
       timer = setTimeout(() => {
+        if (disposed) return;
         renderer.setText(nextSource);
         renderer.render(highlighter.highlight(nextSource));
       }, 50);
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      clearTimeout(timer);
+      renderer.dispose();
     },
   };
 }

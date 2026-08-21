@@ -1,6 +1,7 @@
 {
   "name": "syntax-highlighter",
   "private": true,
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "build": "pnpm --filter @opentf/syntax-highlighter build",
     "test": "pnpm -r test",
