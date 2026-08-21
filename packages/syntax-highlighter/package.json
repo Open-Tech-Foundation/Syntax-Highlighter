@@ -1,0 +1,33 @@
+{
+  "name": "@opentf/syntax-highlighter",
+  "version": "0.1.0",
+  "description": "A JavaScript syntax highlighter built on the CSS Custom Highlight API.",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./themes/*": "./src/themes/*"
+  },
+  "files": [
+    "dist",
+    "src/themes"
+  ],
+  "scripts": {
+    "build": "esdev build --lib src --dts-bundle",
+    "test": "esdev test",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Open-Tech-Foundation/Syntax-Highlighter.git"
+  },
+  "keywords": [
+    "syntax-highlighter",
+    "css-custom-highlight-api",
+    "highlight"
+  ],
+  "license": "MIT"
+}

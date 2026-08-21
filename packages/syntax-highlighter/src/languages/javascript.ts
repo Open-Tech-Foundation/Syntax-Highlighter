@@ -1,0 +1,119 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const keywords = [
+  "as",
+  "async",
+  "await",
+  "break",
+  "case",
+  "catch",
+  "class",
+  "const",
+  "continue",
+  "debugger",
+  "default",
+  "delete",
+  "do",
+  "else",
+  "export",
+  "extends",
+  "finally",
+  "for",
+  "from",
+  "function",
+  "get",
+  "if",
+  "import",
+  "in",
+  "instanceof",
+  "let",
+  "new",
+  "of",
+  "return",
+  "set",
+  "static",
+  "super",
+  "switch",
+  "this",
+  "throw",
+  "try",
+  "typeof",
+  "var",
+  "void",
+  "while",
+  "with",
+  "yield",
+];
+
+const booleans = ["true", "false"];
+const nulls = ["null"];
+const constants = [
+  "undefined",
+  "NaN",
+  "Infinity",
+  "globalThis",
+  "console",
+  "Math",
+  "JSON",
+  "Promise",
+  "Symbol",
+];
+
+const regexKeywords = [
+  "return",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "new",
+  "delete",
+  "void",
+  "case",
+  "do",
+  "else",
+  "yield",
+  "await",
+  "throw",
+];
+
+const operators = [
+  "=>", "...", "?.", "??", "===", "!==",
+  "**=", "<<=", ">>=", ">>>=", "&&=", "||=", "??=",
+  "==", "!=", "<=", ">=", "&&", "||", "++", "--",
+  "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=",
+  "**", "<<", ">>", ">>>",
+  "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "<", ">", "?",
+];
+
+const punctuation = ["(", ")", "{", "}", "[", "]", ";", ",", ":", "."];
+
+const javascript: LanguageDefinition = {
+  name: "javascript",
+  aliases: ["js", "jsx", "mjs", "cjs"],
+
+  keywords,
+  booleans,
+  nulls,
+  constants,
+  regexKeywords,
+  operators,
+  punctuation,
+
+  lex: {
+    strings: [
+      { open: "'", close: "'", escape: "\\", multiline: false },
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "`", close: "`", escape: "\\", multiline: true, template: true },
+    ],
+    comments: [
+      { open: "//", close: "\n", line: true },
+      { open: "/*", close: "*/" },
+    ],
+    identifierStart: /[$_\p{ID_Start}]/u,
+    identifierPart: /[$_\u200C\u200D\p{ID_Continue}]/u,
+    regex: true,
+    shebang: true,
+  },
+};
+
+export default javascript;

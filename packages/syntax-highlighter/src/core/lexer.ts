@@ -1,0 +1,457 @@
+import { ParseMode } from "./state.ts";
+
+export type ScanNumberFn = (source: string, pos: number) => number;
+
+export interface StringDef {
+  open: string;
+  close: string;
+  escape?: string;
+  multiline?: boolean;
+  template?: boolean;
+}
+
+export interface CommentDef {
+  open: string;
+  close: string;
+  line?: boolean;
+}
+
+export interface LexDefinition {
+  strings?: StringDef[];
+  comments?: CommentDef[];
+  identifierStart?: RegExp;
+  identifierPart?: RegExp;
+  operators?: string[];
+  punctuation?: string[];
+  regex?: boolean;
+  shebang?: boolean;
+  scanNumber?: ScanNumberFn;
+}
+
+export interface LanguageDefinition {
+  name: string;
+  aliases?: string[];
+  keywords?: string[];
+  booleans?: string[];
+  nulls?: string[];
+  constants?: string[];
+  regexKeywords?: string[];
+  operators?: string[];
+  punctuation?: string[];
+  lex?: LexDefinition;
+}
+
+export type RawTokenType =
+  | "whitespace"
+  | "identifier"
+  | "number"
+  | "string"
+  | "regex"
+  | "comment"
+  | "decorator"
+  | "operator"
+  | "punctuation";
+
+export interface RawTokenDetail {
+  quote?: string;
+  unterminated?: boolean;
+  kind?: "line" | "block";
+  templateOpen?: boolean;
+  templateClose?: boolean;
+  unknown?: boolean;
+}
+
+export interface RawToken {
+  type: RawTokenType;
+  start: number;
+  end: number;
+  value: string;
+  detail?: RawTokenDetail;
+}
+
+const DEFAULT_IDENTIFIER_START = /[$_\p{ID_Start}]/u;
+const DEFAULT_IDENTIFIER_PART = /[$_\u200C\u200D\p{ID_Continue}]/u;
+
+function sortByLengthDesc(items: string[]): string[] {
+  return [...items].sort((a, b) => b.length - a.length);
+}
+
+function isDigit(ch: string): boolean {
+  return ch >= "0" && ch <= "9";
+}
+
+function isHexDigit(ch: string): boolean {
+  return isDigit(ch) || (ch >= "a" && ch <= "f") || (ch >= "A" && ch <= "F");
+}
+
+function isAlpha(ch: string): boolean {
+  return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
+}
+
+function isWhitespaceChar(ch: string): boolean {
+  return (
+    ch === " " ||
+    ch === "\t" ||
+    ch === "\n" ||
+    ch === "\r" ||
+    ch === "\f" ||
+    ch === "\v" ||
+    ch === "\u00a0" ||
+    ch === "\ufeff"
+  );
+}
+
+export function defaultScanNumber(source: string, pos: number): number {
+  const len = source.length;
+  let i = pos;
+  const eat = (pred: (c: string) => boolean) => {
+    while (i < len && (pred(source[i]) || source[i] === "_")) i += 1;
+  };
+
+  if (source[i] === "0" && i + 1 < len) {
+    const marker = source[i + 1];
+    const radixPred =
+      marker === "x" || marker === "X"
+        ? isHexDigit
+        : marker === "o" || marker === "O"
+          ? (c: string) => c >= "0" && c <= "7"
+          : marker === "b" || marker === "B"
+            ? (c: string) => c === "0" || c === "1"
+            : null;
+    if (radixPred) {
+      i += 2;
+      eat(radixPred);
+      if (source[i] === "n") i += 1;
+      return i;
+    }
+  }
+
+  eat(isDigit);
+  if (source[i] === ".") {
+    i += 1;
+    eat(isDigit);
+  }
+  if (source[i] === "e" || source[i] === "E") {
+    const save = i;
+    i += 1;
+    if (source[i] === "+" || source[i] === "-") i += 1;
+    if (isDigit(source[i])) eat(isDigit);
+    else i = save;
+  }
+  if (source[i] === "n") i += 1;
+  return i;
+}
+
+export function modeOf(raw: RawToken): ParseMode {
+  switch (raw.type) {
+    case "string":
+      if (raw.detail?.quote === "`") return ParseMode.TEMPLATE;
+      return raw.detail?.quote === "'" ? ParseMode.STRING_SINGLE : ParseMode.STRING_DOUBLE;
+    case "comment":
+      return raw.detail?.kind === "block" ? ParseMode.BLOCK_COMMENT : ParseMode.LINE_COMMENT;
+    case "regex":
+      return ParseMode.REGEX;
+    default:
+      return ParseMode.NORMAL;
+  }
+}
+
+export class Lexer {
+  strings: StringDef[];
+  comments: CommentDef[];
+  identifierStart: RegExp;
+  identifierPart: RegExp;
+  operators: string[];
+  punctuation: string[];
+  regexEnabled: boolean;
+  shebang: boolean;
+  scanNumber: ScanNumberFn;
+  regexKeywords: Set<string>;
+  stringOpeners: Map<string, StringDef>;
+
+  source = "";
+  length = 0;
+  tokens: RawToken[] = [];
+  prev: RawToken | null = null;
+  pos = 0;
+
+  constructor(language: Partial<LanguageDefinition> = {}) {
+    const lex = language.lex ?? {};
+    this.strings = lex.strings ?? [];
+    this.comments = (lex.comments ?? [])
+      .slice()
+      .sort((a, b) => b.open.length - a.open.length);
+    this.identifierStart = lex.identifierStart ?? DEFAULT_IDENTIFIER_START;
+    this.identifierPart = lex.identifierPart ?? DEFAULT_IDENTIFIER_PART;
+    this.operators = sortByLengthDesc(lex.operators ?? language.operators ?? []);
+    this.punctuation = sortByLengthDesc(
+      lex.punctuation ?? language.punctuation ?? [],
+    );
+    this.regexEnabled = lex.regex !== false;
+    this.shebang = lex.shebang === true;
+    this.scanNumber = lex.scanNumber ?? defaultScanNumber;
+    this.regexKeywords = new Set(language.regexKeywords ?? []);
+    this.stringOpeners = new Map();
+    for (const def of this.strings) this.stringOpeners.set(def.open[0], def);
+  }
+
+  tokenize(source: string): RawToken[] {
+    this.source = source;
+    this.length = source.length;
+    this.tokens = [];
+    this.prev = null;
+    this.pos = 0;
+
+    if (this.shebang && source.startsWith("#!")) {
+      let end = source.indexOf("\n");
+      if (end === -1) end = this.length;
+      this.emit("comment", 0, end, { kind: "line" });
+      this.pos = end;
+    }
+
+    this.scanCode(false);
+    return this.tokens;
+  }
+
+  emit(type: RawTokenType, start: number, end: number, detail?: RawTokenDetail): void {
+    const token: RawToken = {
+      type,
+      start,
+      end,
+      value: this.source.slice(start, end),
+      detail,
+    };
+    if (type !== "whitespace") this.prev = token;
+    this.tokens.push(token);
+  }
+
+  matchList(list: string[]): string | null {
+    for (const item of list) {
+      if (item && this.source.startsWith(item, this.pos)) return item;
+    }
+    return null;
+  }
+
+  matchCommentOpen(): CommentDef | null {
+    for (const def of this.comments) {
+      if (this.source.startsWith(def.open, this.pos)) return def;
+    }
+    return null;
+  }
+
+  regexAllowed(): boolean {
+    const p = this.prev;
+    if (!p) return true;
+    switch (p.type) {
+      case "number":
+      case "string":
+      case "regex":
+        return false;
+      case "identifier":
+        return this.regexKeywords.has(p.value);
+      case "operator":
+        return true;
+      case "punctuation":
+        return p.value !== ")" && p.value !== "]" && p.value !== "}";
+      default:
+        return true;
+    }
+  }
+
+  tryScanRegex(): boolean {
+    const s = this.source;
+    const start = this.pos;
+    let i = this.pos + 1;
+    let inClass = false;
+    while (i < this.length) {
+      const c = s[i];
+      if (c === "\\") {
+        i += 2;
+        continue;
+      }
+      if (c === "\n") return false;
+      if (inClass) {
+        if (c === "]") inClass = false;
+      } else if (c === "[") {
+        inClass = true;
+      } else if (c === "/") {
+        i += 1;
+        while (i < this.length && isAlpha(s[i])) i += 1;
+        this.pos = i;
+        this.emit("regex", start, i);
+        return true;
+      }
+      i += 1;
+    }
+    return false;
+  }
+
+  scanString(def: StringDef): void {
+    const s = this.source;
+    const start = this.pos;
+    this.pos += def.open.length;
+    while (this.pos < this.length) {
+      const c = s[this.pos];
+      if (c === "\\") {
+        this.pos += 2;
+        continue;
+      }
+      if (!def.multiline && c === "\n") break;
+      if (s.startsWith(def.close, this.pos)) {
+        this.pos += def.close.length;
+        this.emit("string", start, this.pos, { quote: def.open });
+        return;
+      }
+      this.pos += 1;
+    }
+    this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+  }
+
+  scanTemplate(def: StringDef): void {
+    const s = this.source;
+    let start = this.pos;
+    this.pos += def.open.length;
+    for (;;) {
+      if (this.pos >= this.length) {
+        this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+        return;
+      }
+      const c = s[this.pos];
+      if (c === "\\") {
+        this.pos += 2;
+        continue;
+      }
+      if (s.startsWith(def.close, this.pos)) {
+        this.pos += def.close.length;
+        this.emit("string", start, this.pos, { quote: def.open });
+        return;
+      }
+      if (c === "$" && s[this.pos + 1] === "{") {
+        this.emit("string", start, this.pos, { quote: def.open });
+        const open = this.pos;
+        this.pos += 2;
+        this.emit("punctuation", open, this.pos, { templateOpen: true });
+        this.scanCode(true);
+        start = this.pos;
+        continue;
+      }
+      this.pos += 1;
+    }
+  }
+
+  scanLineComment(def: CommentDef): void {
+    const start = this.pos;
+    const end = this.source.indexOf(def.close, this.pos + def.open.length);
+    const stop = end === -1 ? this.length : end;
+    this.pos = stop;
+    this.emit("comment", start, stop, { kind: "line" });
+  }
+
+  scanBlockComment(def: CommentDef): void {
+    const start = this.pos;
+    const end = this.source.indexOf(def.close, this.pos + def.open.length);
+    if (end === -1) {
+      this.pos = this.length;
+      this.emit("comment", start, this.length, { kind: "block", unterminated: true });
+      return;
+    }
+    this.pos = end + def.close.length;
+    this.emit("comment", start, this.pos, { kind: "block" });
+  }
+
+  scanCode(untilTemplateClose: boolean): void {
+    const s = this.source;
+    let depth = 0;
+    while (this.pos < this.length) {
+      const start = this.pos;
+      const ch = s[this.pos];
+
+      if (isWhitespaceChar(ch)) {
+        let i = this.pos + 1;
+        while (i < this.length && isWhitespaceChar(s[i])) i += 1;
+        this.emit("whitespace", start, i);
+        this.pos = i;
+        continue;
+      }
+
+      if (this.identifierStart.test(ch)) {
+        let i = this.pos + 1;
+        while (i < this.length && this.identifierPart.test(s[i])) i += 1;
+        this.emit("identifier", start, i);
+        this.pos = i;
+        continue;
+      }
+
+      if (isDigit(ch) || (ch === "." && isDigit(s[this.pos + 1]))) {
+        const end = this.scanNumber(s, this.pos);
+        if (end > this.pos) {
+          this.emit("number", start, end);
+          this.pos = end;
+          continue;
+        }
+      }
+
+      const strDef = this.stringOpeners.get(ch);
+      if (strDef) {
+        if (strDef.template) this.scanTemplate(strDef);
+        else this.scanString(strDef);
+        continue;
+      }
+
+      const commentDef = this.matchCommentOpen();
+      if (commentDef) {
+        if (commentDef.line) this.scanLineComment(commentDef);
+        else this.scanBlockComment(commentDef);
+        continue;
+      }
+
+      if (this.regexEnabled && ch === "/" && this.regexAllowed() && this.tryScanRegex()) {
+        continue;
+      }
+
+      if (ch === "@" && this.identifierStart.test(s[this.pos + 1] ?? "")) {
+        let i = this.pos + 1;
+        while (i < this.length && this.identifierPart.test(s[i])) i += 1;
+        this.emit("decorator", start, i);
+        this.pos = i;
+        continue;
+      }
+
+      if (ch === "{") {
+        if (untilTemplateClose) depth += 1;
+        this.pos += 1;
+        this.emit("punctuation", start, this.pos);
+        continue;
+      }
+
+      if (ch === "}") {
+        if (untilTemplateClose && depth === 0) {
+          this.pos += 1;
+          this.emit("punctuation", start, this.pos, { templateClose: true });
+          return;
+        }
+        if (untilTemplateClose) depth -= 1;
+        this.pos += 1;
+        this.emit("punctuation", start, this.pos);
+        continue;
+      }
+
+      const op = this.matchList(this.operators);
+      if (op) {
+        this.pos += op.length;
+        this.emit("operator", start, this.pos);
+        continue;
+      }
+
+      const punc = this.matchList(this.punctuation);
+      if (punc) {
+        this.pos += punc.length;
+        this.emit("punctuation", start, this.pos);
+        continue;
+      }
+
+      this.pos += 1;
+      this.emit("punctuation", start, this.pos, { unknown: true });
+    }
+  }
+}
