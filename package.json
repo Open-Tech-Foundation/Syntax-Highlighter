@@ -1,9 +1,11 @@
 {
   "name": "syntax-highlighter",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "scripts": {
+    "build": "pnpm --filter @opentf/syntax-highlighter build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
   "devDependencies": {
     "typescript": "^7.0.2"
   }
