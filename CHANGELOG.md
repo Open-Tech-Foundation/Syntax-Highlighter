@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added AGENTS.md with contribution rules for AI coding agents.
+
 ### Changed
 
 - Rewrote the README in the Open Tech Foundation house style (centered header, tagline, license section).
