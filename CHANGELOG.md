@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Redesigned the demo as an IDE-style workbench: a title bar with an editor tab, an activity bar, an editor with a line-number gutter and horizontal scrolling, a tabbed bottom panel for tokens and custom languages, and a status bar.
 - Fixed destructured parameters, private fields, Unicode identifiers, custom string escapes, and regex literals after JavaScript control headers.
 - Namespaced CSS highlights under `sh-*`, preserving unrelated page highlights; renderer text replacement now clears stale ranges, and public highlight handles support disposal.
 - Added `@opentf/esrun-types` to the library development dependencies and documented the esdev/pnpm development workflow.
