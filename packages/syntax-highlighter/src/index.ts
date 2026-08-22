@@ -12,9 +12,11 @@ export type {
   RawToken,
 } from "./core/lexer.ts";
 export { Highlighter } from "./core/highlighter.ts";
+export type { TokenizerLike } from "./core/highlighter.ts";
 export { HighlightRenderer } from "./core/renderer.ts";
 export { HIGHLIGHT_PREFIX } from "./core/renderer.ts";
 export { Tokenizer } from "./core/tokenizer.ts";
+export { GenericTokenizer } from "./core/generic-tokenizer.ts";
 export { Lexer } from "./core/lexer.ts";
 export {
   registerLanguage,

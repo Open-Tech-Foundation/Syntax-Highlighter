@@ -90,6 +90,7 @@ const punctuation = ["(", ")", "{", "}", "[", "]", ";", ",", ":", "."];
 const javascript: LanguageDefinition = {
   name: "javascript",
   aliases: ["js", "jsx", "mjs", "cjs"],
+  semantic: "javascript",
 
   keywords,
   booleans,

@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added unit tests covering `GenericTokenizer` and the `Highlighter` dispatch it hangs off.
+- Added `GenericTokenizer`, a language-agnostic classifier, and a `semantic` field on language definitions selecting between it and the JavaScript-specific `Tokenizer`. Definitions default to `generic`, so a registered custom language no longer has JavaScript's arrow, class, import and parameter semantics applied to it.
 - Added runtime validation and focused registry/renderer tests for custom language definitions and CSS highlight lifecycle behavior.
 - Added an esdev-scaffolded vanilla demo site under `demo/` that highlights a live code sample from the workspace package.
 - Set up a Bun workspace with an `@opentf/syntax-highlighter` package under `packages/`.
