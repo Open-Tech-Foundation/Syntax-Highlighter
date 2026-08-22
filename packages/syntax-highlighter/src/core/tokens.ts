@@ -5,7 +5,6 @@ export interface TokenTypeConst {
   readonly CLASS: "class";
   readonly PARAMETER: "parameter";
   readonly PROPERTY: "property";
-  readonly TYPE: "type";
   readonly VARIABLE: "variable";
   readonly CONSTANT: "constant";
   readonly NUMBER: "number";
@@ -17,8 +16,6 @@ export interface TokenTypeConst {
   readonly DECORATOR: "decorator";
   readonly BOOLEAN: "boolean";
   readonly NULL: "null";
-  readonly TAG: "tag";
-  readonly ATTRIBUTE: "attribute";
 }
 
 export const TokenType: TokenTypeConst = Object.freeze({
@@ -28,7 +25,6 @@ export const TokenType: TokenTypeConst = Object.freeze({
   CLASS: "class",
   PARAMETER: "parameter",
   PROPERTY: "property",
-  TYPE: "type",
   VARIABLE: "variable",
   CONSTANT: "constant",
   NUMBER: "number",
@@ -40,8 +36,6 @@ export const TokenType: TokenTypeConst = Object.freeze({
   DECORATOR: "decorator",
   BOOLEAN: "boolean",
   NULL: "null",
-  TAG: "tag",
-  ATTRIBUTE: "attribute",
 });
 
 export type TokenType = TokenTypeConst[keyof TokenTypeConst];

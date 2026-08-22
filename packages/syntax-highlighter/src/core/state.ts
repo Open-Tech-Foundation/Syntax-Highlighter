@@ -1,27 +1,5 @@
 import type { Token } from "./tokens.ts";
 
-export interface ParseModeConst {
-  readonly NORMAL: "NORMAL";
-  readonly STRING_SINGLE: "STRING_SINGLE";
-  readonly STRING_DOUBLE: "STRING_DOUBLE";
-  readonly TEMPLATE: "TEMPLATE";
-  readonly LINE_COMMENT: "LINE_COMMENT";
-  readonly BLOCK_COMMENT: "BLOCK_COMMENT";
-  readonly REGEX: "REGEX";
-}
-
-export const ParseMode: ParseModeConst = Object.freeze({
-  NORMAL: "NORMAL",
-  STRING_SINGLE: "STRING_SINGLE",
-  STRING_DOUBLE: "STRING_DOUBLE",
-  TEMPLATE: "TEMPLATE",
-  LINE_COMMENT: "LINE_COMMENT",
-  BLOCK_COMMENT: "BLOCK_COMMENT",
-  REGEX: "REGEX",
-});
-
-export type ParseMode = ParseModeConst[keyof ParseModeConst];
-
 export interface ExpectationConst {
   readonly NONE: null;
   readonly FUNCTION_NAME: "EXPECT_FUNCTION_NAME";
@@ -89,7 +67,6 @@ export function createContext(
 }
 
 export interface HighlightState {
-  mode: ParseMode;
   contexts: Context[];
   expectation: Expectation;
   previousToken: Token | null;
@@ -104,7 +81,6 @@ export interface HighlightState {
 
 export function createState(): HighlightState {
   return {
-    mode: ParseMode.NORMAL,
     contexts: [],
     expectation: Expectation.NONE,
     previousToken: null,

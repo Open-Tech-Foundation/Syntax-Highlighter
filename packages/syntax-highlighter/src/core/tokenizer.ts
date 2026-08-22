@@ -39,12 +39,13 @@ const CONTROL_HEADER_KEYWORDS = new Set([
 ]);
 
 export class Tokenizer {
-  language: LanguageDefinition;
-  lexer: Lexer;
-  keywords: Set<string>;
-  booleans: Set<string>;
-  nulls: Set<string>;
-  constants: Set<string>;
+  readonly language: LanguageDefinition;
+  private lexer: Lexer;
+  private keywords: Set<string>;
+  private booleans: Set<string>;
+  private nulls: Set<string>;
+  private constants: Set<string>;
+  #sigIndex: Int32Array = new Int32Array(1);
 
   constructor(language: LanguageDefinition) {
     this.language = language;
@@ -57,10 +58,10 @@ export class Tokenizer {
 
   tokenize(source: string): Token[] {
     const raws = this.lexer.tokenize(source);
+    this.#buildSigIndex(raws);
     const ctx = createState();
     const out: Token[] = [];
-    const parens = this.#matchParens(raws);
-    const parameterBindings = this.#findParameterBindings(raws, parens);
+    const { parens, parameterBindings } = this.#analyze(raws);
 
     for (let i = 0; i < raws.length; i++) {
       out.push(
@@ -98,8 +99,7 @@ export class Tokenizer {
       ctx.functionName = null;
     }
 
-    const isArrow =
-      raw.type === "operator" && src.slice(raw.start, raw.end) === "=>";
+    const isArrow = raw.type === "operator" && raw.value === "=>";
     if (!isArrow) ctx.afterArrow = false;
 
     const ch = src[raw.start];
@@ -141,7 +141,7 @@ export class Tokenizer {
     }
 
     ctx.previousToken = tok;
-    ctx.previousValue = src.slice(raw.start, raw.end);
+    ctx.previousValue = raw.value;
     return tok;
   }
 
@@ -153,7 +153,7 @@ export class Tokenizer {
     src: string,
     parameterBindings: Set<number>,
   ): Token {
-    const val = src.slice(raw.start, raw.end);
+    const val = raw.value;
 
     if (parameterBindings.has(idx)) {
       const params = this.#nearestParameterContext(ctx);
@@ -242,7 +242,7 @@ export class Tokenizer {
   }
 
   #operator(raw: RawToken, ctx: HighlightState, out: Token[], src: string): Token {
-    const op = src.slice(raw.start, raw.end);
+    const op = raw.value;
 
     if (op === "=>") {
       ctx.afterArrow = true;
@@ -542,42 +542,78 @@ export class Tokenizer {
     return ctx.contexts[ctx.contexts.length - 1] ?? null;
   }
 
-  #nextSig(raws: RawToken[], idx: number): RawToken | null {
-    for (let i = idx + 1; i < raws.length; i++) {
-      if (raws[i].type !== WHITESPACE) return raws[i];
+  /**
+   * `#sigIndex[i]` is the first index >= i holding a significant token —
+   * neither whitespace nor a comment — or `raws.length` when there is none.
+   * Built once per tokenize() so lookahead is O(1) rather than a fresh scan
+   * per identifier, and so a comment between two tokens is transparent
+   * (`foo /* c *\/ ()` still reads as a call).
+   */
+  #buildSigIndex(raws: RawToken[]): void {
+    const next = new Int32Array(raws.length + 1);
+    next[raws.length] = raws.length;
+    for (let i = raws.length - 1; i >= 0; i--) {
+      const type = raws[i].type;
+      next[i] = type === WHITESPACE || type === "comment" ? next[i + 1]! : i;
     }
-    return null;
+    this.#sigIndex = next;
+  }
+
+  #nextSig(raws: RawToken[], idx: number): RawToken | null {
+    const i = this.#sigIndex[idx + 1] ?? raws.length;
+    return i < raws.length ? raws[i] : null;
   }
 
   #nextSigIndex(raws: RawToken[], idx: number): number {
-    for (let i = idx; i < raws.length; i++) {
-      if (raws[i].type !== WHITESPACE) return i;
-    }
-    return raws.length;
+    return this.#sigIndex[idx] ?? raws.length;
   }
 
-  #findParameterBindings(
-    raws: RawToken[],
-    parens: Map<number, number>,
-  ): Set<number> {
-    const bindings = new Set<number>();
-    for (let open = 0; open < raws.length; open++) {
-      if (raws[open].type !== "punctuation" || raws[open].value !== "(") continue;
-      const close = parens.get(open);
-      if (close == null) continue;
-      const after = this.#nextSig(raws, close);
-      const previousIndex = this.#previousSigIndex(raws, open - 1);
-      const previous = previousIndex >= 0 ? raws[previousIndex] : null;
-      const isArrow = after?.value === "=>";
-      const isBodyHeader =
-        after?.value === "{" &&
-        previous?.type === "identifier" &&
-        !CONTROL_HEADER_KEYWORDS.has(previous.value);
-      if (isArrow || isBodyHeader) {
-        this.#collectBindings(raws, open + 1, close, bindings);
+  #analyze(raws: RawToken[]): {
+    parens: Map<number, number>;
+    parameterBindings: Set<number>;
+  } {
+    const parens = new Map<number, number>();
+    const parameterBindings = new Set<number>();
+    const stack: number[] = [];
+    const prevStack: number[] = [];
+    let prevSig = -1;
+
+    for (let i = 0; i < raws.length; i++) {
+      const raw = raws[i];
+      if (raw.type === "whitespace") continue;
+      if (raw.type !== "punctuation") {
+        prevSig = i;
+        continue;
       }
+      if (raw.value === "(") {
+        stack.push(i);
+        prevStack.push(prevSig);
+        prevSig = i;
+        continue;
+      }
+      if (raw.value === ")") {
+        const open = stack.pop();
+        const prevAtOpen = prevStack.pop();
+        if (open != null && prevAtOpen !== undefined) {
+          parens.set(open, i);
+          const after = this.#nextSig(raws, i);
+          const previous = prevAtOpen >= 0 ? raws[prevAtOpen] : null;
+          const isArrow = after?.value === "=>";
+          const isBodyHeader =
+            after?.value === "{" &&
+            previous?.type === "identifier" &&
+            !CONTROL_HEADER_KEYWORDS.has(previous.value);
+          if (isArrow || isBodyHeader) {
+            this.#collectBindings(raws, open + 1, i, parameterBindings);
+          }
+        }
+        prevSig = i;
+        continue;
+      }
+      prevSig = i;
     }
-    return bindings;
+
+    return { parens, parameterBindings };
   }
 
   #collectBindings(
@@ -722,33 +758,11 @@ export class Tokenizer {
     return i;
   }
 
-  #previousSigIndex(raws: RawToken[], idx: number): number {
-    for (let i = idx; i >= 0; i--) {
-      if (raws[i].type !== WHITESPACE) return i;
-    }
-    return -1;
-  }
-
   #nearestParameterContext(ctx: HighlightState): Context | null {
     for (let i = ctx.contexts.length - 1; i >= 0; i--) {
       if (ctx.contexts[i].kind === ContextKind.PARAMETERS) return ctx.contexts[i];
     }
     return null;
-  }
-
-  #matchParens(raws: RawToken[]): Map<number, number> {
-    const m = new Map<number, number>();
-    const s: number[] = [];
-    for (let i = 0; i < raws.length; i++) {
-      if (raws[i].type !== "punctuation") continue;
-      const p = raws[i].value;
-      if (p === "(") s.push(i);
-      else if (p === ")" && s.length) {
-        const open = s.pop();
-        if (open != null) m.set(open, i);
-      }
-    }
-    return m;
   }
 }
 

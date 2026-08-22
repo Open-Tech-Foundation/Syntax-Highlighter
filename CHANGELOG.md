@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Token lookahead in the tokenizer is precomputed once per `tokenize()`: O(1) per identifier instead of a rescan, and comments are transparent to it, so `greet /* who */ ()` reads as a call.
 - Redesigned the demo as an IDE-style workbench: a title bar with an editor tab, an activity bar, an editor with a line-number gutter and horizontal scrolling, a tabbed bottom panel for tokens and custom languages, and a status bar.
 - Fixed destructured parameters, private fields, Unicode identifiers, custom string escapes, and regex literals after JavaScript control headers.
 - Namespaced CSS highlights under `sh-*`, preserving unrelated page highlights; renderer text replacement now clears stale ranges, and public highlight handles support disposal.
@@ -27,3 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Consolidated the themes into a single `themes/default.css` driven by custom properties: follows `prefers-color-scheme` automatically, with `data-sh-theme="light"|"dark"` on `<html>` to force a mode; the separate dark/light files are gone.
 - Made `HighlightRenderer` safe to run multiple instances on one page: renderers now merge their ranges into the shared `CSS.highlights` registry instead of clearing it, and `dispose()` removes an instance.
 - Rebuilt the demo site as a developer playground: overlay editor with live highlighting, token stream inspector, sample snippets, dark/light theme switching via bundled theme stylesheets, and live registration of custom language definitions (JSON).
+
+### Fixed
+
+- Fixed five type errors in `lexer.ts`: `ScanFrame` was missing the `resumeTemplate` field the scanner already used. `esdev build` does not typecheck, so these never failed the build.
+- Fixed a template-literal scan bug that swallowed the rest of the source. A template chunk stayed on the scan stack after handing control to its `${...}`, so once the interpolation closed the abandoned frame re-scanned everything that followed as one unterminated string. Any source containing a template literal was affected.

@@ -171,6 +171,41 @@ test("offsets are exact", () => {
   assertEquals(src.slice(tok.start, tok.end), "hello");
 });
 
+test("code after a template literal is not swallowed by it", () => {
+  // A template chunk used to stay on the scan stack after handing control to
+  // its `${...}`, so the abandoned frame re-scanned everything that followed
+  // as one unterminated string.
+  const src = "const a = `x${ y }z`;\nconst b = 1;";
+  assertEquals(findToken(src, "b").type, "variable");
+  assertEquals(findToken(src, "1").type, "number");
+  assertEquals(
+    types(src).filter((t) => t === "string").length,
+    2,
+    "one chunk before the hole and one after",
+  );
+});
+
+test("deeply nested template interpolation does not overflow", () => {
+  const src = "`" + "${`".repeat(500) + "x" + "`}".repeat(500) + "`";
+  const all = tokenizer.tokenize(src);
+  let pos = 0;
+  for (const t of all) {
+    assertEquals(t.start, pos);
+    pos = t.end;
+  }
+  assertEquals(pos, src.length);
+});
+
+test("comments are transparent to lookahead", () => {
+  assertEquals(findToken("greet /* who */ ()", "greet").type, "function");
+  assertEquals(
+    findToken("function f() /* body */ { return 1; }", "f").type,
+    "function",
+  );
+  const src = "const o = { a /* key */ : 1 };";
+  assertEquals(findToken(src, "a").type, "property");
+});
+
 test("tokens cover the whole source contiguously", () => {
   const src = "const a=1;/*c*/let b=`t${b}s`;// x\n";
   const all = tokenizer.tokenize(src);

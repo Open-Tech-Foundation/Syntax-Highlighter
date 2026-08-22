@@ -1,5 +1,3 @@
-import { ParseMode } from "./state.ts";
-
 export type ScanNumberFn = (source: string, pos: number) => number;
 
 export interface StringDef {
@@ -39,6 +37,8 @@ export interface LanguageDefinition {
   regexKeywords?: string[];
   operators?: string[];
   punctuation?: string[];
+  /** Semantic classifier. Defaults to `generic`; JavaScript opts into `javascript`. */
+  semantic?: "javascript" | "generic";
   lex?: LexDefinition;
 }
 
@@ -112,6 +112,29 @@ function matches(re: RegExp, value: string): boolean {
   return re.test(value);
 }
 
+/** Index a list of tokens by their first character, longest-first. */
+function indexByFirstChar(items: string[]): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const item of items) {
+    if (!item) continue;
+    const ch = item[0];
+    const arr = map.get(ch);
+    if (arr) arr.push(item);
+    else map.set(ch, [item]);
+  }
+  for (const arr of map.values()) arr.sort((a, b) => b.length - a.length);
+  return map;
+}
+
+/** Compile `identifierStart identifierPart*` into a single sticky regex. */
+function buildIdentifierRe(start: RegExp, part: RegExp): RegExp {
+  const flags = new Set([...start.flags, ...part.flags]);
+  flags.delete("g");
+  flags.add("u");
+  flags.add("y");
+  return new RegExp(`(?:${start.source})(?:${part.source})*`, [...flags].sort().join(""));
+}
+
 export function defaultScanNumber(source: string, pos: number): number {
   const len = source.length;
   let i = pos;
@@ -153,18 +176,14 @@ export function defaultScanNumber(source: string, pos: number): number {
   return i;
 }
 
-export function modeOf(raw: RawToken): ParseMode {
-  switch (raw.type) {
-    case "string":
-      if (raw.detail?.quote === "`") return ParseMode.TEMPLATE;
-      return raw.detail?.quote === "'" ? ParseMode.STRING_SINGLE : ParseMode.STRING_DOUBLE;
-    case "comment":
-      return raw.detail?.kind === "block" ? ParseMode.BLOCK_COMMENT : ParseMode.LINE_COMMENT;
-    case "regex":
-      return ParseMode.REGEX;
-    default:
-      return ParseMode.NORMAL;
-  }
+interface ScanFrame {
+  kind: "code" | "template";
+  untilClose?: boolean;
+  depth?: number;
+  def?: StringDef;
+  start?: number;
+  /** For an interpolation frame: the template to resume once it closes. */
+  resumeTemplate?: StringDef;
 }
 
 export class Lexer {
@@ -179,15 +198,19 @@ export class Lexer {
   shebang: boolean;
   scanNumber: ScanNumberFn;
   regexKeywords: Set<string>;
-  stringOpeners: Map<string, StringDef[]>;
 
-  source = "";
-  length = 0;
-  tokens: RawToken[] = [];
-  prev: RawToken | null = null;
-  pos = 0;
-  parenControls: boolean[] = [];
-  lastClosedControlParen = false;
+  private stringOpeners: Map<string, StringDef[]>;
+  private operatorByChar: Map<string, string[]>;
+  private punctuationByChar: Map<string, string[]>;
+  private identifierRe: RegExp;
+
+  private source = "";
+  private length = 0;
+  private tokens: RawToken[] = [];
+  private prev: RawToken | null = null;
+  private pos = 0;
+  private parenControls: boolean[] = [];
+  private lastClosedControlParen = false;
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
@@ -206,6 +229,7 @@ export class Lexer {
     this.shebang = lex.shebang === true;
     this.scanNumber = lex.scanNumber ?? defaultScanNumber;
     this.regexKeywords = new Set(language.regexKeywords ?? []);
+
     this.stringOpeners = new Map();
     for (const def of this.strings) {
       if (!def.open) continue;
@@ -216,9 +240,25 @@ export class Lexer {
     for (const defs of this.stringOpeners.values()) {
       defs.sort((a, b) => b.open.length - a.open.length);
     }
+
+    this.operatorByChar = indexByFirstChar(this.operators);
+    this.punctuationByChar = indexByFirstChar(this.punctuation);
+    this.identifierRe = buildIdentifierRe(this.identifierStart, this.identifierPart);
   }
 
   tokenize(source: string): RawToken[] {
+    // Snapshot the mutable scan state so tokenize() is re-entrant: a custom
+    // scanNumber callback (or any future re-entrant path) can call tokenize()
+    // again without corrupting the outer scan.
+    const saved = {
+      source: this.source,
+      length: this.length,
+      tokens: this.tokens,
+      prev: this.prev,
+      pos: this.pos,
+      parenControls: this.parenControls,
+      lastClosedControlParen: this.lastClosedControlParen,
+    };
     this.source = source;
     this.length = source.length;
     this.tokens = [];
@@ -227,15 +267,25 @@ export class Lexer {
     this.parenControls = [];
     this.lastClosedControlParen = false;
 
-    if (this.shebang && source.startsWith("#!")) {
-      let end = source.indexOf("\n");
-      if (end === -1) end = this.length;
-      this.emit("comment", 0, end, { kind: "line" });
-      this.pos = end;
-    }
+    try {
+      if (this.shebang && source.startsWith("#!")) {
+        let end = source.indexOf("\n");
+        if (end === -1) end = this.length;
+        this.emit("comment", 0, end, { kind: "line" });
+        this.pos = end;
+      }
 
-    this.scanCode(false);
-    return this.tokens;
+      this.scanCode();
+      return this.tokens;
+    } finally {
+      this.source = saved.source;
+      this.length = saved.length;
+      this.tokens = saved.tokens;
+      this.prev = saved.prev;
+      this.pos = saved.pos;
+      this.parenControls = saved.parenControls;
+      this.lastClosedControlParen = saved.lastClosedControlParen;
+    }
   }
 
   emit(type: RawTokenType, start: number, end: number, detail?: RawTokenDetail): void {
@@ -246,7 +296,9 @@ export class Lexer {
       value: this.source.slice(start, end),
       detail,
     };
-    if (type !== "whitespace") {
+    // `prev` tracks the last significant code token — whitespace and comments
+    // are skipped so regex-vs-division disambiguation is comment-robust.
+    if (type !== "whitespace" && type !== "comment") {
       this.prev = token;
       this.lastClosedControlParen =
         type === "punctuation" &&
@@ -256,9 +308,13 @@ export class Lexer {
     this.tokens.push(token);
   }
 
-  matchList(list: string[]): string | null {
-    for (const item of list) {
-      if (item && this.source.startsWith(item, this.pos)) return item;
+  matchList(byChar: Map<string, string[]>): string | null {
+    const ch = this.source[this.pos];
+    if (ch === undefined) return null;
+    const candidates = byChar.get(ch);
+    if (!candidates) return null;
+    for (const item of candidates) {
+      if (this.source.startsWith(item, this.pos)) return item;
     }
     return null;
   }
@@ -341,40 +397,6 @@ export class Lexer {
     this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
   }
 
-  scanTemplate(def: StringDef): void {
-    const s = this.source;
-    let start = this.pos;
-    this.pos += def.open.length;
-    const escape = def.escape ?? "\\";
-    for (;;) {
-      if (this.pos >= this.length) {
-        this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
-        return;
-      }
-      const c = s[this.pos];
-      if (escape && s.startsWith(escape, this.pos)) {
-        this.pos += escape.length;
-        if (this.pos < this.length) this.pos += 1;
-        continue;
-      }
-      if (s.startsWith(def.close, this.pos)) {
-        this.pos += def.close.length;
-        this.emit("string", start, this.pos, { quote: def.open });
-        return;
-      }
-      if (c === "$" && s[this.pos + 1] === "{") {
-        this.emit("string", start, this.pos, { quote: def.open });
-        const open = this.pos;
-        this.pos += 2;
-        this.emit("punctuation", open, this.pos, { templateOpen: true });
-        this.scanCode(true);
-        start = this.pos;
-        continue;
-      }
-      this.pos += 1;
-    }
-  }
-
   scanLineComment(def: CommentDef): void {
     const start = this.pos;
     const end = this.source.indexOf(def.close, this.pos + def.open.length);
@@ -395,14 +417,68 @@ export class Lexer {
     this.emit("comment", start, this.pos, { kind: "block" });
   }
 
-  scanCode(untilTemplateClose: boolean): void {
+  /**
+   * Scan code and template literals with an explicit stack instead of the
+   * previous scanTemplate() <-> scanCode(true) mutual recursion, so pathological
+   * `${` nesting cannot overflow the call stack.
+   */
+  scanCode(untilTemplateClose = false): void {
+    const frames: ScanFrame[] = [
+      { kind: "code", untilClose: untilTemplateClose, depth: 0 },
+    ];
     const s = this.source;
-    let depth = 0;
-    while (this.pos < this.length) {
+
+    while (frames.length > 0) {
+      const frame = frames[frames.length - 1];
+      if (!frame) break;
+
+      if (frame.kind === "template") {
+        const def = frame.def!;
+        const start = frame.start!;
+        if (this.pos >= this.length) {
+          this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+          frames.pop();
+          continue;
+        }
+        const ch = s[this.pos];
+        const escape = def.escape ?? "\\";
+        if (escape && s.startsWith(escape, this.pos)) {
+          this.pos += escape.length;
+          if (this.pos < this.length) this.pos += 1;
+          continue;
+        }
+        if (s.startsWith(def.close, this.pos)) {
+          this.pos += def.close.length;
+          this.emit("string", start, this.pos, { quote: def.open });
+          frames.pop();
+          continue;
+        }
+        if (ch === "$" && s[this.pos + 1] === "{") {
+          this.emit("string", start, this.pos, { quote: def.open });
+          const open = this.pos;
+          this.pos += 2;
+          this.emit("punctuation", open, this.pos, { templateOpen: true });
+          // This chunk is finished; the interpolation frame owns resuming the
+          // template after its closing `}`. Popping first is what keeps a
+          // stale chunk frame from re-scanning the rest of the source.
+          frames.pop();
+          frames.push({ kind: "code", untilClose: true, depth: 0, resumeTemplate: def });
+          continue;
+        }
+        this.pos += 1;
+        continue;
+      }
+
+      // ---- code frame ----
+      if (this.pos >= this.length) {
+        frames.pop();
+        if (frame.resumeTemplate) {
+          frames.push({ kind: "template", def: frame.resumeTemplate, start: this.pos });
+        }
+        continue;
+      }
       const start = this.pos;
       const ch = s[this.pos];
-      const width = codePointWidthAt(s, this.pos);
-      const codePoint = s.slice(this.pos, this.pos + width);
 
       if (isWhitespaceChar(ch)) {
         let i = this.pos + 1;
@@ -412,15 +488,12 @@ export class Lexer {
         continue;
       }
 
-      if (matches(this.identifierStart, codePoint)) {
-        let i = this.pos + width;
-        while (i < this.length) {
-          const partWidth = codePointWidthAt(s, i);
-          if (!matches(this.identifierPart, s.slice(i, i + partWidth))) break;
-          i += partWidth;
-        }
-        this.emit("identifier", start, i);
-        this.pos = i;
+      this.identifierRe.lastIndex = this.pos;
+      const id = this.identifierRe.exec(s);
+      if (id) {
+        const end = this.pos + id[0].length;
+        this.emit("identifier", start, end);
+        this.pos = end;
         continue;
       }
 
@@ -436,8 +509,12 @@ export class Lexer {
       const strDefs = this.stringOpeners.get(ch);
       const strDef = strDefs?.find((def) => s.startsWith(def.open, this.pos));
       if (strDef) {
-        if (strDef.template) this.scanTemplate(strDef);
-        else this.scanString(strDef);
+        if (strDef.template) {
+          frames.push({ kind: "template", def: strDef, start: this.pos });
+          this.pos += strDef.open.length;
+        } else {
+          this.scanString(strDef);
+        }
         continue;
       }
 
@@ -472,19 +549,23 @@ export class Lexer {
       }
 
       if (ch === "{") {
-        if (untilTemplateClose) depth += 1;
+        if (frame.untilClose) frame.depth = (frame.depth ?? 0) + 1;
         this.pos += 1;
         this.emit("punctuation", start, this.pos);
         continue;
       }
 
       if (ch === "}") {
-        if (untilTemplateClose && depth === 0) {
+        if (frame.untilClose && frame.depth === 0) {
           this.pos += 1;
           this.emit("punctuation", start, this.pos, { templateClose: true });
-          return;
+          frames.pop();
+          if (frame.resumeTemplate) {
+            frames.push({ kind: "template", def: frame.resumeTemplate, start: this.pos });
+          }
+          continue;
         }
-        if (untilTemplateClose) depth -= 1;
+        if (frame.untilClose) frame.depth = (frame.depth ?? 0) - 1;
         this.pos += 1;
         this.emit("punctuation", start, this.pos);
         continue;
@@ -504,14 +585,14 @@ export class Lexer {
         continue;
       }
 
-      const op = this.matchList(this.operators);
+      const op = this.matchList(this.operatorByChar);
       if (op) {
         this.pos += op.length;
         this.emit("operator", start, this.pos);
         continue;
       }
 
-      const punc = this.matchList(this.punctuation);
+      const punc = this.matchList(this.punctuationByChar);
       if (punc) {
         this.pos += punc.length;
         this.emit("punctuation", start, this.pos);
