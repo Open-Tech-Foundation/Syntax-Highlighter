@@ -26,6 +26,11 @@ export {
 
 export interface HighlightOptions {
   language?: string;
+  /**
+   * How long `refresh()` coalesces successive calls, in milliseconds.
+   * `0` re-highlights synchronously on every call.
+   */
+  debounceMs?: number;
 }
 
 export interface HighlightHandle {
@@ -45,7 +50,7 @@ export async function createHighlighter({
 export async function highlightElement(
   element: HTMLElement,
   source: string,
-  { language = "javascript" }: HighlightOptions = {},
+  { language = "javascript", debounceMs = 50 }: HighlightOptions = {},
 ): Promise<HighlightHandle> {
   const highlighter = await createHighlighter({ language });
   const renderer = new HighlightRenderer(element);
@@ -60,11 +65,13 @@ export async function highlightElement(
     refresh(nextSource: string) {
       if (disposed) return;
       clearTimeout(timer);
-      timer = setTimeout(() => {
+      const paint = () => {
         if (disposed) return;
         renderer.setText(nextSource);
         renderer.render(highlighter.highlight(nextSource));
-      }, 50);
+      };
+      if (debounceMs <= 0) paint();
+      else timer = setTimeout(paint, debounceMs);
     },
     dispose() {
       if (disposed) return;
