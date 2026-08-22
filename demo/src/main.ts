@@ -8,6 +8,7 @@
 import {
   createHighlighter,
   getRegisteredLanguages,
+  isSignificant,
   registerLanguage,
   HighlightRenderer,
   type Highlighter,
@@ -259,6 +260,12 @@ let renderSeq = 0;
 let activePanel: "editor" | "tokens" | "custom" = "editor";
 const highlighters = new Map<string, Promise<Highlighter>>();
 
+/** Drop the memoized highlighter for a language so the next use rebuilds it. */
+function invalidateHighlighter(language: string): void {
+  highlighters.delete(language.toLowerCase());
+  highlighters.delete(language);
+}
+
 function highlighterFor(language: string): Promise<Highlighter> {
   let pending = highlighters.get(language);
   if (!pending) {
@@ -293,7 +300,7 @@ function renderNow(source: string): void {
     if (seq !== renderSeq || currentSource !== source) return;
     const tokens = h.highlight(source);
     renderer!.render(tokens);
-    const significant = tokens.filter((t) => t.end > t.start && t.type !== "whitespace");
+    const significant = tokens.filter((t) => isSignificant(t) && t.end > t.start);
     tokenList.replaceChildren(
       ...significant.map((t) =>
         element("li", {}, [
@@ -383,7 +390,6 @@ for (const t of panelTabs) {
 panelCollapse.addEventListener("click", () => activatePanel("editor"));
 
 for (const name of getRegisteredLanguages()) languageSelect.add(new Option(name, name));
-if (languageSelect.options.length === 0) languageSelect.add(new Option("javascript", "javascript"));
 
 languageSelect.addEventListener("change", () => void switchLanguage(languageSelect.value));
 
@@ -410,6 +416,9 @@ registerBtn.addEventListener("click", () => {
   try {
     const definition = JSON.parse(customJson.value) as LanguageDefinition;
     registerLanguage(definition);
+    // The definition behind this name just changed; a memoized highlighter
+    // built from the previous one would keep tokenizing with stale rules.
+    invalidateHighlighter(definition.name);
     if (![...languageSelect.options].some((o) => o.value === definition.name)) {
       languageSelect.add(new Option(definition.name, definition.name));
     }

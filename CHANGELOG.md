@@ -38,5 +38,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed the demo serving a stale highlighter after a custom language was re-registered under a name it had already used.
 - Fixed five type errors in `lexer.ts`: `ScanFrame` was missing the `resumeTemplate` field the scanner already used. `esdev build` does not typecheck, so these never failed the build.
 - Fixed a template-literal scan bug that swallowed the rest of the source. A template chunk stayed on the scan stack after handing control to its `${...}`, so once the interpolation closed the abandoned frame re-scanned everything that followed as one unterminated string. Any source containing a template literal was affected.
