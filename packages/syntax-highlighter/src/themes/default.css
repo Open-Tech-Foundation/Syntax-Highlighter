@@ -6,8 +6,11 @@
  *
  * Mode selection:
  *   - automatic: follows `prefers-color-scheme`
- *   - forced: set `data-sh-theme="light"` or `data-sh-theme="dark"` on <html>;
- *     these rules come after the media query, so they win over it.
+ *   - forced: set `data-sh-theme="light"` or `data-sh-theme="dark"` on <html>
+ *
+ * The light palette is declared once, on bare `:root`, and is what an
+ * unforced light system and a forced light page both get. The media query
+ * excludes a forced-light root so it cannot override an explicit choice.
  */
 
 :root {
@@ -23,18 +26,15 @@
   --sh-constant: #0550ae;
   --sh-property: #116329;
   --sh-parameter: #953800;
-  --sh-type: #953800;
   --sh-operator: #0550ae;
   --sh-punctuation: #24292f;
   --sh-decorator: #953800;
   --sh-boolean: #0550ae;
   --sh-null: #0550ae;
-  --sh-tag: #116329;
-  --sh-attribute: #0550ae;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-sh-theme="light"]) {
     --sh-comment: #7f848e;
     --sh-keyword: #c678dd;
     --sh-string: #98c379;
@@ -47,38 +47,12 @@
     --sh-constant: #d19a66;
     --sh-property: #e06c75;
     --sh-parameter: #d19a66;
-    --sh-type: #e5c07b;
     --sh-operator: #56b6c2;
     --sh-punctuation: #abb2bf;
     --sh-decorator: #d19a66;
     --sh-boolean: #d19a66;
     --sh-null: #d19a66;
-    --sh-tag: #e06c75;
-    --sh-attribute: #d19a66;
   }
-}
-
-:root[data-sh-theme="light"] {
-  --sh-comment: #6e7781;
-  --sh-keyword: #cf222e;
-  --sh-string: #0a3069;
-  --sh-number: #0550ae;
-  --sh-regex: #116329;
-  --sh-function: #8250df;
-  --sh-class: #953800;
-  --sh-variable: #24292f;
-  --sh-identifier: #24292f;
-  --sh-constant: #0550ae;
-  --sh-property: #116329;
-  --sh-parameter: #953800;
-  --sh-type: #953800;
-  --sh-operator: #0550ae;
-  --sh-punctuation: #24292f;
-  --sh-decorator: #953800;
-  --sh-boolean: #0550ae;
-  --sh-null: #0550ae;
-  --sh-tag: #116329;
-  --sh-attribute: #0550ae;
 }
 
 :root[data-sh-theme="dark"] {
@@ -94,14 +68,11 @@
   --sh-constant: #d19a66;
   --sh-property: #e06c75;
   --sh-parameter: #d19a66;
-  --sh-type: #e5c07b;
   --sh-operator: #56b6c2;
   --sh-punctuation: #abb2bf;
   --sh-decorator: #d19a66;
   --sh-boolean: #d19a66;
   --sh-null: #d19a66;
-  --sh-tag: #e06c75;
-  --sh-attribute: #d19a66;
 }
 
 ::highlight(sh-comment) { color: var(--sh-comment); }
@@ -116,11 +87,8 @@
 ::highlight(sh-constant) { color: var(--sh-constant); }
 ::highlight(sh-property) { color: var(--sh-property); }
 ::highlight(sh-parameter) { color: var(--sh-parameter); }
-::highlight(sh-type) { color: var(--sh-type); }
 ::highlight(sh-operator) { color: var(--sh-operator); }
 ::highlight(sh-punctuation) { color: var(--sh-punctuation); }
 ::highlight(sh-decorator) { color: var(--sh-decorator); }
 ::highlight(sh-boolean) { color: var(--sh-boolean); }
 ::highlight(sh-null) { color: var(--sh-null); }
-::highlight(sh-tag) { color: var(--sh-tag); }
-::highlight(sh-attribute) { color: var(--sh-attribute); }

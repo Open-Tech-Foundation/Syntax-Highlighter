@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Collapsed the duplicated light palette in `themes/default.css` and dropped the unused `--sh-type`, `--sh-tag` and `--sh-attribute` tokens; the `prefers-color-scheme: dark` block no longer applies to a root forced to light.
 - `getRegisteredLanguages()` now lists built-in languages before they have been lazily imported, so a language picker no longer sees an empty list on a fresh page.
 - `registerLanguage()` now rejects an alias that would take over another language's registered name (or a built-in's), instead of silently shadowing it; conflicts are checked before the registry is touched, so a rejected definition cannot half-register.
 - Token lookahead in the tokenizer is precomputed once per `tokenize()`: O(1) per identifier instead of a rescan, and comments are transparent to it, so `greet /* who */ ()` reads as a call.
