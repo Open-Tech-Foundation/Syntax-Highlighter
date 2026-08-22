@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- `getRegisteredLanguages()` now lists built-in languages before they have been lazily imported, so a language picker no longer sees an empty list on a fresh page.
+- `registerLanguage()` now rejects an alias that would take over another language's registered name (or a built-in's), instead of silently shadowing it; conflicts are checked before the registry is touched, so a rejected definition cannot half-register.
 - Token lookahead in the tokenizer is precomputed once per `tokenize()`: O(1) per identifier instead of a rescan, and comments are transparent to it, so `greet /* who */ ()` reads as a call.
 - Redesigned the demo as an IDE-style workbench: a title bar with an editor tab, an activity bar, an editor with a line-number gutter and horizontal scrolling, a tabbed bottom panel for tokens and custom languages, and a status bar.
 - Fixed destructured parameters, private fields, Unicode identifiers, custom string escapes, and regex literals after JavaScript control headers.

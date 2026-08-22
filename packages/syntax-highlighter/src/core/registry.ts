@@ -123,12 +123,34 @@ export function registerLanguage(
 ): LanguageDefinition {
   validateLanguageDefinition(definition);
   const nameKey = definition.name.toLowerCase();
+  const aliasKeys = (definition.aliases ?? [])
+    .map((alias) => alias.toLowerCase())
+    .filter((alias) => alias !== nameKey);
+
+  // Re-registering under the same *name* replaces the old definition on
+  // purpose. An alias silently taking over some other language's name is a
+  // different thing, and always a mistake — reject it. Every conflict is
+  // checked before the registry is touched so a rejected definition cannot
+  // leave half of itself registered.
+  for (const alias of aliasKeys) {
+    const existing = registered.get(alias);
+    const takesRegisteredName =
+      existing !== undefined &&
+      existing !== definition &&
+      existing.name.toLowerCase() === alias;
+    if (takesRegisteredName || builtinLoaders[alias] !== undefined) {
+      throw new Error(
+        `Language definition alias "${alias}" is already the name of another language`,
+      );
+    }
+  }
+
   for (const [key, current] of registered) {
     if (current.name.toLowerCase() === nameKey) registered.delete(key);
   }
   registered.set(nameKey, definition);
-  for (const alias of definition.aliases ?? []) {
-    registered.set(alias.toLowerCase(), definition);
+  for (const alias of aliasKeys) {
+    registered.set(alias, definition);
   }
   return definition;
 }
@@ -145,6 +167,14 @@ export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
   return registerLanguage(await loader());
 }
 
+/**
+ * Every language `loadLanguage()` will resolve, by canonical name. Built-ins
+ * are included before they have been lazily imported — otherwise this returns
+ * an empty list on a fresh page and callers building a language picker have
+ * to hard-code the built-ins back in.
+ */
 export function getRegisteredLanguages(): string[] {
-  return [...new Set(registered.values())].map((d) => d.name);
+  const names = new Set(Object.keys(builtinLoaders));
+  for (const definition of new Set(registered.values())) names.add(definition.name);
+  return [...names];
 }

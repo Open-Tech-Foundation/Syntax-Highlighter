@@ -52,3 +52,16 @@ test("re-registering a language removes stale aliases", async () => {
   assertEquals(await loadLanguage("new-name"), replacement);
   assert(await rejects(() => loadLanguage("old-name")));
 });
+
+test("an alias cannot take over another language's name", () => {
+  registerLanguage({ name: "occupied", keywords: ["a"] });
+  assert(throws(() => registerLanguage({ name: "squatter", aliases: ["occupied"] })));
+  // A built-in counts even before it has been lazily imported.
+  assert(throws(() => registerLanguage({ name: "squatter", aliases: ["JavaScript"] })));
+  // The rejected definition must not have half-registered itself.
+  assert(!getRegisteredLanguages().includes("squatter"));
+});
+
+test("built-in languages are listed before they are loaded", () => {
+  assert(getRegisteredLanguages().includes("javascript"));
+});
