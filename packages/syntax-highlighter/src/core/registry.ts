@@ -14,6 +14,16 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   sql: () => import("../languages/sql.ts").then((m) => m.default),
   yaml: () => import("../languages/yaml.ts").then((m) => m.default),
   markdown: () => import("../languages/markdown.ts").then((m) => m.default),
+  java: () => import("../languages/java.ts").then((m) => m.default),
+  go: () => import("../languages/go.ts").then((m) => m.default),
+  rust: () => import("../languages/rust.ts").then((m) => m.default),
+  php: () => import("../languages/php.ts").then((m) => m.default),
+  ruby: () => import("../languages/ruby.ts").then((m) => m.default),
+  c: () => import("../languages/c.ts").then((m) => m.default),
+  cpp: () => import("../languages/cpp.ts").then((m) => m.default),
+  csharp: () => import("../languages/csharp.ts").then((m) => m.default),
+  swift: () => import("../languages/swift.ts").then((m) => m.default),
+  kotlin: () => import("../languages/kotlin.ts").then((m) => m.default),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

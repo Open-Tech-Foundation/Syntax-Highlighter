@@ -1,0 +1,42 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const csharp: LanguageDefinition = {
+  name: "csharp",
+  aliases: ["cs", "c#"],
+  semantic: "generic",
+  keywords: [
+    "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char",
+    "checked", "class", "const", "continue", "decimal", "default", "delegate",
+    "do", "double", "else", "enum", "event", "explicit", "extern", "false",
+    "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit",
+    "in", "int", "interface", "internal", "is", "lock", "long", "namespace",
+    "new", "null", "object", "operator", "out", "override", "params", "private",
+    "protected", "public", "readonly", "record", "ref", "return", "sbyte",
+    "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct",
+    "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong",
+    "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile",
+    "while", "var", "async", "await", "when", "where", "get", "set", "value",
+  ],
+  booleans: ["true", "false"],
+  nulls: ["null"],
+  operators: [
+    "==", "!=", "<=", ">=", "&&", "||", "??", "??=", "=>", "++", "--",
+    "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<", ">>", "<<=", ">>=",
+    "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "<", ">", "?", ":", ".", "..",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ".", ":", "::", "@", "#", "$"],
+  lex: {
+    strings: [
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+      { open: '@"', close: '"', escape: '""', multiline: true },
+    ],
+    comments: [
+      { open: "//", close: "\n", line: true },
+      { open: "/*", close: "*/" },
+    ],
+    regex: false,
+  },
+};
+
+export default csharp;

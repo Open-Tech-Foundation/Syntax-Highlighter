@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Expanded built-in languages to 21 (added java, go, rust, php, ruby, c, cpp, csharp, swift, kotlin with keyword-heavy generic lexing and aliases: jsp, golang, rs, rb, c++/cc/cxx, cs/c#, swiftlang, kt/kts) and wired demo with 10 new samples; verified via Highlighter for all 21, tsc, esdev test, and headless Chrome (puppeteer-core) with 4+ controls and FPS.
 - Added 10 popular themes (github-light, github-dark, monokai, dracula, nord, solarized-dark/light, one-dark, gruvbox-dark, tokyo-night) alongside default (11 total) and wired demo Theme picker to switch via #sh-theme
 - Added 10 built-in languages (html, css, jsx, python, typescript, json, bash, sql, yaml, markdown) with generic lexing and lazy-loaded via `loadLanguage()`; demo now lists all languages and syncs samples by language.
 - Added Biome (`biome.json`, `@biomejs/biome@2.5.10`) for lint (`tsr lint`) and format (`tsr fmt` / `tsr fmt:check` via `biome check`, fix via `tsr lint -- --write`), wired into `tsr check` and `tsr ci`.

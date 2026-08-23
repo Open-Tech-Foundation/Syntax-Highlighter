@@ -1,0 +1,33 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const ruby: LanguageDefinition = {
+  name: "ruby",
+  aliases: ["rb"],
+  semantic: "generic",
+  keywords: [
+    "alias", "and", "begin", "break", "case", "class", "def", "defined?",
+    "do", "else", "elsif", "end", "ensure", "false", "for", "if", "in",
+    "module", "next", "nil", "not", "or", "redo", "rescue", "retry",
+    "return", "self", "super", "then", "true", "undef", "unless", "until",
+    "when", "while", "yield", "__FILE__", "__LINE__", "__ENCODING__",
+  ],
+  booleans: ["true", "false"],
+  nulls: ["nil"],
+  operators: [
+    "=>", "==", "!=", "=~", "!~", "<=>", "<=", ">=", "&&", "||", "**", "++", "--",
+    "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<", ">>",
+    "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "<", ">", "?", ":", ".", "..", "...",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ".", ":", "::", "#", "@", "$"],
+  lex: {
+    strings: [
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+      { open: "`", close: "`", escape: "\\", multiline: false },
+    ],
+    comments: [{ open: "#", close: "\n", line: true }],
+    regex: false,
+  },
+};
+
+export default ruby;

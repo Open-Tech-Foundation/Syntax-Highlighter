@@ -1,0 +1,36 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const rust: LanguageDefinition = {
+  name: "rust",
+  aliases: ["rs"],
+  semantic: "generic",
+  keywords: [
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern",
+    "false", "fn", "for", "if", "impl", "in", "let", "loop", "match", "mod",
+    "move", "mut", "pub", "ref", "return", "self", "Self", "static", "struct",
+    "super", "trait", "true", "type", "unsafe", "use", "where", "while",
+    "async", "await", "dyn", "abstract", "become", "box", "do", "final",
+    "macro", "override", "priv", "typeof", "unsized", "virtual", "yield",
+    "try", "union",
+  ],
+  booleans: ["true", "false"],
+  nulls: [],
+  operators: [
+    "=>", "->", "::", "&&", "||", "==", "!=", "<=", ">=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=", "<<", ">>",
+    "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "<", ">", "?", ":", ".", "..", "...",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "@"],
+  lex: {
+    strings: [
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+    ],
+    comments: [
+      { open: "//", close: "\n", line: true },
+      { open: "/*", close: "*/" },
+    ],
+    regex: false,
+  },
+};
+
+export default rust;

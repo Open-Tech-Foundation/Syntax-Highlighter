@@ -195,6 +195,113 @@ console.log("hi");
 
 <!-- comment -->`,
   },
+  {
+    name: "java — class",
+    language: "java",
+    source: `public class Main {
+  public static void main(String[] args) {
+    // comment
+    System.out.println("Hello");
+  }
+}`,
+  },
+  {
+    name: "go — func",
+    language: "go",
+    source: `package main
+
+import "fmt"
+
+func greet(name string) string {
+  // comment
+  return fmt.Sprintf("Hello, %s!", name)
+}`,
+  },
+  {
+    name: "rust — fn",
+    language: "rust",
+    source: `fn greet(name: &str) -> String {
+    // comment
+    format!("Hello, {}!", name)
+}
+
+let s = greet("world");`,
+  },
+  {
+    name: "php — hello",
+    language: "php",
+    source: `<?php
+// comment
+function greet(string $name): string {
+  return "Hello, $name!";
+}
+
+echo greet("world");`,
+  },
+  {
+    name: "ruby — def",
+    language: "ruby",
+    source: `# comment
+def greet(name)
+  "Hello, #{name}!"
+end
+
+puts greet("world")`,
+  },
+  {
+    name: "c — hello",
+    language: "c",
+    source: `#include <stdio.h>
+
+// comment
+int main() {
+  printf("Hello, world!\n");
+  return 0;
+}`,
+  },
+  {
+    name: "cpp — hello",
+    language: "cpp",
+    source: `#include <iostream>
+
+// comment
+int main() {
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
+}`,
+  },
+  {
+    name: "csharp — hello",
+    language: "csharp",
+    source: `using System;
+
+// comment
+class Program {
+  static void Main() {
+    Console.WriteLine("Hello, world!");
+  }
+}`,
+  },
+  {
+    name: "swift — func",
+    language: "swift",
+    source: `// comment
+func greet(name: String) -> String {
+  return "Hello, \(name)!"
+}
+
+let s = greet(name: "world")`,
+  },
+  {
+    name: "kotlin — fun",
+    language: "kotlin",
+    source: `// comment
+fun greet(name: String): String {
+  return "Hello, $name!"
+}
+
+val s = greet("world")`,
+  },
 ];
 
 /** A one-line status message. */

@@ -1,0 +1,39 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const swift: LanguageDefinition = {
+  name: "swift",
+  aliases: ["swiftlang"],
+  semantic: "generic",
+  keywords: [
+    "associatedtype", "class", "deinit", "enum", "extension", "fileprivate",
+    "func", "import", "init", "inout", "internal", "let", "open", "operator",
+    "private", "precedencegroup", "protocol", "public", "rethrows", "static",
+    "struct", "subscript", "typealias", "var", "break", "case", "catch",
+    "continue", "default", "defer", "do", "else", "fallthrough", "for",
+    "guard", "if", "in", "repeat", "return", "throw", "switch", "where",
+    "while", "as", "Any", "catch", "false", "is", "nil", "rethrows", "self",
+    "Self", "super", "throw", "throws", "true", "try", "await", "async",
+  ],
+  booleans: ["true", "false"],
+  nulls: ["nil"],
+  operators: [
+    "==", "!=", "===", "!==", "<=", ">=", "&&", "||", "??", "...", "..<", "->", "=>", "::",
+    "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
+    "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "<", ">", "?", ":", ".", "@", "#", "$",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ":", ".", "@", "#"],
+  lex: {
+    strings: [
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: '"""', close: '"""', escape: "\\", multiline: true },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+    ],
+    comments: [
+      { open: "//", close: "\n", line: true },
+      { open: "/*", close: "*/" },
+    ],
+    regex: false,
+  },
+};
+
+export default swift;
