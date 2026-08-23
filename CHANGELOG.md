@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Updated `README.md` with renderer-agnostic one-liner and short desc merged as blockquote, regular description, `Features` section, and updated `Usage` to explicit `renderer.render(source, tokens)` (`CSSHighlightRenderer` / `HtmlRenderer` / `JsonRenderer`).
+- Updated `packages/syntax-highlighter/package.json` description and keywords to renderer-agnostic (`Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.` + `semantic-tokens`/`ssr`/`ansi`/`themes` keywords).
 
 ### Added
 

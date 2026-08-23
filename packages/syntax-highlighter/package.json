@@ -1,7 +1,7 @@
 {
   "name": "@opentf/syntax-highlighter",
   "version": "0.1.0",
-  "description": "A JavaScript syntax highlighter built on the CSS Custom Highlight API.",
+  "description": "Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -24,8 +24,17 @@
     "url": "git+https://github.com/Open-Tech-Foundation/Syntax-Highlighter.git"
   },
   "keywords": [
+    "syntax-highlighting",
     "syntax-highlighter",
     "css-custom-highlight-api",
+    "tokenizer",
+    "renderer-agnostic",
+    "semantic-tokens",
+    "ssr",
+    "html",
+    "json",
+    "ansi",
+    "themes",
     "highlight"
   ],
   "license": "MIT"
