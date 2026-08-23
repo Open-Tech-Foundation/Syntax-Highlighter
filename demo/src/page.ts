@@ -287,7 +287,7 @@ class Program {
     language: "swift",
     source: `// comment
 func greet(name: String) -> String {
-  return "Hello, \(name)!"
+  return "Hello, (name)!"
 }
 
 let s = greet(name: "world")`,

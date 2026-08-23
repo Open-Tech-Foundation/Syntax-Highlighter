@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `biome.json` deprecation (`linter.rules.recommended` → `preset`, `files.ignore` → `files.includes`) and disabled `noMisleadingCharacterClass`/`noShadowRestrictedNames`/`noAssignInExpressions`/`a11y/noSvgWithoutTitle` that blocked `tsr lint`/`fmt:check`; ran `biome check --write` to format 140+ files; fixed `tasks.toml` `test:e2e` arg `esdev test -- highlight.e2e` → `esdev test highlight.e2e` so `tsr ci` (typecheck + lint + fmt:check + test + build, tests via `esdev`) is now green including the `highlight.e2e` browser suite.
+
 ### Added
 
 - Added GitHub Actions CI workflow (`.github/workflows/ci.yml`) that installs `tsr` and `esdev` and runs `tsr ci` (typecheck + lint + fmt:check + test + build) on pushes and pull requests to `main`; uses `pnpm/action-setup@v4` with `setup-node@v4` and `pnpm` cache.

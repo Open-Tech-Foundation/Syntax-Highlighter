@@ -11,11 +11,12 @@
  * the runtime's own `WebSocket`. It is deliberately small: launch a browser,
  * load a page, evaluate an expression, sample painted pixels, shut down.
  */
-import { Command } from "runtime:system";
-import { serve } from "runtime:http";
+
 import { file, makeTempDir, mkdir, remove } from "runtime:fs";
+import { serve } from "runtime:http";
 import { extname, join, normalize, resolve, sep } from "runtime:path";
 import { env } from "runtime:process";
+import { Command } from "runtime:system";
 
 const BROWSERS = ["chromium", "google-chrome", "google-chrome-stable", "chrome"];
 
@@ -48,9 +49,7 @@ export async function findBrowser() {
         timeout: 10_000,
       }).output();
       if (probe.success) return name;
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return null;
 }

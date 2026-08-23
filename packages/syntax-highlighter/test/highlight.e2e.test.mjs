@@ -7,9 +7,10 @@
  * These drive the built `dist/` in headless Chrome and read pixels back off
  * a screenshot.
  */
-import { test, assert, assertEquals, beforeAll, afterAll } from "runtime:test";
-import { Command } from "runtime:system";
+
 import { dirname, fromFileURL, join } from "runtime:path";
+import { Command } from "runtime:system";
+import { afterAll, assert, assertEquals, beforeAll, test } from "runtime:test";
 import {
   findBrowser,
   nearestColor,
@@ -27,11 +28,9 @@ const browserPath = await findBrowser();
 // not move nearly this far, and an entirely wrong colour moves much further.
 const COLOR_TOLERANCE = 24;
 
-const SOURCE = [
-  "const greet = (name) => `hi ${name}!`;",
-  "// a comment",
-  "let total = 42;",
-].join("\n");
+const SOURCE = ["const greet = (name) => `hi ${name}!`;", "// a comment", "let total = 42;"].join(
+  "\n",
+);
 
 const offsetOf = (text, from = 0) => SOURCE.indexOf(text, from);
 

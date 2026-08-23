@@ -1,4 +1,4 @@
-import { test, assert, assertEquals } from "runtime:test";
+import { assert, assertEquals, test } from "runtime:test";
 import { Lexer } from "../src/core/lexer.ts";
 import { Tokenizer } from "../src/core/tokenizer.ts";
 import javascript from "../src/languages/javascript.ts";
@@ -91,19 +91,19 @@ test("object keys vs shorthand methods", () => {
 test("template literals with nested expressions", () => {
   const src = "`a${ x }b${ `c${ y }` }d`";
   assertEquals(types(src), [
-    "string",       // `a${          outer chunk up to ${
-    "punctuation",  // ${
-    "variable",     // x
-    "punctuation",  // }             closes outer expression
-    "string",       // b             outer chunk up to ${
-    "punctuation",  // ${
-    "string",       // `c${          inner template chunk
-    "punctuation",  // ${
-    "variable",     // y
-    "punctuation",  // }             closes inner expression
-    "string",       // `             inner template closing backtick
-    "punctuation",  // }             closes outer expression
-    "string",       // d`            final chunk incl. closing backtick
+    "string", // `a${          outer chunk up to ${
+    "punctuation", // ${
+    "variable", // x
+    "punctuation", // }             closes outer expression
+    "string", // b             outer chunk up to ${
+    "punctuation", // ${
+    "string", // `c${          inner template chunk
+    "punctuation", // ${
+    "variable", // y
+    "punctuation", // }             closes inner expression
+    "string", // `             inner template closing backtick
+    "punctuation", // }             closes outer expression
+    "string", // d`            final chunk incl. closing backtick
   ]);
 });
 
@@ -186,7 +186,7 @@ test("code after a template literal is not swallowed by it", () => {
 });
 
 test("deeply nested template interpolation does not overflow", () => {
-  const src = "`" + "${`".repeat(500) + "x" + "`}".repeat(500) + "`";
+  const src = `\`${"${`".repeat(500)}x${"`}".repeat(500)}\``;
   const all = tokenizer.tokenize(src);
   let pos = 0;
   for (const t of all) {
@@ -198,10 +198,7 @@ test("deeply nested template interpolation does not overflow", () => {
 
 test("comments are transparent to lookahead", () => {
   assertEquals(findToken("greet /* who */ ()", "greet").type, "function");
-  assertEquals(
-    findToken("function f() /* body */ { return 1; }", "f").type,
-    "function",
-  );
+  assertEquals(findToken("function f() /* body */ { return 1; }", "f").type, "function");
   const src = "const o = { a /* key */ : 1 };";
   assertEquals(findToken(src, "a").type, "property");
 });
@@ -264,7 +261,7 @@ test("custom string escape delimiters are honored", () => {
   const lexer = new Lexer({
     lex: { strings: [{ open: "'", close: "'", escape: "%" }] },
   });
-  const source = "'left%\'right'";
+  const source = "'left%'right'";
   const [token] = lexer.tokenize(source);
   assertEquals(token.type, "string");
   assertEquals(token.end, source.length);

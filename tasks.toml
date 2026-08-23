@@ -26,7 +26,7 @@ packages = ["packages/syntax-highlighter"]
 run = "esdev test"
 
 [tasks."test:e2e"]
-run = "esdev test -- highlight.e2e"
+run = "esdev test highlight.e2e"
 dir = "packages/syntax-highlighter"
 
 # ------------------------------------------------------------------ lint / fmt (Biome)

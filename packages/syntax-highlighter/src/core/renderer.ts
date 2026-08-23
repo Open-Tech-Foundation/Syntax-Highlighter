@@ -1,4 +1,4 @@
-import { TokenType, WHITESPACE, type Token } from "./tokens.ts";
+import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 const HIGHLIGHTABLE = new Set<string>(Object.values(TokenType));
 export const HIGHLIGHT_PREFIX = "sh-";
@@ -20,9 +20,7 @@ export class HighlightRenderer {
     this.element = element;
     this.textNode = null;
     this.supported =
-      typeof CSS !== "undefined" &&
-      !!CSS.highlights &&
-      typeof globalThis.Highlight !== "undefined";
+      typeof CSS !== "undefined" && !!CSS.highlights && typeof globalThis.Highlight !== "undefined";
     instances.add(this);
   }
 

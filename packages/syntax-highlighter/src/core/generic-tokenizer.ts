@@ -1,5 +1,5 @@
-import { Lexer, type LanguageDefinition, type RawToken } from "./lexer.ts";
-import { TokenType, WHITESPACE, createToken, type Token } from "./tokens.ts";
+import { type LanguageDefinition, Lexer, type RawToken } from "./lexer.ts";
+import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 

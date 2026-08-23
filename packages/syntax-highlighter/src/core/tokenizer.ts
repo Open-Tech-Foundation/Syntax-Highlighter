@@ -1,13 +1,13 @@
-import { Lexer, type LanguageDefinition, type RawToken } from "./lexer.ts";
-import { TokenType, WHITESPACE, createToken, type Token } from "./tokens.ts";
+import { type LanguageDefinition, Lexer, type RawToken } from "./lexer.ts";
 import {
+  type Context,
   ContextKind,
-  Expectation,
   createContext,
   createState,
-  type Context,
+  Expectation,
   type HighlightState,
 } from "./state.ts";
+import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
@@ -30,13 +30,7 @@ const OBJECT_STARTERS = new Set([
   "var",
 ]);
 
-const CONTROL_HEADER_KEYWORDS = new Set([
-  "if",
-  "for",
-  "while",
-  "switch",
-  "with",
-]);
+const CONTROL_HEADER_KEYWORDS = new Set(["if", "for", "while", "switch", "with"]);
 
 export class Tokenizer {
   readonly language: LanguageDefinition;
@@ -64,18 +58,7 @@ export class Tokenizer {
     const { parens, parameterBindings } = this.#analyze(raws);
 
     for (let i = 0; i < raws.length; i++) {
-      out.push(
-        this.#process(
-          raws[i],
-          i,
-          raws,
-          ctx,
-          out,
-          source,
-          parens,
-          parameterBindings,
-        ),
-      );
+      out.push(this.#process(raws[i], i, raws, ctx, out, source, parens, parameterBindings));
     }
 
     return out;
@@ -218,26 +201,19 @@ export class Tokenizer {
     }
 
     const decl = ctx.declarations.get(val);
-    if (decl === "function")
-      return createToken(TokenType.FUNCTION, raw.start, raw.end);
-    if (decl === "class")
-      return createToken(TokenType.CLASS, raw.start, raw.end);
+    if (decl === "function") return createToken(TokenType.FUNCTION, raw.start, raw.end);
+    if (decl === "class") return createToken(TokenType.CLASS, raw.start, raw.end);
 
     const nxt = this.#nextSig(raws, idx);
     if (nxt?.type === "punctuation" && src[nxt.start] === "(") {
       return createToken(TokenType.FUNCTION, raw.start, raw.end);
     }
 
-    if (
-      nxt?.type === "punctuation" &&
-      src[nxt.start] === ":" &&
-      top?.kind === ContextKind.OBJECT
-    ) {
+    if (nxt?.type === "punctuation" && src[nxt.start] === ":" && top?.kind === ContextKind.OBJECT) {
       return createToken(TokenType.PROPERTY, raw.start, raw.end);
     }
 
-    if (CONSTANT_RE.test(val))
-      return createToken(TokenType.CONSTANT, raw.start, raw.end);
+    if (CONSTANT_RE.test(val)) return createToken(TokenType.CONSTANT, raw.start, raw.end);
     return createToken(TokenType.VARIABLE, raw.start, raw.end);
   }
 
@@ -278,10 +254,8 @@ export class Tokenizer {
 
       case "(": {
         const closeIdx = parens.get(idx);
-        const after =
-          closeIdx != null ? this.#nextSig(raws, closeIdx) : null;
-        const nextIsBrace =
-          after?.type === "punctuation" && src[after.start] === "{";
+        const after = closeIdx != null ? this.#nextSig(raws, closeIdx) : null;
+        const nextIsBrace = after?.type === "punctuation" && src[after.start] === "{";
         const prevIsControl =
           ctx.previousToken?.type === TokenType.KEYWORD &&
           ctx.previousValue != null &&
@@ -409,18 +383,10 @@ export class Tokenizer {
     if (prev.type === TokenType.OPERATOR) return true;
     if (prev.type === TokenType.PUNCTUATION) {
       const ch = val?.[0];
-      if (
-        ch === "(" ||
-        ch === "[" ||
-        ch === "{" ||
-        ch === "," ||
-        ch === ":" ||
-        ch === "?"
-      )
+      if (ch === "(" || ch === "[" || ch === "{" || ch === "," || ch === ":" || ch === "?")
         return true;
     }
-    if (prev.type === TokenType.KEYWORD && val != null && OBJECT_STARTERS.has(val))
-      return true;
+    if (prev.type === TokenType.KEYWORD && val != null && OBJECT_STARTERS.has(val)) return true;
     return false;
   }
 
@@ -516,11 +482,7 @@ export class Tokenizer {
     let target: Context | null = null;
     for (let i = ctx.contexts.length - 1; i >= 0; i--) {
       const c = ctx.contexts[i].kind;
-      if (
-        c === ContextKind.FUNCTION ||
-        c === ContextKind.CLASS ||
-        c === ContextKind.BLOCK
-      ) {
+      if (c === ContextKind.FUNCTION || c === ContextKind.CLASS || c === ContextKind.BLOCK) {
         target = ctx.contexts[i];
         break;
       }
@@ -616,12 +578,7 @@ export class Tokenizer {
     return { parens, parameterBindings };
   }
 
-  #collectBindings(
-    raws: RawToken[],
-    start: number,
-    end: number,
-    bindings: Set<number>,
-  ): void {
+  #collectBindings(raws: RawToken[], start: number, end: number, bindings: Set<number>): void {
     let i = this.#nextSigIndex(raws, start);
     while (i < end) {
       i = this.#parseBinding(raws, i, end, bindings);
@@ -631,13 +588,8 @@ export class Tokenizer {
     }
   }
 
-  #parseBinding(
-    raws: RawToken[],
-    index: number,
-    end: number,
-    bindings: Set<number>,
-  ): number {
-    let i = this.#nextSigIndex(raws, index);
+  #parseBinding(raws: RawToken[], index: number, end: number, bindings: Set<number>): number {
+    const i = this.#nextSigIndex(raws, index);
     if (i >= end) return i;
     const token = raws[i];
 
@@ -661,12 +613,7 @@ export class Tokenizer {
     return this.#skipDefault(raws, i + 1, end, new Set([",", ")"]));
   }
 
-  #parseObjectBinding(
-    raws: RawToken[],
-    open: number,
-    end: number,
-    bindings: Set<number>,
-  ): number {
+  #parseObjectBinding(raws: RawToken[], open: number, end: number, bindings: Set<number>): number {
     let i = this.#nextSigIndex(raws, open + 1);
     while (i < end && raws[i].value !== "}") {
       if (raws[i].type === "operator" && raws[i].value === "...") {
@@ -684,9 +631,10 @@ export class Tokenizer {
           i = this.#parseBinding(raws, next + 1, end, bindings);
         } else {
           bindings.add(key);
-          i = raws[next]?.value === "="
-            ? this.#skipDefault(raws, next + 1, end, new Set([",", "}"]))
-            : next;
+          i =
+            raws[next]?.value === "="
+              ? this.#skipDefault(raws, next + 1, end, new Set([",", "}"]))
+              : next;
         }
       } else {
         i += 1;
@@ -697,12 +645,7 @@ export class Tokenizer {
     return i < end ? i + 1 : i;
   }
 
-  #parseArrayBinding(
-    raws: RawToken[],
-    open: number,
-    end: number,
-    bindings: Set<number>,
-  ): number {
+  #parseArrayBinding(raws: RawToken[], open: number, end: number, bindings: Set<number>): number {
     let i = this.#nextSigIndex(raws, open + 1);
     while (i < end && raws[i].value !== "]") {
       if (raws[i].value === ",") {
@@ -716,12 +659,7 @@ export class Tokenizer {
     return i < end ? i + 1 : i;
   }
 
-  #skipDefault(
-    raws: RawToken[],
-    index: number,
-    end: number,
-    stops: Set<string>,
-  ): number {
+  #skipDefault(raws: RawToken[], index: number, end: number, stops: Set<string>): number {
     let i = this.#nextSigIndex(raws, index);
     let depth = 0;
     while (i < end) {

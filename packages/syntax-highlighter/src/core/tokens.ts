@@ -48,11 +48,7 @@ export type Token = {
   end: number;
 };
 
-export function createToken(
-  type: Token["type"],
-  start: number,
-  end: number,
-): Token {
+export function createToken(type: Token["type"], start: number, end: number): Token {
   return { type, start, end };
 }
 

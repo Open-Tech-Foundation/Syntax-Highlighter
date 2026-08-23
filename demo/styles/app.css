@@ -20,7 +20,7 @@ body {
 body {
   background: var(--bg-editor);
   color: var(--fg);
-  font: 14px/1.5 var(--sans);
+  font: 14px / 1.5 var(--sans);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -311,7 +311,7 @@ select:focus {
   text-align: right;
   color: var(--gutter-fg);
   background: transparent;
-  font: 13px/1.55 var(--mono);
+  font: 13px / 1.55 var(--mono);
   white-space: pre;
   overflow: hidden;
   user-select: none;
@@ -325,7 +325,7 @@ select:focus {
   margin: 0;
   border: 0;
   padding: 0.75rem 1rem 0.75rem 3.9rem;
-  font: 13px/1.55 var(--mono);
+  font: 13px / 1.55 var(--mono);
   tab-size: 2;
   white-space: pre;
   background: transparent;
@@ -465,7 +465,7 @@ select:focus {
   border-radius: 5px;
   background: var(--bg-editor);
   color: var(--fg);
-  font: 12px/1.5 var(--mono);
+  font: 12px / 1.5 var(--mono);
 }
 
 .custom-json:focus {

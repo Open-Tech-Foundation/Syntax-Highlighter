@@ -8,14 +8,14 @@
 import {
   createHighlighter,
   getRegisteredLanguages,
-  isSignificant,
-  registerLanguage,
-  HighlightRenderer,
   type Highlighter,
+  HighlightRenderer,
+  isSignificant,
   type LanguageDefinition,
+  registerLanguage,
 } from "@opentf/syntax-highlighter";
 
-import { LEDE, LINKS, SAMPLES, editHint, statusMessage } from "./page.ts";
+import { editHint, LEDE, LINKS, SAMPLES, statusMessage } from "./page.ts";
 
 const DEBOUNCE_MS = 60;
 
@@ -101,12 +101,7 @@ function activityButton(
   return btn;
 }
 
-function panelTab(
-  id: string,
-  label: string,
-  icon: string,
-  active = false,
-): HTMLButtonElement {
+function panelTab(id: string, label: string, icon: string, active = false): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.className = active ? "panel-tab active" : "panel-tab";
   btn.dataset.tab = id;
@@ -145,7 +140,12 @@ root.replaceChildren(
     element("div", { className: "titlebar-actions" }, [
       element("button", { id: "theme-toggle", className: "icon-button", title: "Change theme" }),
       element("div", { className: "dropdown" }, [
-        element("button", { id: "about-toggle", className: "icon-button", title: "About", innerHTML: ICONS.info }),
+        element("button", {
+          id: "about-toggle",
+          className: "icon-button",
+          title: "About",
+          innerHTML: ICONS.info,
+        }),
         element("div", { id: "about-menu", className: "menu", hidden: true }, [
           element("div", { className: "menu-header", textContent: LEDE }),
           ...LINKS.map((l) =>
@@ -180,7 +180,11 @@ root.replaceChildren(
         element("span", { className: "spacer" }),
         labeledSelect("language", "Language", []),
         labeledSelect("syntax-theme", "Theme", [...SYNTAX_THEMES] as unknown as string[]),
-        labeledSelect("sample", "Sample", SAMPLES.map((s) => s.name)),
+        labeledSelect(
+          "sample",
+          "Sample",
+          SAMPLES.map((s) => s.name),
+        ),
       ]),
 
       element("div", { className: "editor", id: "editor" }, [
@@ -223,7 +227,11 @@ root.replaceChildren(
               placeholder:
                 '{\n  "name": "minilang",\n  "aliases": ["mini"],\n  "keywords": ["frob"],\n  "operators": ["->>"]\n}',
             }),
-            element("button", { id: "register", className: "button", textContent: "Register & switch" }),
+            element("button", {
+              id: "register",
+              className: "button",
+              textContent: "Register & switch",
+            }),
           ]),
         ]),
       ]),
@@ -236,7 +244,11 @@ root.replaceChildren(
     element("span", { className: "spacer" }),
     element("span", { id: "status-language", className: "status-item" }),
     element("span", { id: "status-tokens", className: "status-item" }),
-    element("span", { id: "status-theme", className: "status-item status-button", title: "Change theme" }),
+    element("span", {
+      id: "status-theme",
+      className: "status-item status-button",
+      title: "Change theme",
+    }),
   ]),
 );
 
@@ -261,9 +273,7 @@ const statusLeft = byId<HTMLElement>("status-left");
 const statusLanguage = byId<HTMLElement>("status-language");
 const statusTokens = byId<HTMLElement>("status-tokens");
 const statusTheme = byId<HTMLElement>("status-theme");
-const activityButtons = [
-  ...document.querySelectorAll<HTMLButtonElement>(".activity"),
-];
+const activityButtons = [...document.querySelectorAll<HTMLButtonElement>(".activity")];
 const panelTabs = [...document.querySelectorAll<HTMLButtonElement>(".panel-tab")];
 
 /* ------------------------------------------------------- highlight pipeline */
@@ -296,7 +306,7 @@ function highlighterFor(language: string): Promise<Highlighter> {
 function renderGutter(source: string): void {
   const lineCount = source.split("\n").length;
   const numbers = Array.from({ length: lineCount }, (_, i) => String(i + 1)).join("\n");
-  gutter.textContent = numbers + "\n";
+  gutter.textContent = `${numbers}\n`;
 }
 
 function syncScroll(): void {
@@ -314,7 +324,7 @@ function renderNow(source: string): void {
   void highlighterFor(languageSelect.value).then((h) => {
     if (seq !== renderSeq || currentSource !== source) return;
     const tokens = h.highlight(source);
-    renderer!.render(tokens);
+    renderer?.render(tokens);
     const significant = tokens.filter((t) => isSignificant(t) && t.end > t.start);
     tokenList.replaceChildren(
       ...significant.map((t) =>

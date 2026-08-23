@@ -1,28 +1,27 @@
 import { Highlighter } from "./core/highlighter.ts";
-import { HighlightRenderer } from "./core/renderer.ts";
 import { loadLanguage } from "./core/registry.ts";
+import { HighlightRenderer } from "./core/renderer.ts";
 
-export { TokenType, WHITESPACE, createToken, isSignificant } from "./core/tokens.ts";
-export type { Token } from "./core/tokens.ts";
+export { GenericTokenizer } from "./core/generic-tokenizer.ts";
+export type { TokenizerLike } from "./core/highlighter.ts";
+export { Highlighter } from "./core/highlighter.ts";
 export type {
+  CommentDef,
   LanguageDefinition,
   LexDefinition,
-  StringDef,
-  CommentDef,
   RawToken,
+  StringDef,
 } from "./core/lexer.ts";
-export { Highlighter } from "./core/highlighter.ts";
-export type { TokenizerLike } from "./core/highlighter.ts";
-export { HighlightRenderer } from "./core/renderer.ts";
-export { HIGHLIGHT_PREFIX } from "./core/renderer.ts";
-export { Tokenizer } from "./core/tokenizer.ts";
-export { GenericTokenizer } from "./core/generic-tokenizer.ts";
 export { Lexer } from "./core/lexer.ts";
 export {
-  registerLanguage,
-  loadLanguage,
   getRegisteredLanguages,
+  loadLanguage,
+  registerLanguage,
 } from "./core/registry.ts";
+export { HIGHLIGHT_PREFIX, HighlightRenderer } from "./core/renderer.ts";
+export { Tokenizer } from "./core/tokenizer.ts";
+export type { Token } from "./core/tokens.ts";
+export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
 
 export interface HighlightOptions {
   language?: string;

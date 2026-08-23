@@ -1,8 +1,5 @@
 import { assert, assertEquals, test } from "runtime:test";
-import {
-  HIGHLIGHT_PREFIX,
-  HighlightRenderer,
-} from "../src/core/renderer.ts";
+import { HIGHLIGHT_PREFIX, HighlightRenderer } from "../src/core/renderer.ts";
 
 class FakeHighlight {
   constructor(...ranges) {

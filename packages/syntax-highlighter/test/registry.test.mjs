@@ -1,9 +1,5 @@
 import { assert, assertEquals, test } from "runtime:test";
-import {
-  getRegisteredLanguages,
-  loadLanguage,
-  registerLanguage,
-} from "../src/core/registry.ts";
+import { getRegisteredLanguages, loadLanguage, registerLanguage } from "../src/core/registry.ts";
 
 function throws(fn) {
   try {

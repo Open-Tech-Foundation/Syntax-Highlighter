@@ -1,7 +1,7 @@
 import { assert, assertEquals, test } from "runtime:test";
 import { GenericTokenizer } from "../src/core/generic-tokenizer.ts";
-import { Tokenizer } from "../src/core/tokenizer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
+import { Tokenizer } from "../src/core/tokenizer.ts";
 import javascript from "../src/languages/javascript.ts";
 
 // Deliberately expressible as JSON — this is the shape a user pastes into
@@ -107,7 +107,6 @@ test("Highlighter dispatches on the semantic field", () => {
   assert(new Highlighter(javascript).tokenizer instanceof Tokenizer);
   assert(new Highlighter(minilang).tokenizer instanceof GenericTokenizer);
   assert(
-    new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof
-      GenericTokenizer,
+    new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof GenericTokenizer,
   );
 });

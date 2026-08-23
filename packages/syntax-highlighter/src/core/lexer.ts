@@ -215,15 +215,11 @@ export class Lexer {
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
     this.strings = lex.strings ?? [];
-    this.comments = (lex.comments ?? [])
-      .slice()
-      .sort((a, b) => b.open.length - a.open.length);
+    this.comments = (lex.comments ?? []).slice().sort((a, b) => b.open.length - a.open.length);
     this.identifierStart = lex.identifierStart ?? DEFAULT_IDENTIFIER_START;
     this.identifierPart = lex.identifierPart ?? DEFAULT_IDENTIFIER_PART;
     this.operators = sortByLengthDesc(lex.operators ?? language.operators ?? []);
-    this.punctuation = sortByLengthDesc(
-      lex.punctuation ?? language.punctuation ?? [],
-    );
+    this.punctuation = sortByLengthDesc(lex.punctuation ?? language.punctuation ?? []);
     this.regexEnabled = lex.regex !== false;
     this.regexAfterParenKeywords = new Set(lex.regexAfterParenKeywords ?? []);
     this.shebang = lex.shebang === true;
@@ -301,9 +297,7 @@ export class Lexer {
     if (type !== "whitespace" && type !== "comment") {
       this.prev = token;
       this.lastClosedControlParen =
-        type === "punctuation" &&
-        token.value === ")" &&
-        detail?.controlClose === true;
+        type === "punctuation" && token.value === ")" && detail?.controlClose === true;
     }
     this.tokens.push(token);
   }
@@ -423,9 +417,7 @@ export class Lexer {
    * `${` nesting cannot overflow the call stack.
    */
   scanCode(untilTemplateClose = false): void {
-    const frames: ScanFrame[] = [
-      { kind: "code", untilClose: untilTemplateClose, depth: 0 },
-    ];
+    const frames: ScanFrame[] = [{ kind: "code", untilClose: untilTemplateClose, depth: 0 }];
     const s = this.source;
 
     while (frames.length > 0) {
@@ -532,10 +524,7 @@ export class Lexer {
       const decoratorWidth = codePointWidthAt(s, this.pos + 1);
       if (
         ch === "@" &&
-        matches(
-          this.identifierStart,
-          s.slice(this.pos + 1, this.pos + 1 + decoratorWidth),
-        )
+        matches(this.identifierStart, s.slice(this.pos + 1, this.pos + 1 + decoratorWidth))
       ) {
         let i = this.pos + 1 + decoratorWidth;
         while (i < this.length) {
@@ -573,8 +562,7 @@ export class Lexer {
 
       if (ch === "(") {
         this.parenControls.push(
-          this.prev?.type === "identifier" &&
-            this.regexAfterParenKeywords.has(this.prev.value),
+          this.prev?.type === "identifier" && this.regexAfterParenKeywords.has(this.prev.value),
         );
       }
 
