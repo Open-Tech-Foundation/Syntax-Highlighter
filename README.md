@@ -4,15 +4,26 @@
 
 *An [Open Tech Foundation](https://opentechf.org/) project*
 
-*Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.*
+*Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output. A fast, renderer-agnostic syntax highlighting library with semantic tokenization and support for CSS Custom Highlights, HTML/SSR, JSON, and ANSI terminal output.*
 
 </div>
 
-A fast, renderer-agnostic syntax highlighting library with semantic tokenization and support for CSS Custom Highlights, HTML/SSR, JSON, and ANSI terminal output.
-
+<!-- desc -->
 A modern syntax highlighting library that separates tokenization from rendering. A single semantic tokenizer produces renderer-agnostic token ranges that can power native browser highlighting, HTML/SSR output, JSON tooling, ANSI terminal output, and future custom renderers.
 
-> Highlights source code using native `Range` objects and semantic CSS highlights—without modifying the DOM.
+## Features
+
+* **Renderer-agnostic architecture** — one semantic tokenizer powers multiple output targets.
+* **Native browser highlighting** — uses the CSS Custom Highlight API without injecting token `<span>` elements into the DOM.
+* **SSR & static HTML** — render highlighted code to HTML for Next.js, Nextra, documentation sites, and static builds.
+* **ANSI terminal output** — generate syntax-highlighted output for terminals and CLI tooling.
+* **JSON token output** — inspect, test, serialize, and consume the semantic token stream.
+* **Extensible language support** — register languages and aliases without coupling them to renderers.
+* **Semantic tokens** — tokens use stable semantic types such as `keyword`, `string`, `function`, `number`, `comment`, and `operator`.
+* **UTF-16 range-based tokens** — precise `start`/`end` offsets make tokens directly consumable by different renderers.
+* **Themeable** — shared semantic themes work across browser and HTML renderers.
+* **Efficient updates** — designed for repeated highlighting and dynamic code content without rebuilding large DOM trees.
+* **Composable renderers** — add custom renderers without changing the tokenizer or language definitions.
 
 ## Usage
 
@@ -20,30 +31,25 @@ A modern syntax highlighting library that separates tokenization from rendering.
 pnpm add @opentf/syntax-highlighter
 ```
 
-Load the bundled theme and highlight an element:
-
 ```ts
 import "@opentf/syntax-highlighter/themes/default.css";
-import { highlightElement } from "@opentf/syntax-highlighter";
+import { createHighlighter, CSSHighlightRenderer, HtmlRenderer, JsonRenderer } from "@opentf/syntax-highlighter";
 
-const handle = await highlightElement(
-  document.querySelector("pre")!,
-  'const answer = 42;',
-);
+const highlighter = await createHighlighter({ language: "javascript" });
+const tokens = highlighter.highlight(source);
 
-handle.refresh('const answer = 43;');
-// Call handle.dispose() when the element is removed.
+// Browser — CSS Custom Highlights
+const css = new CSSHighlightRenderer(element);
+css.render(source, tokens);
+
+// SSR / static HTML
+const html = new HtmlRenderer().render(source, tokens);
+
+// JSON / tooling
+const json = new JsonRenderer().render(source, tokens);
 ```
 
-`refresh()` coalesces successive calls over 50ms by default; pass
-`{ debounceMs }` to change that, or `{ debounceMs: 0 }` to re-highlight
-synchronously.
-
-The renderer keeps the source in one text node and registers ranges under the
-`sh-*` highlight names. The default stylesheet follows the system color scheme;
-set `data-sh-theme="light"` or `data-sh-theme="dark"` on `<html>` to force a
-mode. Browsers without the CSS Custom Highlight API still receive the source
-text, without semantic colors.
+`CSSHighlightRenderer.render(source, tokens)` sets the text, clears stale `sh-*` highlights, and registers `Range`/`StaticRange` objects from UTF-16 offsets. Themes style both `::highlight(sh-*)` and `.sh-*` via `themes/shared.css` variables (`--sh-keyword` etc.); set `data-sh-theme="light"` or `"dark"` on `<html>` to force a mode.
 
 The built-in language is JavaScript. Additional lexical language definitions can
 be registered with `registerLanguage()` and loaded by name or alias. Definitions
