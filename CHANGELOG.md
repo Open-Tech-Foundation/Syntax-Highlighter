@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added GitHub Actions CI workflow (`.github/workflows/ci.yml`) that installs `tsr` and `esdev` and runs `tsr ci` (typecheck + lint + fmt:check + test + build) on pushes and pull requests to `main`; uses `pnpm/action-setup@v4` with `setup-node@v4` and `pnpm` cache.
+
+### Added
+
 - Added STF (Structured Text Format) language from https://stf.opentechf.org/ — DATE/TIMESTAMP/DECIMAL/BIGINT/BINARY/Geometry/Time/Duration constructors, T/F/N literals, backtick/double-quote strings, # comments, @version/@schema directives with 2 demo samples (config + stream); verified Highlighter 101, tsc, headless 101 picker + STF + 4 themes + FPS.
 - Reached 100 languages (added ocaml, elm, fortran, pascal, ada, lisp, scheme, prolog, smalltalk, d, v, odin, gleam, tcl, raku, vb, coffeescript, haml, ejs, stylus, ini, env, csv, properties, fish, systemd, apache, typst, org, wasm; 100 total) with 30 demo samples; verified Highlighter 100, tsc, headless 100 picker + 5 langs + 4 themes + FPS 61.
 - Expanded to 70 languages (added erlang, julia, assembly, nim, crystal, less, astro, pug, handlebars, jinja, liquid, nix, batch, gitconfig, actions, kubernetes, rst, asciidoc; covers full requested set incl. Less/SVG/Astro/Pug/Handlebars/Jinja/Liquid/Nix/Batch/GitConfig/Actions/Kubernetes/RST/AsciiDoc; 70 total) with 18 demo samples; verified Highlighter 70, tsc, headless 70 picker + 18 langs + 4 themes + FPS 61.
