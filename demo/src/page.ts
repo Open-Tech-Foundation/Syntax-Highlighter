@@ -605,6 +605,17 @@ resource "aws_instance" "web" {
   instance_type = "t2.micro"
 }`,
   },
+
+  {
+    name: "http — request",
+    language: "http",
+    source: `GET /api/users HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Bearer token123
+
+{"query": "test"}`,
+  },
 ];
 
 /** A one-line status message. */

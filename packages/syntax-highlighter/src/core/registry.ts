@@ -54,6 +54,51 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   regex: () => import("../languages/regex.ts").then((m) => m.default),
   protobuf: () => import("../languages/protobuf.ts").then((m) => m.default),
   hcl: () => import("../languages/hcl.ts").then((m) => m.default),
+  http: () => import("../languages/http.ts").then((m) => m.default),
+};
+
+const aliasToCanonical: Record<string, string> = {
+  "js": "javascript", "mjs": "javascript", "cjs": "javascript",
+  "ts": "typescript", "tsx": "typescript", "mts": "typescript", "cts": "typescript",
+  "jsonc": "json", "json5": "json",
+  "sh": "bash", "shell": "bash", "zsh": "bash", "bashrc": "bash", "ash": "bash",
+  "md": "markdown", "mdx": "markdown", "mkd": "markdown",
+  "jsp": "java",
+  "golang": "go",
+  "rs": "rust",
+  "pl": "perl", "pm": "perl",
+  "rlang": "r", "rscript": "r",
+  "ps": "powershell", "ps1": "powershell", "psm1": "powershell",
+  "objc": "objectivec", "objective-c": "objectivec", "m": "objectivec", "mm": "objectivec",
+  "hs": "haskell",
+  "ex": "elixir", "exs": "elixir",
+  "sc": "scala",
+  "sass": "scss",
+  "htm": "html", "xhtml": "html",
+  "yml": "yaml",
+  "pgsql": "sql", "postgres": "sql", "mysql": "sql", "sqlite": "sql",
+  "kt": "kotlin", "kts": "kotlin",
+  "swiftlang": "swift",
+  "gql": "graphql",
+  "docker": "dockerfile",
+  "patch": "diff",
+  "c++": "cpp", "cc": "cpp", "cxx": "cpp", "hpp": "cpp",
+  "cs": "csharp", "c#": "csharp",
+  "clj": "clojure", "cljs": "clojure", "cljc": "clojure", "edn": "clojure",
+  "f#": "fsharp", "fs": "fsharp", "fsx": "fsharp", "fsi": "fsharp",
+  "gradle": "groovy", "gvy": "groovy",
+  "sol": "solidity",
+  "make": "makefile", "mk": "makefile", "mak": "makefile", "gnumake": "makefile",
+  "nginxconf": "nginx",
+  "tex": "latex", "bibtex": "latex",
+  "re": "regex", "regexp": "regex",
+  "proto": "protobuf", "proto3": "protobuf",
+  "terraform": "hcl", "tf": "hcl", "hcl2": "hcl",
+  "https": "http", "http-request": "http", "http-response": "http",
+  "octave": "matlab", "mat": "matlab",
+  "py": "python", "py3": "python", "pyi": "python",
+  "dartlang": "dart",
+  "xsl": "xml", "xslt": "xml", "svg": "xml", "rss": "xml", "atom": "xml",
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -210,7 +255,11 @@ export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
   const known = registered.get(key);
   if (known) return known;
 
-  const loader = builtinLoaders[key];
+  let loader = builtinLoaders[key];
+  if (!loader) {
+    const canonical = aliasToCanonical[key];
+    if (canonical) loader = builtinLoaders[canonical];
+  }
   if (!loader) {
     throw new Error(`Unknown language: ${name}`);
   }

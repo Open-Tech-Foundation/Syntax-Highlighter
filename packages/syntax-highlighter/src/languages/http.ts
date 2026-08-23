@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const http: LanguageDefinition = {
+  name: "http",
+  aliases: ["https","http-request","http-response"],
+  semantic: "generic",
+  keywords: ["GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS","TRACE","CONNECT","HTTP","HTTPS","Host","Content-Type","Content-Length","Accept","Authorization","Cache-Control","Connection","Cookie","User-Agent","Accept-Encoding","Accept-Language","Referer","Origin","Content-Encoding","Transfer-Encoding"],
+  operators: [":","=",";","?", "&", "/", ".", "-", "_", "~", "%", "#", "@", "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="],
+  punctuation: ["{","}","[","]","(",")",";",":",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"#",close:"\n",line:true}], regex:false },
+};
+export default http;
