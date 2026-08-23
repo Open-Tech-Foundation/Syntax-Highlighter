@@ -50,22 +50,6 @@ const html = new HtmlRenderer().render(source, tokens);
 const json = new JsonRenderer().render(source, tokens);
 ```
 
-`CSSHighlightRenderer.render(source, tokens)` sets the text, clears stale `sh-*` highlights, and registers `Range`/`StaticRange` objects from UTF-16 offsets. Themes style both `::highlight(sh-*)` and `.sh-*` via `themes/shared.css` variables (`--sh-keyword` etc.); set `data-sh-theme="light"` or `"dark"` on `<html>` to force a mode.
-
-The built-in language is JavaScript. Additional lexical language definitions can
-be registered with `registerLanguage()` and loaded by name or alias. Definitions
-are validated at runtime so malformed user-provided JSON fails immediately, and
-an alias that would take over another language's name is rejected rather than
-silently shadowing it.
-
-A definition is classified by its `semantic` field. The default, `generic`,
-uses the language's own keyword, boolean, null and constant lists plus two
-structural cues shared by most languages — an identifier before `(` is a
-function, an identifier after `.` is a property. Only `semantic: "javascript"`
-opts into the JavaScript-specific pass (arrows, destructuring, classes,
-imports, parameter binding), so a custom language is never highlighted as if it
-were JavaScript.
-
 ## Development
 
 The project uses the organization-provided `esdev` binary for builds and tests,
