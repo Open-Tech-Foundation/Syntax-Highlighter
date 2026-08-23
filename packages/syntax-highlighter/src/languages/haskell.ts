@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const haskell: LanguageDefinition = {
+  name: "haskell",
+  aliases: ["hs"],
+  semantic: "generic",
+  keywords: ["case","class","data","default","deriving","do","else","foreign","if","import","in","infix","infixl","infixr","instance","let","module","newtype","of","then","type","where","qualified","as","hiding","mdo","family","role","instance","forall","exists"],
+  booleans: ["True","False"],
+  nulls: [],
+  operators: ["::","=>","->","<-","==","/=","<=",">=","&&","||","++","!!","=","+","-","*","/","%","&","|","^","~","!","<",">","?",".",":","|","\\","$","@"],
+  punctuation: ["(",")","{","}","[","]",";",",","#","`"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false}], comments: [{open:"--",close:"\n",line:true},{open:"{-",close:"-}"}], regex:false },
+};
+export default haskell;

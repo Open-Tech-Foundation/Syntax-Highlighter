@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const scala: LanguageDefinition = {
+  name: "scala",
+  aliases: ["sc"],
+  semantic: "generic",
+  keywords: ["abstract","case","catch","class","def","do","else","extends","false","final","finally","for","forSome","if","implicit","import","lazy","match","new","null","object","override","package","private","protected","return","sealed","super","this","throw","trait","try","true","type","val","var","while","with","yield","given","using","enum","then"],
+  booleans: ["true","false"],
+  nulls: ["null"],
+  operators: ["=>","<-","=>","==","!=","<=",">=","&&","||","+=","-=","*=","/=","%=","=","+","-","*","/","%","&","|","^","~","!","<",">","?",":",".","::",":::"],
+  punctuation: ["(",")","{","}","[","]",";",",","@","#","_"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:'"""',close:'"""',escape:"\\",multiline:true},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default scala;

@@ -302,6 +302,109 @@ fun greet(name: String): String {
 
 val s = greet("world")`,
   },
+
+  {
+    name: "dart — class",
+    language: "dart",
+    source: `class Greeter {
+  final String name;
+  Greeter(this.name);
+  // comment
+  String greet() => 'Hello, $name!';
+}
+var g = Greeter('world');`,
+  },
+  {
+    name: "scala — def",
+    language: "scala",
+    source: `object Main extends App {
+  // comment
+  def greet(name: String): String = s"Hello, $name!"
+  println(greet("world"))
+}`,
+  },
+  {
+    name: "lua — function",
+    language: "lua",
+    source: `-- comment
+function greet(name)
+  return "Hello, " .. name .. "!"
+end
+print(greet("world"))`,
+  },
+  {
+    name: "perl — sub",
+    language: "perl",
+    source: `# comment
+sub greet {
+  my $name = shift;
+  return "Hello, $name!";
+}
+print greet("world");`,
+  },
+  {
+    name: "r — function",
+    language: "r",
+    source: `# comment
+greet <- function(name) {
+  paste0("Hello, ", name, "!")
+}
+print(greet("world"))`,
+  },
+  {
+    name: "powershell — function",
+    language: "powershell",
+    source: `# comment
+function Greet {
+  param([string]$Name)
+  return "Hello, $Name!"
+}
+Greet -Name "world"`,
+  },
+  {
+    name: "objectivec — interface",
+    language: "objectivec",
+    source: `// comment
+@interface Greeter : NSObject
+- (NSString *)greet:(NSString *)name;
+@end
+@implementation Greeter
+- (NSString *)greet:(NSString *)name {
+  return [NSString stringWithFormat:@"Hello, %@!", name];
+}
+@end`,
+  },
+  {
+    name: "haskell — hello",
+    language: "haskell",
+    source: `-- comment
+greet :: String -> String
+greet name = "Hello, " ++ name ++ "!"
+main = print (greet "world")`,
+  },
+  {
+    name: "elixir — def",
+    language: "elixir",
+    source: `# comment
+defmodule Greeter do
+  def greet(name) do
+    "Hello, #{name}!"
+  end
+end
+IO.puts Greeter.greet("world")`,
+  },
+  {
+    name: "zig — fn",
+    language: "zig",
+    source: `// comment
+const std = @import("std");
+fn greet(name: []const u8) []const u8 {
+  return name;
+}
+pub fn main() void {
+  _ = greet("world");
+}`,
+  },
 ];
 
 /** A one-line status message. */

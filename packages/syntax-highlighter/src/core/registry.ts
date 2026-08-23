@@ -24,6 +24,16 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   csharp: () => import("../languages/csharp.ts").then((m) => m.default),
   swift: () => import("../languages/swift.ts").then((m) => m.default),
   kotlin: () => import("../languages/kotlin.ts").then((m) => m.default),
+  dart: () => import("../languages/dart.ts").then((m) => m.default),
+  scala: () => import("../languages/scala.ts").then((m) => m.default),
+  lua: () => import("../languages/lua.ts").then((m) => m.default),
+  perl: () => import("../languages/perl.ts").then((m) => m.default),
+  r: () => import("../languages/r.ts").then((m) => m.default),
+  powershell: () => import("../languages/powershell.ts").then((m) => m.default),
+  objectivec: () => import("../languages/objectivec.ts").then((m) => m.default),
+  haskell: () => import("../languages/haskell.ts").then((m) => m.default),
+  elixir: () => import("../languages/elixir.ts").then((m) => m.default),
+  zig: () => import("../languages/zig.ts").then((m) => m.default),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

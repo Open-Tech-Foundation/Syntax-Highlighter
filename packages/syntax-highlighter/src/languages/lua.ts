@@ -1,0 +1,12 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const lua: LanguageDefinition = {
+  name: "lua",
+  semantic: "generic",
+  keywords: ["and","break","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"],
+  booleans: ["true","false"],
+  nulls: ["nil"],
+  operators: ["==","~=","<=",">=","..","...","and","or","not","=","+","-","*","/","%","^","#","<",">"],
+  punctuation: ["(",")","{","}","[","]",";",",",".",":"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false},{open:"[[",close:"]]",escape:"",multiline:true}], comments: [{open:"--",close:"\n",line:true},{open:"--[[",close:"]]"}], regex:false },
+};
+export default lua;

@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const elixir: LanguageDefinition = {
+  name: "elixir",
+  aliases: ["ex","exs"],
+  semantic: "generic",
+  keywords: ["after","and","case","catch","cond","def","defimpl","defmodule","defp","defprotocol","do","else","end","false","fn","for","if","import","in","nil","not","or","raise","receive","require","rescue","try","true","unless","use","when","with","__MODULE__","__DIR__","__ENV__"],
+  booleans: ["true","false"],
+  nulls: ["nil"],
+  operators: ["|>", "<>", "++","--","==","!=","=~","===","!==","<=",">=","&&","||","and","or","not","in","=","+","-","*","/","%","&","|","^","!","<",">",".","=>","->","|","\\","~>"],
+  punctuation: ["(",")","{","}","[","]",";",",","@","#","$","%","~"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false},{open:'"""',close:'"""',escape:"\\",multiline:true}], comments: [{open:"#",close:"\n",line:true}], regex:false },
+};
+export default elixir;

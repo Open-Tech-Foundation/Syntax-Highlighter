@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const perl: LanguageDefinition = {
+  name: "perl",
+  aliases: ["pl","pm"],
+  semantic: "generic",
+  keywords: ["my","our","local","sub","if","elsif","else","unless","while","until","for","foreach","do","next","last","redo","return","package","use","require","BEGIN","END","print","say","chomp","push","pop","shift","unshift","map","grep","sort","split","join","open","close","die","warn","eval","given","when","default","state","continue","exit"],
+  booleans: ["true","false"],
+  nulls: ["undef"],
+  operators: ["=>","==","!=","<=" ,">=","=~","!~","&&","||","//","+=","-=","*=","/=","%=","=","+","-","*","/","%","&","|","^","~","!","<",">","?",":",".","..","..."],
+  punctuation: ["(",")","{","}","[","]",";",",","@","$","%","#"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false},{open:"`",close:"`",escape:"\\",multiline:false}], comments: [{open:"#",close:"\n",line:true},{open:"=pod",close:"=cut"}], regex:true },
+};
+export default perl;
