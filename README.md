@@ -3,10 +3,15 @@
 # Syntax Highlighter
 
 *An [Open Tech Foundation](https://opentechf.org/) project*
+
+*Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.*
+
 </div>
 
-> ### A JavaScript syntax highlighter built on the CSS Custom Highlight API.
->
+A fast, renderer-agnostic syntax highlighting library with semantic tokenization and support for CSS Custom Highlights, HTML/SSR, JSON, and ANSI terminal output.
+
+A modern syntax highlighting library that separates tokenization from rendering. A single semantic tokenizer produces renderer-agnostic token ranges that can power native browser highlighting, HTML/SSR output, JSON tooling, ANSI terminal output, and future custom renderers.
+
 > Highlights source code using native `Range` objects and semantic CSS highlights—without modifying the DOM.
 
 ## Usage

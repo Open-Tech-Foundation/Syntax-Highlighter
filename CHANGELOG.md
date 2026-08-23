@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Updated `README.md` with renderer-agnostic one-liner, short and regular descriptions.
+
+### Added
+
 - Added shared theme selector layer (`themes/shared.css`) mapping `::highlight(sh-*)` and `.sh-*` to same `--sh-*` variables so `CSSHighlightRenderer` and `HtmlRenderer` share semantic colors; theme files now only define variables and `@import "./shared.css"` (hifi HTML preview in demo `editor-preview` split: `Tokens | JSON (pretty) | HTML | Preview`).
 - Simplified renderer API to explicit `renderer.render(source, tokens)` — `CSSHighlightRenderer` now `render(source, tokens)` (sets text, clears stale, creates `Range`/`StaticRange` from UTF-16 offsets, preserves external highlights, no `setText` required); `HtmlRenderer` and `JsonRenderer` expose same `render(source, tokens)` as canonical (duplicate `renderHTML`/`renderJSON` helpers de-emphasized), package exports `CSSHighlightRenderer`, `HtmlRenderer`, `JsonRenderer`.
 
