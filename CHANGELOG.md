@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed CI install steps to use `https://raw.githubusercontent.com/Open-Tech-Foundation/tsr/main/install.sh` and `https://raw.githubusercontent.com/Open-Tech-Foundation/ES-Runtime/main/install.sh` with `bash` instead of `https://tsr.opentechf.org/install.sh` / `https://esrun.opentechf.org/install.sh` with `sh` which returned HTML and failed with `Syntax error: "(" unexpected`.
+
 - Fixed `biome.json` deprecation (`linter.rules.recommended` → `preset`, `files.ignore` → `files.includes`) and disabled `noMisleadingCharacterClass`/`noShadowRestrictedNames`/`noAssignInExpressions`/`a11y/noSvgWithoutTitle` that blocked `tsr lint`/`fmt:check`; ran `biome check --write` to format 140+ files; fixed `tasks.toml` `test:e2e` arg `esdev test -- highlight.e2e` → `esdev test highlight.e2e` so `tsr ci` (typecheck + lint + fmt:check + test + build, tests via `esdev`) is now green including the `highlight.e2e` browser suite.
 
 ### Added

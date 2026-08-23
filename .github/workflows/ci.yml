@@ -23,12 +23,12 @@ jobs:
 
       - name: Install tsr
         run: |
-          curl -fsSL https://tsr.opentechf.org/install.sh | sh
+          curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/tsr/main/install.sh | bash
           echo "$HOME/.tsr/bin" >> $GITHUB_PATH
 
       - name: Install esdev
         run: |
-          curl -fsSL https://esrun.opentechf.org/install.sh | sh
+          curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/ES-Runtime/main/install.sh | bash
           echo "$HOME/.es-runtime/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
