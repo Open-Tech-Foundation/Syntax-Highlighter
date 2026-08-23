@@ -47,6 +47,19 @@ const ICONS = {
 };
 
 const THEME_MODES = ["auto", "light", "dark"] as const;
+const SYNTAX_THEMES = [
+  "default",
+  "github-light",
+  "github-dark",
+  "monokai",
+  "dracula",
+  "nord",
+  "solarized-dark",
+  "solarized-light",
+  "one-dark",
+  "gruvbox-dark",
+  "tokyo-night",
+] as const;
 type ThemeMode = (typeof THEME_MODES)[number];
 const THEME_ICONS: Record<ThemeMode, string> = {
   auto: ICONS.contrast,
@@ -166,6 +179,7 @@ root.replaceChildren(
         ]),
         element("span", { className: "spacer" }),
         labeledSelect("language", "Language", []),
+        labeledSelect("syntax-theme", "Theme", [...SYNTAX_THEMES] as unknown as string[]),
         labeledSelect("sample", "Sample", SAMPLES.map((s) => s.name)),
       ]),
 
@@ -233,6 +247,7 @@ const inputLayer = byId<HTMLTextAreaElement>("input-layer");
 const gutter = byId<HTMLPreElement>("gutter");
 const tokenList = byId<HTMLOListElement>("token-list");
 const languageSelect = byId<HTMLSelectElement>("select-language");
+const syntaxThemeSelect = byId<HTMLSelectElement>("select-syntax-theme");
 const sampleSelect = byId<HTMLSelectElement>("select-sample");
 const themeToggle = byId<HTMLButtonElement>("theme-toggle");
 const aboutToggle = byId<HTMLButtonElement>("about-toggle");
@@ -392,6 +407,18 @@ panelCollapse.addEventListener("click", () => activatePanel("editor"));
 for (const name of [...getRegisteredLanguages()].sort()) languageSelect.add(new Option(name, name));
 
 languageSelect.addEventListener("change", () => void switchLanguage(languageSelect.value));
+
+syntaxThemeSelect.addEventListener("change", () => {
+  const link = document.getElementById("sh-theme") as HTMLLinkElement | null;
+  if (link) {
+    // dist build serves themes from /assets/, dev serves from node_modules
+    const isDist = link.href.includes("/assets/");
+    link.href = isDist
+      ? `/assets/${syntaxThemeSelect.value}.css`
+      : `./node_modules/@opentf/syntax-highlighter/src/themes/${syntaxThemeSelect.value}.css`;
+  }
+  setStatus("ok", `theme: ${syntaxThemeSelect.value}`);
+});
 
 sampleSelect.addEventListener("change", () => {
   const sample = SAMPLES[sampleSelect.selectedIndex];

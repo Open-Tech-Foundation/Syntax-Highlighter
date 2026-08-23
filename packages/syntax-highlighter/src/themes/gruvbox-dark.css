@@ -1,0 +1,37 @@
+/* Gruvbox Dark */
+:root {
+  --sh-comment: #928374;
+  --sh-keyword: #fb4934;
+  --sh-string: #b8bb26;
+  --sh-number: #d3869b;
+  --sh-regex: #b8bb26;
+  --sh-function: #fabd2f;
+  --sh-class: #8ec07c;
+  --sh-variable: #ebdbb2;
+  --sh-identifier: #ebdbb2;
+  --sh-constant: #d3869b;
+  --sh-property: #83a598;
+  --sh-parameter: #fe8019;
+  --sh-operator: #fb4934;
+  --sh-punctuation: #ebdbb2;
+  --sh-decorator: #fe8019;
+  --sh-boolean: #d3869b;
+  --sh-null: #d3869b;
+}
+::highlight(sh-comment) { color: var(--sh-comment); }
+::highlight(sh-keyword) { color: var(--sh-keyword); }
+::highlight(sh-string) { color: var(--sh-string); }
+::highlight(sh-number) { color: var(--sh-number); }
+::highlight(sh-regex) { color: var(--sh-regex); }
+::highlight(sh-function) { color: var(--sh-function); }
+::highlight(sh-class) { color: var(--sh-class); }
+::highlight(sh-variable) { color: var(--sh-variable); }
+::highlight(sh-identifier) { color: var(--sh-identifier); }
+::highlight(sh-constant) { color: var(--sh-constant); }
+::highlight(sh-property) { color: var(--sh-property); }
+::highlight(sh-parameter) { color: var(--sh-parameter); }
+::highlight(sh-operator) { color: var(--sh-operator); }
+::highlight(sh-punctuation) { color: var(--sh-punctuation); }
+::highlight(sh-decorator) { color: var(--sh-decorator); }
+::highlight(sh-boolean) { color: var(--sh-boolean); }
+::highlight(sh-null) { color: var(--sh-null); }
