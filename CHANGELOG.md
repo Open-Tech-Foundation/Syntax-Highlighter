@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Fixed `pnpm/action-setup` version conflict in CI/release workflows — removed `with: version:` (now resolves via `packageManager: pnpm@11.21.0`) to avoid `ERR_PNPM_BAD_PM_VERSION` / `Multiple versions of pnpm specified` on `pnpm/action-setup@v4`.
+- Fixed npm package README — `tsr build` / `release.toml` now `cp ../../README.md README.md` into `packages/syntax-highlighter/` so `pnpm pack` includes `README.md` (was missing; root README outside package not auto-included).
 
 ## [0.1.0] - 2026-08-23
 

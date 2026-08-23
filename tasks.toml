@@ -13,7 +13,7 @@ dir = "demo"
 
 # ------------------------------------------------------------------ build
 [tasks.build]
-run = "esdev build --lib src --dts-bundle"
+run = "esdev build --lib src --dts-bundle && cp ../../README.md README.md"
 dir = "packages/syntax-highlighter"
 
 # ------------------------------------------------------------------ typecheck / test
