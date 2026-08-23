@@ -1010,6 +1010,39 @@ DocumentRoot /var/www/html`,
   (func $greet (param $n i32) (result i32)
     local.get $n))`,
   },
+
+  {
+    name: "stf — config",
+    language: "stf",
+    source: `# comments are part of the format
+{
+  service: \`checkout-api\`,
+  enabled: T,
+  launch_on: DATE(2026-02-01),
+  deploy_after: TIMESTAMP(2026-01-15T10:30:00Z),
+  price_cap: DECIMAL(199.00),   # scale is data
+  account_id: BIGINT(9007199254740993),
+  signing_key: BINARY(SGVsbG8=),
+  boundary: Geometry("Polygon", [
+    [
+      [80.27, 13.08],
+      [80.28, 13.08],
+      [80.28, 13.09],
+      [80.27, 13.08]
+    ]
+  ]),
+  opens: Time("09:30"),
+  ttl: Duration("PT45M"),
+  regions: [\`eu-west-1\`, \`us-east-1\`]
+}`,
+  },
+  {
+    name: "stf — stream",
+    language: "stf",
+    source: `@version(1.0)
+{at: TIMESTAMP(2026-01-15T10:30:00Z), level: \`warn\`}
+{at: TIMESTAMP(2026-01-15T10:30:04Z), level: \`info\`}`,
+  },
 ];
 
 /** A one-line status message. */
