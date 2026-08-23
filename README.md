@@ -4,7 +4,7 @@
 
 *An [Open Tech Foundation](https://opentechf.org/) project*
 
-*Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.*
+*Modern, renderer-agnostic syntax highlighting with one tokenizer*
 
 </div>
 
