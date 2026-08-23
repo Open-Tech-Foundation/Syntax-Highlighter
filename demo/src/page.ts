@@ -405,6 +405,96 @@ pub fn main() void {
   _ = greet("world");
 }`,
   },
+
+  {
+    name: "scss — variables",
+    language: "scss",
+    source: `// comment
+$primary: #333;
+@mixin center {
+  display: flex;
+  justify-content: center;
+}
+.container {
+  @include center;
+  color: $primary;
+}`,
+  },
+  {
+    name: "vue — sfc",
+    language: "vue",
+    source: `<template>
+  <!-- comment -->
+  <div class="app">{{ msg }}</div>
+</template>
+<script setup>
+import { ref } from 'vue';
+const msg = ref('Hello');
+</script>`,
+  },
+  {
+    name: "svelte — component",
+    language: "svelte",
+    source: `<script>
+  // comment
+  let count = 0;
+  function inc() { count += 1; }
+</script>
+<button on:click={inc}>{count}</button>`,
+  },
+  {
+    name: "toml — config",
+    language: "toml",
+    source: `# comment
+[owner]
+name = "Tom"
+[database]
+server = "192.168.1.1"
+ports = [8000, 8001]`,
+  },
+  {
+    name: "xml — doc",
+    language: "xml",
+    source: `<?xml version="1.0"?>
+<!-- comment -->
+<note>
+  <to>User</to>
+  <from>App</from>
+  <body>Hello</body>
+</note>`,
+  },
+  {
+    name: "graphql — query",
+    language: "graphql",
+    source: `# comment
+query GetUser {
+  user(id: "1") {
+    name
+    email
+  }
+}`,
+  },
+  {
+    name: "dockerfile — build",
+    language: "dockerfile",
+    source: `# comment
+FROM node:20
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["node", "index.js"]`,
+  },
+  {
+    name: "diff — patch",
+    language: "diff",
+    source: `diff --git a/file.txt b/file.txt
+--- a/file.txt
++++ b/file.txt
+@@ -1,3 +1,3 @@
+-hello
++hello world
+ context`,
+  },
 ];
 
 /** A one-line status message. */

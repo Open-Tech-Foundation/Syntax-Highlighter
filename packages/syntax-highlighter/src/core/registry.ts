@@ -34,6 +34,14 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   haskell: () => import("../languages/haskell.ts").then((m) => m.default),
   elixir: () => import("../languages/elixir.ts").then((m) => m.default),
   zig: () => import("../languages/zig.ts").then((m) => m.default),
+  scss: () => import("../languages/scss.ts").then((m) => m.default),
+  vue: () => import("../languages/vue.ts").then((m) => m.default),
+  svelte: () => import("../languages/svelte.ts").then((m) => m.default),
+  toml: () => import("../languages/toml.ts").then((m) => m.default),
+  xml: () => import("../languages/xml.ts").then((m) => m.default),
+  graphql: () => import("../languages/graphql.ts").then((m) => m.default),
+  dockerfile: () => import("../languages/dockerfile.ts").then((m) => m.default),
+  diff: () => import("../languages/diff.ts").then((m) => m.default),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

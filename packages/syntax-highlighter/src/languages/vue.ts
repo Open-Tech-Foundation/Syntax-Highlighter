@@ -1,0 +1,10 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const vue: LanguageDefinition = {
+  name: "vue",
+  semantic: "generic",
+  keywords: ["template","script","style","setup","defineProps","defineEmits","defineExpose","ref","reactive","computed","watch","onMounted","onUnmounted","props","emits","export","default","import","from","if","else","for","while","return","const","let","var","function","class"],
+  operators: ["=>","==","!=","<=",">=","&&","||","=","+","-","*","/","%","!","<",">","?",";",":",".",",","::"],
+  punctuation: ["(",")","{","}","[","]","<",">","/",";",",","@","#","$","&","|"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false},{open:"`",close:"`",escape:"\\",multiline:false}], comments: [{open:"<!--",close:"-->"},{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default vue;
