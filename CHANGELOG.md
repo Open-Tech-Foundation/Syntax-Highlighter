@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-23
+
 ### Added
 
 - Updated `README.md` with renderer-agnostic one-liner and short desc merged as blockquote, regular description, `Features` section, and updated `Usage` to explicit `renderer.render(source, tokens)` (`CSSHighlightRenderer` / `HtmlRenderer` / `JsonRenderer`).
