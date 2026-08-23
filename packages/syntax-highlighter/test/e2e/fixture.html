@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>syntax-highlighter e2e fixture</title>
+    <!-- The theme exactly as a consumer loads it, and the built package
+         exactly as it is published — not the TypeScript sources. -->
+    <link rel="stylesheet" href="/src/themes/default.css" />
+    <style>
+      body {
+        margin: 0;
+        background: #ffffff;
+      }
+      pre {
+        margin: 0;
+        padding: 12px;
+        /* A large, plain face keeps glyph cores solid, so a sampled pixel is
+           the highlight colour rather than an antialiased blend. */
+        font: 28px/1.6 "DejaVu Sans Mono", monospace;
+        -webkit-font-smoothing: antialiased;
+        white-space: pre;
+        color: #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <pre id="one"></pre>
+    <pre id="two"></pre>
+    <script type="module">
+      import * as api from "/dist/index.js";
+      // The tests drive the public API themselves; this only exposes it.
+      window.sh = api;
+      window.ready = true;
+    </script>
+  </body>
+</html>
