@@ -1,0 +1,78 @@
+/* Shared renderer selectors — consumed by both renderers via same semantic variables.
+ *
+ * CSSHighlightRenderer → ::highlight(sh-*)
+ * HTMLRenderer         → .sh-*
+ *
+ * Theme files define only --sh-* variables; this file maps them to both
+ * selector forms so themes stay renderer-agnostic. Keep rendering and theming
+ * separate — HTMLRenderer does not inject <style>.
+ */
+
+::highlight(sh-comment),
+.sh-comment {
+  color: var(--sh-comment);
+}
+::highlight(sh-keyword),
+.sh-keyword {
+  color: var(--sh-keyword);
+}
+::highlight(sh-string),
+.sh-string {
+  color: var(--sh-string);
+}
+::highlight(sh-number),
+.sh-number {
+  color: var(--sh-number);
+}
+::highlight(sh-regex),
+.sh-regex {
+  color: var(--sh-regex);
+}
+::highlight(sh-function),
+.sh-function {
+  color: var(--sh-function);
+}
+::highlight(sh-class),
+.sh-class {
+  color: var(--sh-class);
+}
+::highlight(sh-variable),
+.sh-variable {
+  color: var(--sh-variable);
+}
+::highlight(sh-identifier),
+.sh-identifier {
+  color: var(--sh-identifier);
+}
+::highlight(sh-constant),
+.sh-constant {
+  color: var(--sh-constant);
+}
+::highlight(sh-property),
+.sh-property {
+  color: var(--sh-property);
+}
+::highlight(sh-parameter),
+.sh-parameter {
+  color: var(--sh-parameter);
+}
+::highlight(sh-operator),
+.sh-operator {
+  color: var(--sh-operator);
+}
+::highlight(sh-punctuation),
+.sh-punctuation {
+  color: var(--sh-punctuation);
+}
+::highlight(sh-decorator),
+.sh-decorator {
+  color: var(--sh-decorator);
+}
+::highlight(sh-boolean),
+.sh-boolean {
+  color: var(--sh-boolean);
+}
+::highlight(sh-null),
+.sh-null {
+  color: var(--sh-null);
+}

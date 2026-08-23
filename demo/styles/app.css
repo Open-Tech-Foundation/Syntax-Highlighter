@@ -562,3 +562,83 @@ select:focus {
   border-top: 1px solid var(--border);
   margin-top: 0.25rem;
 }
+
+/* ----------------------------------------------------------- editor-preview hifi */
+
+.editor-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.9fr);
+  min-height: 0;
+  gap: 0;
+  background: var(--bg-editor);
+}
+
+.preview {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0 0.35rem;
+  height: 32px;
+  background: linear-gradient(180deg, var(--panel-header-bg), var(--bg-panel));
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.preview-header .panel-tab {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  border-bottom: none;
+}
+
+.preview-header .panel-tab.active {
+  background: var(--bg-editor);
+  color: var(--fg);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.preview-body {
+  overflow: auto;
+  min-height: 0;
+  background: var(--bg-editor);
+  padding: 0.35rem 0;
+}
+
+.json-pane,
+.html-pane {
+  margin: 0;
+  padding: 0.75rem;
+  font: 12px / 1.6 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--fg);
+  background: transparent;
+}
+
+.preview-body .token-list {
+  padding-top: 0.25rem;
+}
+
+.html-preview-pane {
+  padding: 0.75rem;
+  font: 13px / 1.55 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg-editor);
+  color: var(--fg);
+}
+
+.html-preview-pane span[class^="sh-"] {
+  font: inherit;
+}

@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added shared theme selector layer (`themes/shared.css`) mapping `::highlight(sh-*)` and `.sh-*` to same `--sh-*` variables so `CSSHighlightRenderer` and `HtmlRenderer` share semantic colors; theme files now only define variables and `@import "./shared.css"` (hifi HTML preview in demo `editor-preview` split: `Tokens | JSON (pretty) | HTML | Preview`).
+- Simplified renderer API to explicit `renderer.render(source, tokens)` — `CSSHighlightRenderer` now `render(source, tokens)` (sets text, clears stale, creates `Range`/`StaticRange` from UTF-16 offsets, preserves external highlights, no `setText` required); `HtmlRenderer` and `JsonRenderer` expose same `render(source, tokens)` as canonical (duplicate `renderHTML`/`renderJSON` helpers de-emphasized), package exports `CSSHighlightRenderer`, `HtmlRenderer`, `JsonRenderer`.
+
+### Changed
+
+- Renamed `HighlightRenderer` → `CSSHighlightRenderer` for explicit renderer choice; `CSSHighlightRenderer` now `render(source, tokens)` is canonical, no default renderer — consumer tokenizes then picks `CSSHighlightRenderer` / `HtmlRenderer` / `JsonRenderer` (`render(source, tokens)`).
+
+### Added
+
+- Added JSON renderer (`renderJSON`/`validateTokens`/`JsonRenderer`) that validates the minimal `{start,end,type}` contract (exclusive UTF-16 offsets, semantic `type`, contiguous coverage, no surrogate splits) and serializes tokens — and HTML renderer (`renderHTML`/`renderDocument`/`escapeHtml`/`HtmlRenderer`) for SSR/static/docs that recovers text via `source.slice(start,end)` and emits escaped `<span class="sh-{type}">` HTML with no DOM/Range dependency.
+
 ### Fixed
 
 - Fixed CI install steps to use `https://raw.githubusercontent.com/Open-Tech-Foundation/tsr/main/install.sh` and `https://raw.githubusercontent.com/Open-Tech-Foundation/ES-Runtime/main/install.sh` with `bash` instead of `https://tsr.opentechf.org/install.sh` / `https://esrun.opentechf.org/install.sh` with `sh` which returned HTML and failed with `Syntax error: "(" unexpected`.

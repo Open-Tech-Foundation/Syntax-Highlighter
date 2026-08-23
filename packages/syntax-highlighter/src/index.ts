@@ -1,10 +1,14 @@
+import { CSSHighlightRenderer } from "./core/css-renderer.ts";
 import { Highlighter } from "./core/highlighter.ts";
 import { loadLanguage } from "./core/registry.ts";
-import { HighlightRenderer } from "./core/renderer.ts";
 
+export { CSSHighlightRenderer } from "./core/css-renderer.ts";
 export { GenericTokenizer } from "./core/generic-tokenizer.ts";
 export type { TokenizerLike } from "./core/highlighter.ts";
 export { Highlighter } from "./core/highlighter.ts";
+export type { HtmlRendererOptions } from "./core/html-renderer.ts";
+export { HtmlRenderer } from "./core/html-renderer.ts";
+export { JsonRenderer } from "./core/json-renderer.ts";
 export type {
   CommentDef,
   LanguageDefinition,
@@ -18,7 +22,6 @@ export {
   loadLanguage,
   registerLanguage,
 } from "./core/registry.ts";
-export { HIGHLIGHT_PREFIX, HighlightRenderer } from "./core/renderer.ts";
 export { Tokenizer } from "./core/tokenizer.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
@@ -34,7 +37,7 @@ export interface HighlightOptions {
 
 export interface HighlightHandle {
   highlighter: Highlighter;
-  renderer: HighlightRenderer;
+  renderer: CSSHighlightRenderer;
   refresh(nextSource: string): void;
   dispose(): void;
 }
@@ -52,9 +55,8 @@ export async function highlightElement(
   { language = "javascript", debounceMs = 50 }: HighlightOptions = {},
 ): Promise<HighlightHandle> {
   const highlighter = await createHighlighter({ language });
-  const renderer = new HighlightRenderer(element);
-  renderer.setText(source);
-  renderer.render(highlighter.highlight(source));
+  const renderer = new CSSHighlightRenderer(element);
+  renderer.render(source, highlighter.highlight(source));
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;
@@ -66,8 +68,7 @@ export async function highlightElement(
       clearTimeout(timer);
       const paint = () => {
         if (disposed) return;
-        renderer.setText(nextSource);
-        renderer.render(highlighter.highlight(nextSource));
+        renderer.render(nextSource, highlighter.highlight(nextSource));
       };
       if (debounceMs <= 0) paint();
       else timer = setTimeout(paint, debounceMs);

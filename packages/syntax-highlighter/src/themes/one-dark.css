@@ -1,4 +1,6 @@
 /* One Dark (Atom) */
+@import "./shared.css";
+
 :root {
   --sh-comment: #5c6370;
   --sh-keyword: #c678dd;
@@ -17,55 +19,4 @@
   --sh-decorator: #d19a66;
   --sh-boolean: #d19a66;
   --sh-null: #d19a66;
-}
-::highlight(sh-comment) {
-  color: var(--sh-comment);
-}
-::highlight(sh-keyword) {
-  color: var(--sh-keyword);
-}
-::highlight(sh-string) {
-  color: var(--sh-string);
-}
-::highlight(sh-number) {
-  color: var(--sh-number);
-}
-::highlight(sh-regex) {
-  color: var(--sh-regex);
-}
-::highlight(sh-function) {
-  color: var(--sh-function);
-}
-::highlight(sh-class) {
-  color: var(--sh-class);
-}
-::highlight(sh-variable) {
-  color: var(--sh-variable);
-}
-::highlight(sh-identifier) {
-  color: var(--sh-identifier);
-}
-::highlight(sh-constant) {
-  color: var(--sh-constant);
-}
-::highlight(sh-property) {
-  color: var(--sh-property);
-}
-::highlight(sh-parameter) {
-  color: var(--sh-parameter);
-}
-::highlight(sh-operator) {
-  color: var(--sh-operator);
-}
-::highlight(sh-punctuation) {
-  color: var(--sh-punctuation);
-}
-::highlight(sh-decorator) {
-  color: var(--sh-decorator);
-}
-::highlight(sh-boolean) {
-  color: var(--sh-boolean);
-}
-::highlight(sh-null) {
-  color: var(--sh-null);
 }

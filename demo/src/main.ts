@@ -6,11 +6,13 @@
  * language), and a status bar.
  */
 import {
+  CSSHighlightRenderer,
   createHighlighter,
   getRegisteredLanguages,
   type Highlighter,
-  HighlightRenderer,
+  HtmlRenderer,
   isSignificant,
+  JsonRenderer,
   type LanguageDefinition,
   registerLanguage,
 } from "@opentf/syntax-highlighter";
@@ -187,22 +189,60 @@ root.replaceChildren(
         ),
       ]),
 
-      element("div", { className: "editor", id: "editor" }, [
-        element("pre", { id: "gutter", className: "gutter", ariaHidden: "true" }),
-        element("pre", { id: "highlight-layer", className: "layer highlight", ariaHidden: "true" }),
-        element("textarea", {
-          id: "input-layer",
-          className: "layer input",
-          spellcheck: false,
-          wrap: "off",
-          placeholder: "Type JavaScript…",
-        }),
+      element("div", { className: "editor-preview" }, [
+        element("div", { className: "editor", id: "editor" }, [
+          element("pre", { id: "gutter", className: "gutter", ariaHidden: "true" }),
+          element("pre", {
+            id: "highlight-layer",
+            className: "layer highlight",
+            ariaHidden: "true",
+          }),
+          element("textarea", {
+            id: "input-layer",
+            className: "layer input",
+            spellcheck: false,
+            wrap: "off",
+            placeholder: "Type JavaScript…",
+          }),
+        ]),
+        element("section", { className: "preview", id: "preview" }, [
+          element("div", { className: "preview-header" }, [
+            panelTab("tokens", "Tokens", ICONS.list, true),
+            panelTab("json", "JSON", ICONS.code),
+            panelTab("html", "HTML", ICONS.file),
+            panelTab("preview", "Preview", ICONS.sun),
+            element("span", { className: "spacer" }),
+            element("button", {
+              id: "preview-copy",
+              className: "icon-button",
+              title: "Copy",
+              textContent: "⧉",
+            }),
+          ]),
+          element("div", { className: "preview-body" }, [
+            element("ol", { id: "token-list", className: "token-list" }),
+            element("pre", {
+              id: "json-pane",
+              className: "json-pane",
+              hidden: true,
+            } as unknown as Record<string, unknown>),
+            element("pre", {
+              id: "html-pane",
+              className: "html-pane",
+              hidden: true,
+            } as unknown as Record<string, unknown>),
+            element("div", {
+              id: "html-preview-pane",
+              className: "html-preview-pane",
+              hidden: true,
+            } as unknown as Record<string, unknown>),
+          ]),
+        ]),
       ]),
 
       element("section", { className: "panel", id: "panel", hidden: true }, [
         element("div", { className: "panel-header" }, [
-          panelTab("tokens", "Tokens", ICONS.list, true),
-          panelTab("custom", "Custom language", ICONS.code),
+          panelTab("custom", "Custom language", ICONS.code, true),
           element("span", { className: "spacer" }),
           element("button", {
             id: "panel-collapse",
@@ -212,8 +252,7 @@ root.replaceChildren(
           }),
         ]),
         element("div", { className: "panel-body" }, [
-          element("ol", { id: "token-list", className: "token-list" }),
-          element("div", { id: "custom-pane", className: "custom-pane", hidden: true }, [
+          element("div", { id: "custom-pane", className: "custom-pane" }, [
             element("p", {
               className: "hint",
               textContent:
@@ -258,6 +297,9 @@ const highlightLayer = byId<HTMLPreElement>("highlight-layer");
 const inputLayer = byId<HTMLTextAreaElement>("input-layer");
 const gutter = byId<HTMLPreElement>("gutter");
 const tokenList = byId<HTMLOListElement>("token-list");
+const jsonPane = byId<HTMLPreElement>("json-pane");
+const htmlPane = byId<HTMLPreElement>("html-pane");
+const htmlPreviewPane = byId<HTMLDivElement>("html-preview-pane");
 const languageSelect = byId<HTMLSelectElement>("select-language");
 const syntaxThemeSelect = byId<HTMLSelectElement>("select-syntax-theme");
 const sampleSelect = byId<HTMLSelectElement>("select-sample");
@@ -274,11 +316,13 @@ const statusLanguage = byId<HTMLElement>("status-language");
 const statusTokens = byId<HTMLElement>("status-tokens");
 const statusTheme = byId<HTMLElement>("status-theme");
 const activityButtons = [...document.querySelectorAll<HTMLButtonElement>(".activity")];
-const panelTabs = [...document.querySelectorAll<HTMLButtonElement>(".panel-tab")];
+const panelTabs = [...document.querySelectorAll<HTMLButtonElement>(".panel .panel-tab")];
+const previewTabs = [...document.querySelectorAll<HTMLButtonElement>(".preview .panel-tab")];
 
 /* ------------------------------------------------------- highlight pipeline */
 
-let renderer: HighlightRenderer | null = null;
+let renderer: CSSHighlightRenderer | null = null;
+let activePreview: "tokens" | "json" | "html" | "preview" = "tokens";
 let currentSource = "";
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let renderSeq = 0;
@@ -319,12 +363,11 @@ function renderNow(source: string): void {
   currentSource = source;
   const seq = ++renderSeq;
   if (!renderer) return;
-  renderer.setText(source);
   renderGutter(source);
   void highlighterFor(languageSelect.value).then((h) => {
     if (seq !== renderSeq || currentSource !== source) return;
     const tokens = h.highlight(source);
-    renderer?.render(tokens);
+    renderer?.render(source, tokens);
     const significant = tokens.filter((t) => isSignificant(t) && t.end > t.start);
     tokenList.replaceChildren(
       ...significant.map((t) =>
@@ -334,6 +377,23 @@ function renderNow(source: string): void {
         ]),
       ),
     );
+    try {
+      jsonPane.textContent = JSON.stringify(
+        JSON.parse(new JsonRenderer().render(source, tokens)),
+        null,
+        2,
+      );
+    } catch {
+      jsonPane.textContent = "Invalid tokens";
+    }
+    try {
+      const html = new HtmlRenderer().render(source, tokens);
+      htmlPane.textContent = html;
+      htmlPreviewPane.innerHTML = html;
+    } catch {
+      htmlPane.textContent = "Invalid tokens";
+      htmlPreviewPane.textContent = "Invalid tokens";
+    }
     statusTokens.textContent = `${significant.length} tokens`;
     syncScroll();
   });
@@ -378,10 +438,35 @@ function cycleTheme(): void {
   applyTheme(THEME_MODES[themeIndex] ?? "auto");
 }
 
-function activatePanel(tab: "editor" | "tokens" | "custom"): void {
+function activatePanel(tab: "editor" | "custom"): void {
   activePanel = tab;
   const open = tab !== "editor";
   panel.hidden = !open;
+
+  for (const btn of previewTabs) {
+    btn.addEventListener("click", () => {
+      const tab = (btn.dataset.tab ?? "tokens") as "tokens" | "json" | "html" | "preview";
+      activatePreview(tab);
+    });
+  }
+
+  document.getElementById("preview-copy")?.addEventListener("click", async () => {
+    const pane =
+      activePreview === "json"
+        ? jsonPane
+        : activePreview === "html"
+          ? htmlPane
+          : activePreview === "preview"
+            ? htmlPreviewPane
+            : tokenList;
+    const text = (pane as unknown as HTMLElement).textContent ?? "";
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("ok", "copied");
+    } catch {
+      setStatus("error", "copy failed");
+    }
+  });
 
   for (const btn of activityButtons) {
     btn.classList.toggle("active", btn.dataset.panel === tab);
@@ -389,17 +474,35 @@ function activatePanel(tab: "editor" | "tokens" | "custom"): void {
   for (const t of panelTabs) {
     t.classList.toggle("active", open && t.dataset.tab === tab);
   }
-  tokenList.hidden = !(open && tab === "tokens");
   customPane.hidden = !(open && tab === "custom");
+}
+
+function activatePreview(tab: "tokens" | "json" | "html" | "preview"): void {
+  activePreview = tab;
+  for (const btn of previewTabs) btn.classList.toggle("active", btn.dataset.tab === tab);
+  tokenList.hidden = tab !== "tokens";
+  jsonPane.hidden = tab !== "json";
+  htmlPane.hidden = tab !== "html";
+  htmlPreviewPane.hidden = tab !== "preview";
 }
 
 for (const btn of activityButtons) {
   btn.addEventListener("click", () => {
-    const target = (btn.dataset.panel ?? "editor") as "editor" | "tokens" | "custom";
+    const target = (btn.dataset.panel ?? "editor") as
+      | "editor"
+      | "tokens"
+      | "json"
+      | "html"
+      | "preview"
+      | "custom";
+    if (target === "tokens" || target === "json" || target === "html" || target === "preview") {
+      activatePreview(target as "tokens" | "json" | "html" | "preview");
+      return;
+    }
     if (target !== "editor" && activePanel === target) {
       activatePanel("editor");
     } else {
-      activatePanel(target);
+      activatePanel(target as "editor" | "custom");
     }
     if (activePanel === "editor") inputLayer.focus();
   });
@@ -407,7 +510,7 @@ for (const btn of activityButtons) {
 
 for (const t of panelTabs) {
   t.addEventListener("click", () => {
-    const tab = (t.dataset.tab ?? "tokens") as "tokens" | "custom";
+    const tab = (t.dataset.tab ?? "custom") as "custom";
     activatePanel(tab);
   });
 }
@@ -473,7 +576,7 @@ registerBtn.addEventListener("click", () => {
 
 /* ------------------------------------------------------------------ boot */
 
-renderer = new HighlightRenderer(highlightLayer);
+renderer = new CSSHighlightRenderer(highlightLayer);
 // Start with first sample's language.
 if (SAMPLES[0]?.language) languageSelect.value = SAMPLES[0].language;
 inputLayer.value = SAMPLES[0]?.source ?? "";
