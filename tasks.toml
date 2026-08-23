@@ -1,0 +1,48 @@
+# tasks.toml — workspace root anchor and config for `tsr` (https://tsr.opentechf.org)
+# Run any task from anywhere in the repo: `tsr <task> [-- <passthrough>]`
+# Inspect without executing: `tsr <task> --dry-run`  •  List: `tsr --list`  •  Edit: `tsr --config`
+
+[workspace]
+members = ["packages/*", "demo"]
+
+# ------------------------------------------------------------------ demo
+# Live demo workbench (IDE-style playground) — `esdev start` defaults to http://localhost:5173
+[tasks.demo]
+run = "esdev start"
+dir = "demo"
+
+# ------------------------------------------------------------------ build
+[tasks.build]
+run = "esdev build --lib src --dts-bundle"
+dir = "packages/syntax-highlighter"
+
+# ------------------------------------------------------------------ typecheck / test
+[tasks.typecheck]
+packages = ["packages/*"]
+run = "tsc --noEmit"
+
+[tasks.test]
+packages = ["packages/syntax-highlighter"]
+run = "esdev test"
+
+[tasks."test:e2e"]
+run = "esdev test -- highlight.e2e"
+dir = "packages/syntax-highlighter"
+
+# ------------------------------------------------------------------ lint / fmt (Biome)
+[tasks.lint]
+run = "biome lint"
+
+[tasks.fmt]
+run = "biome format --write"
+
+[tasks."fmt:check"]
+run = "biome check"
+
+# ------------------------------------------------------------------ ci
+[tasks.check]
+deps = ["typecheck", "lint", "fmt:check", "test"]
+
+[tasks.ci]
+deps = ["typecheck", "lint", "fmt:check", "test", "build"]
+

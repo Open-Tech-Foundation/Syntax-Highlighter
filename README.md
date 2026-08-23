@@ -57,13 +57,24 @@ were JavaScript.
 ## Development
 
 The project uses the organization-provided `esdev` binary for builds and tests,
-and pnpm for workspace dependency management:
+and pnpm for workspace dependency management. [`tsr`](https://tsr.opentechf.org)
+wraps them into a single interface — `tasks.toml` is the workspace root:
 
 ```sh
 pnpm install
-esdev test
-pnpm typecheck
-pnpm build
+
+# via tsr (recommended) — run from anywhere in the repo
+tsr demo           # demo workbench (esdev start in demo/)
+tsr test           # library unit tests
+tsr test:all       # all workspaces
+tsr typecheck      # tsc --noEmit across workspaces
+tsr lint           # biome lint (fix: tsr lint -- --write)
+tsr fmt            # biome format --write
+tsr build          # library → packages/syntax-highlighter/dist/
+tsr ci             # typecheck + lint + fmt:check + test:all + build
+tsr clean          # rm -rf dist/
+
+# no package.json scripts — tsr is the entry point
 ```
 
 `@opentf/esrun-types` is a development dependency in each TypeScript workspace
