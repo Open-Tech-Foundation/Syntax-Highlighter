@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const kubernetes: LanguageDefinition = {
+  name: "kubernetes",
+  aliases: ["k8s","k8s-manifest","k8s-yaml"],
+  semantic: "generic",
+  keywords: ["apiVersion","kind","metadata","name","namespace","labels","annotations","spec","replicas","selector","matchLabels","template","containers","image","ports","containerPort","env","resources","limits","requests","volumeMounts","volumes","service","deployment","pod","configMap","secret","ingress","statefulSet","daemonSet","job","cronJob","serviceAccount"],
+  operators: [":","-","|","&","!","?",".",","],
+  punctuation: ["[","]","{","}","(",")",";",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-","|","&","#","!","?",".",",",";",":"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"#",close:"\n",line:true}], regex:false },
+};
+export default kubernetes;

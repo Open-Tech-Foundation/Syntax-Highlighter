@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const asciidoc: LanguageDefinition = {
+  name: "asciidoc",
+  aliases: ["adoc","asciidoctor"],
+  semantic: "generic",
+  keywords: ["include","ifdef","ifndef","endif","toc","sectnums","source","NOTE","TIP","IMPORTANT","WARNING","CAUTION","listing","example","sidebar","quote","verse","table","colspan","rowspan"],
+  operators: ["==","--","__",":","`","|","*","#","=","-","`","'","*","_","|","#","!","?",".",",",";",":"],
+  punctuation: ["[","]","(",")","{","}","<",">","`","*","_","|","*","#",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-","=","-","`","'","*","_","|","#","!","?",".",",",";",":","=","-","*","+","%"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"//",close:"\n",line:true},{open:"////",close:"////"}], regex:false },
+};
+export default asciidoc;

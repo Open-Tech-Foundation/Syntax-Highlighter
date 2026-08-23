@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const nim: LanguageDefinition = {
+  name: "nim",
+  aliases: ["nimrod"],
+  semantic: "generic",
+  keywords: ["addr","and","as","asm","bind","block","break","case","cast","concept","const","continue","converter","defer","discard","distinct","div","do","elif","else","end","enum","except","export","finally","for","from","func","if","import","in","include","interface","is","isnot","iterator","let","macro","method","mixin","mod","nil","not","notin","object","of","or","out","proc","ptr","raise","ref","return","shl","shr","static","template","try","tuple","type","using","var","when","while","xor","true","false","nil"],
+  booleans: ["true","false"],
+  nulls: ["nil"],
+  operators: ["=>","->","=","==","!=","<",">","<=",">=","+","-","*","/","%","&","|","^","~","!","?",";",":",".",",","@","$","#","`","~","|","&"],
+  punctuation: ["(",")","{","}","[","]",";",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'''",close:"'''",escape:"",multiline:true},{open:'"""',close:'"""',escape:"\\",multiline:true}], comments: [{open:"#",close:"\n",line:true}], regex:false },
+};
+export default nim;

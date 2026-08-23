@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const erlang: LanguageDefinition = {
+  name: "erlang",
+  aliases: ["erl","hrl"],
+  semantic: "generic",
+  keywords: ["after","and","andalso","band","begin","bnot","bor","bsl","bsr","bxor","case","catch","cond","div","end","fun","if","let","not","of","or","orelse","receive","rem","try","when","xor","maybe","else","maybe","true","false","nil"],
+  booleans: ["true","false"],
+  nulls: ["nil","undefined"],
+  operators: ["->","<-","=>","==","/=","=:=","=/=","<",">","=<",">=","=","+","-","*","/","++","--","!","?",";",":",".","|","||","&&","!","?",".",","],
+  punctuation: ["(",")","{","}","[","]",";",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"%",close:"\n",line:true}], regex:false },
+};
+export default erlang;

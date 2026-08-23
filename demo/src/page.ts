@@ -616,6 +616,164 @@ Authorization: Bearer token123
 
 {"query": "test"}`,
   },
+
+  {
+    name: "erlang — case",
+    language: "erlang",
+    source: `% comment
+case X of
+  1 -> ok;
+  _ -> error
+end.`,
+  },
+  {
+    name: "julia — function",
+    language: "julia",
+    source: `# comment
+function greet(name)
+  return "Hello, " * name * "!"
+end
+println(greet("world"))`,
+  },
+  {
+    name: "assembly — mov",
+    language: "assembly",
+    source: `; comment
+section .text
+global _start
+_start:
+  mov rax, 1
+  ret`,
+  },
+  {
+    name: "nim — proc",
+    language: "nim",
+    source: `# comment
+proc greet(name: string): string =
+  result = "Hello, " & name & "!"
+echo greet("world")`,
+  },
+  {
+    name: "crystal — def",
+    language: "crystal",
+    source: `# comment
+def greet(name)
+  "Hello, #{name}!"
+end
+puts greet("world")`,
+  },
+  {
+    name: "less — mixin",
+    language: "less",
+    source: `/* comment */
+@color: #111;
+.mixin(@a) { color: @a; }
+.box { .mixin(@color); }`,
+  },
+  {
+    name: "astro — component",
+    language: "astro",
+    source: `---
+// comment
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Hi"><h1>Hello</h1></Layout>`,
+  },
+  {
+    name: "pug — template",
+    language: "pug",
+    source: `// comment
+doctype html
+html
+  body
+    h1 Hello #{name}`,
+  },
+  {
+    name: "handlebars — if",
+    language: "handlebars",
+    source: `{{!-- comment --}}
+{{#if user}}
+  Hello {{user.name}}!
+{{/if}}`,
+  },
+  {
+    name: "jinja — block",
+    language: "jinja",
+    source: `{# comment #}
+{% if user %}
+  Hello {{ user.name }}!
+{% endif %}`,
+  },
+  {
+    name: "liquid — assign",
+    language: "liquid",
+    source: `{% comment %}comment{% endcomment %}
+{% assign name = "world" %}
+Hello {{ name }}!`,
+  },
+  {
+    name: "nix — let",
+    language: "nix",
+    source: `# comment
+{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell { buildInputs = [ pkgs.hello ]; }`,
+  },
+  {
+    name: "batch — echo",
+    language: "batch",
+    source: `@echo off
+rem comment
+echo Hello %NAME%
+pause`,
+  },
+  {
+    name: "gitconfig — section",
+    language: "gitconfig",
+    source: `# comment
+[user]
+  name = Test
+  email = test@example.com`,
+  },
+  {
+    name: "actions — workflow",
+    language: "actions",
+    source: `# comment
+name: ci
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4`,
+  },
+  {
+    name: "kubernetes — deployment",
+    language: "kubernetes",
+    source: `# comment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3`,
+  },
+  {
+    name: "rst — directive",
+    language: "rst",
+    source: `.. note::
+  -- comment
+  Hello, world!
+`,
+  },
+  {
+    name: "asciidoc — header",
+    language: "asciidoc",
+    source: `// comment
+= Hello
+Author Name
+
+Hello, world!`,
+  },
 ];
 
 /** A one-line status message. */

@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const jinja: LanguageDefinition = {
+  name: "jinja",
+  aliases: ["jinja2","django"],
+  semantic: "generic",
+  keywords: ["block","extends","include","macro","import","from","set","if","elif","else","endif","for","endfor","in","is","not","and","or","filter","endfilter","call","endcall","raw","endraw","trans","endtrans","with","endwith","autoescape","endautoescape"],
+  operators: ["{{","}}","{%","%}","{#","#}","|","=","==","!=","<",">","<=",">=","+","-","*","/","%","~","**","and","or","not","in","is","|","&","#","!","?",".",",",";",":"],
+  punctuation: ["{","}","(",")","[","]","|",".",",",";",":","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"{#",close:"#}"}], regex:false },
+};
+export default jinja;

@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const nix: LanguageDefinition = {
+  name: "nix",
+  aliases: ["nixos"],
+  semantic: "generic",
+  keywords: ["let","in","rec","with","inherit","if","then","else","assert","or","and","import","derivation","true","false","null"],
+  booleans: ["true","false"],
+  nulls: ["null"],
+  operators: ["=","==","!=","<",">","<=",">=","+","-","*","/","++","//","&&","||","!","?",";",":",".","->","=>","|","&","#","!","?",".",",",";",":","#","@","$","%","&","|"],
+  punctuation: ["{","}","[","]","(",")",";",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","&","|",";",":","=","/","-"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"''",close:"''",escape:"''",multiline:true}], comments: [{open:"#",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default nix;
