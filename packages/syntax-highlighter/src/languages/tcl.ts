@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const tcl: LanguageDefinition = {
+  name: "tcl",
+  aliases: [],
+  semantic: "generic",
+  keywords: ["proc", "if", "else", "elseif", "while", "for", "foreach", "break", "continue", "return", "set", "puts", "true", "false"],
+  operators: ["=", "==", "!=", "<", ">", "<=", ">=", "&&", "||", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "?", ":", ".", ",", ";"],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "@", "$", "%", "&", "|", "<", ">", ".", "_", "~", "`", "'", "\"", "\\", "?", "!", "^"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default tcl;

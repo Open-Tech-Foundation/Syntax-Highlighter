@@ -1,0 +1,11 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const stylus: LanguageDefinition = {
+  name: "stylus",
+  aliases: ["styl"],
+  semantic: "generic",
+  keywords: ["if", "else", "for", "in", "return", "true", "false", "null"],
+  operators: ["=", "==", "!=", "<", ">", "<=", ">=", "&&", "||", "+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "?", ":", ".", ",", ";"],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "@", "$", "%", "&", "|", "<", ">", ".", "_", "~", "`", "'", "\"", "\\", "?", "!", "^"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default stylus;

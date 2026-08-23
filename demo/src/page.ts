@@ -774,6 +774,242 @@ Author Name
 
 Hello, world!`,
   },
+
+  {
+    name: "ocaml — let",
+    language: "ocaml",
+    source: `(* comment *)
+let greet name = "Hello, " ^ name ^ "!"
+let () = print_endline (greet "world")`,
+  },
+  {
+    name: "elm — case",
+    language: "elm",
+    source: `-- comment
+greet name = "Hello, " ++ name ++ "!"
+main = greet "world"`,
+  },
+  {
+    name: "fortran — program",
+    language: "fortran",
+    source: `! comment
+program hello
+  print *, "Hello, world!"
+end program hello`,
+  },
+  {
+    name: "pascal — program",
+    language: "pascal",
+    source: `{ comment }
+program Hello;
+begin
+  writeln('Hello, world!');
+end.`,
+  },
+  {
+    name: "ada — procedure",
+    language: "ada",
+    source: `-- comment
+procedure Hello is
+begin
+  Put_Line("Hello, world!");
+end Hello;`,
+  },
+  {
+    name: "lisp — defun",
+    language: "lisp",
+    source: `; comment
+(defun greet (name)
+  (format t "Hello, ~a!" name))
+(greet "world")`,
+  },
+  {
+    name: "scheme — define",
+    language: "scheme",
+    source: `; comment
+(define (greet name)
+  (string-append "Hello, " name "!"))
+(display (greet "world"))`,
+  },
+  {
+    name: "prolog — fact",
+    language: "prolog",
+    source: `% comment
+greet(Name) :- format("Hello, ~w!~n", [Name]).
+:- greet(world).`,
+  },
+  {
+    name: "smalltalk — hello",
+    language: "smalltalk",
+    source: `" comment "
+Transcript show: 'Hello, world!'; cr.`,
+  },
+  {
+    name: "d — hello",
+    language: "d",
+    source: `// comment
+import std.stdio;
+void main() {
+  writeln("Hello, world!");
+}`,
+  },
+  {
+    name: "v — fn",
+    language: "v",
+    source: `// comment
+fn greet(name string) string {
+  return 'Hello, ' + name + '!'
+}
+println(greet('world'))`,
+  },
+  {
+    name: "odin — proc",
+    language: "odin",
+    source: `// comment
+package main
+greet :: proc(name: string) -> string {
+  return "Hello"
+}`,
+  },
+  {
+    name: "gleam — fn",
+    language: "gleam",
+    source: `// comment
+pub fn greet(name) {
+  "Hello, " <> name <> "!"
+}`,
+  },
+  {
+    name: "tcl — proc",
+    language: "tcl",
+    source: `# comment
+proc greet {name} {
+  return "Hello, $name!"
+}
+puts [greet world]`,
+  },
+  {
+    name: "raku — sub",
+    language: "raku",
+    source: `# comment
+sub greet($name) {
+  return "Hello, $name!"
+}
+say greet("world");`,
+  },
+  {
+    name: "vb — sub",
+    language: "vb",
+    source: `' comment
+Sub Greet(name As String)
+  Console.WriteLine("Hello, " & name & "!")
+End Sub`,
+  },
+  {
+    name: "coffeescript — class",
+    language: "coffeescript",
+    source: `# comment
+greet = (name) -> "Hello, #{name}!"
+console.log greet "world"`,
+  },
+  {
+    name: "haml — tag",
+    language: "haml",
+    source: `// comment
+%div Hello #{name}`,
+  },
+  {
+    name: "ejs — if",
+    language: "ejs",
+    source: `<%# comment %>
+<% if (user) { %>
+  Hello <%= user.name %>!
+<% } %>`,
+  },
+  {
+    name: "stylus — rule",
+    language: "stylus",
+    source: `// comment
+body
+  color #111
+  .box
+    color #222`,
+  },
+  {
+    name: "ini — section",
+    language: "ini",
+    source: `; comment
+[section]
+key = value`,
+  },
+  {
+    name: "env — vars",
+    language: "env",
+    source: `# comment
+API_KEY=123
+DEBUG=true`,
+  },
+  {
+    name: "csv — data",
+    language: "csv",
+    source: `# comment
+name,age
+Alice,30
+Bob,25`,
+  },
+  {
+    name: "properties — keys",
+    language: "properties",
+    source: `# comment
+key=value
+hello=world`,
+  },
+  {
+    name: "fish — function",
+    language: "fish",
+    source: `# comment
+function greet
+  echo "Hello, $argv!"
+end`,
+  },
+  {
+    name: "systemd — unit",
+    language: "systemd",
+    source: `# comment
+[Unit]
+Description=Hello
+[Service]
+ExecStart=/usr/bin/hello`,
+  },
+  {
+    name: "apache — config",
+    language: "apache",
+    source: `# comment
+ServerName example.com
+DocumentRoot /var/www/html`,
+  },
+  {
+    name: "typst — let",
+    language: "typst",
+    source: `// comment
+#let greet(name) = [Hello, #name!]
+#greet("world")`,
+  },
+  {
+    name: "org — headline",
+    language: "org",
+    source: `# comment
+* Hello
+** World`,
+  },
+  {
+    name: "wasm — module",
+    language: "wasm",
+    source: `; comment
+(module
+  (func $greet (param $n i32) (result i32)
+    local.get $n))`,
+  },
 ];
 
 /** A one-line status message. */

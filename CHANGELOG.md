@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Reached 100 languages (added ocaml, elm, fortran, pascal, ada, lisp, scheme, prolog, smalltalk, d, v, odin, gleam, tcl, raku, vb, coffeescript, haml, ejs, stylus, ini, env, csv, properties, fish, systemd, apache, typst, org, wasm; 100 total) with 30 demo samples; verified Highlighter 100, tsc, headless 100 picker + 5 langs + 4 themes + FPS 61.
 - Expanded to 70 languages (added erlang, julia, assembly, nim, crystal, less, astro, pug, handlebars, jinja, liquid, nix, batch, gitconfig, actions, kubernetes, rst, asciidoc; covers full requested set incl. Less/SVG/Astro/Pug/Handlebars/Jinja/Liquid/Nix/Batch/GitConfig/Actions/Kubernetes/RST/AsciiDoc; 70 total) with 18 demo samples; verified Highlighter 70, tsc, headless 70 picker + 18 langs + 4 themes + FPS 61.
 - Added HTTP language and fixed alias resolution (tsx/json5/shell/mdx/py etc via aliasToCanonical) to fully cover requested 39 (now 52 total, 39/39); verified Highlighter 52, tsc, headless 52 picker + HTTP + 4 themes + FPS 61.
 - Expanded to 51 languages (added matlab, clojure, fsharp, groovy, solidity, makefile, cmake, nginx, latex, regex, protobuf, hcl; covers requested 19 including Lua/R/Scala/Elixir/Haskell/Perl/Objective-C; total 51) with 12 demo samples; verified Highlighter 51, tsc, headless 51 picker + 12 langs + 4 themes + FPS.
