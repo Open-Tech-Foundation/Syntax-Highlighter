@@ -1,0 +1,33 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const bash: LanguageDefinition = {
+  name: "bash",
+  aliases: ["sh", "shell", "zsh", "bashrc", "ash"],
+  semantic: "generic",
+  keywords: [
+    "if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done",
+    "case", "esac", "in", "function", "select", "time", "coproc",
+    "declare", "local", "export", "return", "exit", "break", "continue",
+    "shift", "source", "alias", "echo", "printf", "test", "true", "false",
+  ],
+  booleans: ["true", "false"],
+  operators: [
+    "&&", "||", ">>", "<<", ">>>", "2>", "&>", "==", "!=", "=~",
+    "=", "+", "-", "*", "/", "%", "!", "|", "&", ";", "$", "?", ":", ".",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ",", "@", "#"],
+  lex: {
+    strings: [
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+      { open: "`", close: "`", escape: "\\", multiline: false },
+      { open: "$'", close: "'", escape: "\\", multiline: false },
+      { open: '$"', close: '"', escape: "\\", multiline: false },
+    ],
+    comments: [{ open: "#", close: "\n", line: true }],
+    regex: false,
+    shebang: true,
+  },
+};
+
+export default bash;

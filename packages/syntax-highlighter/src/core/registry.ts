@@ -4,6 +4,16 @@ const registered = new Map<string, LanguageDefinition>();
 
 const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   javascript: () => import("../languages/javascript.ts").then((m) => m.default),
+  typescript: () => import("../languages/typescript.ts").then((m) => m.default),
+  jsx: () => import("../languages/jsx.ts").then((m) => m.default),
+  html: () => import("../languages/html.ts").then((m) => m.default),
+  css: () => import("../languages/css.ts").then((m) => m.default),
+  python: () => import("../languages/python.ts").then((m) => m.default),
+  json: () => import("../languages/json.ts").then((m) => m.default),
+  bash: () => import("../languages/bash.ts").then((m) => m.default),
+  sql: () => import("../languages/sql.ts").then((m) => m.default),
+  yaml: () => import("../languages/yaml.ts").then((m) => m.default),
+  markdown: () => import("../languages/markdown.ts").then((m) => m.default),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

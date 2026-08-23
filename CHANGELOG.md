@@ -8,8 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added Biome (`biome.json`, `@biomejs/biome@2.5.10`) for lint (`tsr lint` / `tsr lint:fix`) and format (`tsr fmt` / `tsr fmt:check` via `biome check`), wired into `tsr check` and `tsr ci`.
-- Added `tasks.toml` for [`tsr`](https://tsr.opentechf.org) — unified `tsr dev` / `tsr build` / `tsr test` / `tsr typecheck` / `tsr ci` / `tsr clean` tasks over the pnpm + esdev runners (`[workspace] members = ["packages/*", "demo"]`, demo tasks scoped to `dir = "demo"`).
+- Added 10 built-in languages (html, css, jsx, python, typescript, json, bash, sql, yaml, markdown) with generic lexing and lazy-loaded via `loadLanguage()`; demo now lists all languages and syncs samples by language.
+- Added Biome (`biome.json`, `@biomejs/biome@2.5.10`) for lint (`tsr lint`) and format (`tsr fmt` / `tsr fmt:check` via `biome check`, fix via `tsr lint -- --write`), wired into `tsr check` and `tsr ci`.
+- Added `tasks.toml` for [`tsr`](https://tsr.opentechf.org) — repo-aware (`[workspace] members = ["packages/*", "demo"]`) with `tsr demo` (esdev start in demo), `build` (esdev --lib), `typecheck`/`test` via packages fan-out, `lint`/`fmt` via Biome, `check`/`ci` deps.
 
 - Added unit tests covering the `highlightElement()` handle lifecycle.
 - Added a `debounceMs` option to `highlightElement()`; `0` re-highlights synchronously on every `refresh()`.

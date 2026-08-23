@@ -1,0 +1,36 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const sql: LanguageDefinition = {
+  name: "sql",
+  aliases: ["pgsql", "postgres", "mysql", "sqlite"],
+  semantic: "generic",
+  keywords: [
+    "select", "from", "where", "join", "inner", "left", "right", "outer",
+    "on", "as", "and", "or", "not", "in", "is", "null", "insert", "into",
+    "values", "update", "set", "delete", "create", "table", "alter", "drop",
+    "index", "view", "database", "schema", "primary", "key", "foreign",
+    "references", "unique", "check", "default", "constraint", "order", "by",
+    "group", "having", "limit", "offset", "union", "all", "distinct",
+    "exists", "between", "like", "case", "when", "then", "else", "end",
+    "with", "recursive", "asc", "desc", "grant", "revoke", "transaction",
+    "commit", "rollback", "begin",
+  ],
+  booleans: ["true", "false"],
+  nulls: ["null"],
+  operators: ["=", "<", ">", "<=", ">=", "<>", "!=", "||", "&&", "+", "-", "*", "/", "%", "!", "~", "::"],
+  punctuation: ["(", ")", ",", ";", ".", "[", "]"],
+  lex: {
+    strings: [
+      { open: "'", close: "'", escape: "''", multiline: false },
+      { open: '"', close: '"', escape: '""', multiline: false },
+      { open: "`", close: "`", escape: "\\", multiline: false },
+    ],
+    comments: [
+      { open: "--", close: "\n", line: true },
+      { open: "/*", close: "*/" },
+    ],
+    regex: false,
+  },
+};
+
+export default sql;

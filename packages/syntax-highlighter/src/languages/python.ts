@@ -1,0 +1,38 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+
+const python: LanguageDefinition = {
+  name: "python",
+  aliases: ["py", "py3", "pyi"],
+  semantic: "generic",
+  keywords: [
+    "and", "as", "assert", "async", "await", "break", "class", "continue",
+    "def", "del", "elif", "else", "except", "finally", "for", "from",
+    "global", "if", "import", "in", "is", "lambda", "nonlocal", "not",
+    "or", "pass", "raise", "return", "try", "while", "with", "yield",
+    "match", "case",
+  ],
+  booleans: ["True", "False"],
+  nulls: ["None"],
+  constants: [],
+  operators: [
+    "**=", "//=", ">>=", "<<=", ":=", "**", "//", "==", "!=", "<=", ">=",
+    "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "->",
+    "=", "+", "-", "*", "/", "%", "&", "|", "^", "~", "<", ">", ":", ".",
+  ],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@"],
+  lex: {
+    strings: [
+      { open: '"""', close: '"""', escape: "\\", multiline: true },
+      { open: "'''", close: "'''", escape: "\\", multiline: true },
+      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: "'", close: "'", escape: "\\", multiline: false },
+    ],
+    comments: [{ open: "#", close: "\n", line: true }],
+    identifierStart: /[_\p{ID_Start}]/u,
+    identifierPart: /[_\p{ID_Continue}]/u,
+    regex: false,
+    shebang: true,
+  },
+};
+
+export default python;

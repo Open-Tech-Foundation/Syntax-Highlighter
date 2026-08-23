@@ -389,7 +389,7 @@ for (const t of panelTabs) {
 
 panelCollapse.addEventListener("click", () => activatePanel("editor"));
 
-for (const name of getRegisteredLanguages()) languageSelect.add(new Option(name, name));
+for (const name of [...getRegisteredLanguages()].sort()) languageSelect.add(new Option(name, name));
 
 languageSelect.addEventListener("change", () => void switchLanguage(languageSelect.value));
 
@@ -397,6 +397,11 @@ sampleSelect.addEventListener("change", () => {
   const sample = SAMPLES[sampleSelect.selectedIndex];
   if (!sample) return;
   inputLayer.value = sample.source;
+  // Keep language in sync with the chosen sample.
+  if (sample.language && languageSelect.value !== sample.language) {
+    languageSelect.value = sample.language;
+    void switchLanguage(sample.language);
+  }
   queueRender();
 });
 
@@ -432,6 +437,8 @@ registerBtn.addEventListener("click", () => {
 /* ------------------------------------------------------------------ boot */
 
 renderer = new HighlightRenderer(highlightLayer);
+// Start with first sample's language.
+if (SAMPLES[0]?.language) languageSelect.value = SAMPLES[0].language;
 inputLayer.value = SAMPLES[0]?.source ?? "";
 applyTheme("auto");
 setStatus("ok", "ready");
