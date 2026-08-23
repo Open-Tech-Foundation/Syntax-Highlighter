@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Updated `README.md` with renderer-agnostic one-liner + short desc merged (with `<!-- desc -->` marker), regular description, `Features` section, removed legacy Range blockquote and updated `Usage` to explicit `renderer.render(source, tokens)` (`CSSHighlightRenderer` / `HtmlRenderer` / `JsonRenderer`).
+- Updated `README.md` with renderer-agnostic one-liner and short desc merged as blockquote, regular description, `Features` section, and updated `Usage` to explicit `renderer.render(source, tokens)` (`CSSHighlightRenderer` / `HtmlRenderer` / `JsonRenderer`).
 
 ### Added
 
