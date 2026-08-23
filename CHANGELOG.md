@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Expanded to 51 languages (added matlab, clojure, fsharp, groovy, solidity, makefile, cmake, nginx, latex, regex, protobuf, hcl; covers requested 19 including Lua/R/Scala/Elixir/Haskell/Perl/Objective-C; total 51) with 12 demo samples; verified Highlighter 51, tsc, headless 51 picker + 12 langs + 4 themes + FPS.
 - Completed coverage of requested 32 (added scss, vue, svelte, toml, xml, graphql, dockerfile, diff; total 39 incl. extras haskell/scala/lua/perl/r/elixir/zig/objectivec) with 8 demo samples; verified Highlighter 39/39, tsc, headless 39 picker + 8 langs + 4 themes + FPS.
 - Expanded to 31 languages (added dart, scala, lua, perl, r, powershell, objectivec, haskell, elixir, zig with aliases dartlang/sc/pl/pm/rlang/ps/ps1/objc/m/mm/hs/ex/exs) and 10 demo samples; verified Highlighter 31, tsc, esdev test, headless 31 picker + 4 themes + FPS 61.
 - Expanded built-in languages to 21 (added java, go, rust, php, ruby, c, cpp, csharp, swift, kotlin with keyword-heavy generic lexing and aliases: jsp, golang, rs, rb, c++/cc/cxx, cs/c#, swiftlang, kt/kts) and wired demo with 10 new samples; verified via Highlighter for all 21, tsc, esdev test, and headless Chrome (puppeteer-core) with 4+ controls and FPS.

@@ -1,0 +1,12 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const protobuf: LanguageDefinition = {
+  name: "protobuf",
+  aliases: ["proto","proto3"],
+  semantic: "generic",
+  keywords: ["syntax","package","import","option","message","enum","service","rpc","returns","repeated","optional","required","oneof","map","extensions","extend","reserved","to","max","bool","string","bytes","int32","int64","uint32","uint64","sint32","sint64","fixed32","fixed64","sfixed32","sfixed64","float","double","true","false"],
+  booleans: ["true","false"],
+  operators: ["=",";","==","!="],
+  punctuation: ["{","}","(",")","[","]",";",",","<",">",".","=","#","@","$","%","&","|","*","+","-","/","%","~","`","'","\"","\\","?","!","^","_","&","|",";",":"],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false}], comments: [{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default protobuf;

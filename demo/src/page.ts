@@ -495,6 +495,116 @@ CMD ["node", "index.js"]`,
 +hello world
  context`,
   },
+
+  {
+    name: "matlab — function",
+    language: "matlab",
+    source: `function y = greet(name)
+% comment
+if nargin < 1
+  name = "world";
+end
+y = ["Hello, " name "!"];
+end`,
+  },
+  {
+    name: "clojure — defn",
+    language: "clojure",
+    source: `;; comment
+(defn greet [name]
+  (str "Hello, " name "!"))
+(println (greet "world"))`,
+  },
+  {
+    name: "fsharp — let",
+    language: "fsharp",
+    source: `// comment
+let greet name = sprintf "Hello, %s!" name
+printfn "%s" (greet "world")`,
+  },
+  {
+    name: "groovy — def",
+    language: "groovy",
+    source: `// comment
+def greet(name) {
+  return "Hello, " + name + "!"
+}
+println greet("world")`,
+  },
+  {
+    name: "solidity — contract",
+    language: "solidity",
+    source: `// comment
+pragma solidity ^0.8.0;
+contract Greeter {
+  function greet(string memory name) public pure returns (string memory) {
+    return "hello";
+  }
+}`,
+  },
+  {
+    name: "makefile — rule",
+    language: "makefile",
+    source: `# comment
+all: build
+build:
+\t@echo "Hello"
+.PHONY: all build`,
+  },
+  {
+    name: "cmake — project",
+    language: "cmake",
+    source: `# comment
+cmake_minimum_required(VERSION 3.20)
+project(hello)
+add_executable(hello main.cpp)`,
+  },
+  {
+    name: "nginx — server",
+    language: "nginx",
+    source: `# comment
+server {
+  listen 80;
+  server_name example.com;
+  location / {
+    proxy_pass http://app;
+  }
+}`,
+  },
+  {
+    name: "latex — doc",
+    language: "latex",
+    source: `% comment
+\\documentclass{article}
+\\begin{document}
+Hello, world!
+\\end{document}`,
+  },
+  {
+    name: "regex — pattern",
+    language: "regex",
+    source: `# comment
+^[a-z]+/[0-9]+$`,
+  },
+  {
+    name: "protobuf — message",
+    language: "protobuf",
+    source: `// comment
+syntax = "proto3";
+package hello;
+message Greeter {
+  string name = 1;
+}`,
+  },
+  {
+    name: "hcl — resource",
+    language: "hcl",
+    source: `# comment
+resource "aws_instance" "web" {
+  ami = "ami-12345"
+  instance_type = "t2.micro"
+}`,
+  },
 ];
 
 /** A one-line status message. */

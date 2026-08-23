@@ -1,0 +1,13 @@
+import type { LanguageDefinition } from "../core/lexer.ts";
+const hcl: LanguageDefinition = {
+  name: "hcl",
+  aliases: ["terraform","tf","hcl2"],
+  semantic: "generic",
+  keywords: ["resource","data","provider","variable","output","locals","module","terraform","required_providers","required_version","backend","provisioner","connection","count","for_each","depends_on","lifecycle","create_before_destroy","prevent_destroy","ignore_changes","source","version","true","false","null"],
+  booleans: ["true","false"],
+  nulls: ["null"],
+  operators: ["=","==","!=","<",">","<=",">=","&&","||","!","+","-","*","/","%","?",";",":","&","|","^","~",".","..","...","=>","->","<-"],
+  punctuation: ["{","}","[","]","(",")",";",",","#","@","$","%","&","|","<",">",".","_","~","`","'","\"","\\","?","!","^","_","&","|",";",":","="],
+  lex: { strings: [{open:'"',close:'"',escape:"\\",multiline:false},{open:"'",close:"'",escape:"\\",multiline:false},{open:'"""',close:'"""',escape:"\\",multiline:true}], comments: [{open:"#",close:"\n",line:true},{open:"//",close:"\n",line:true},{open:"/*",close:"*/"}], regex:false },
+};
+export default hcl;

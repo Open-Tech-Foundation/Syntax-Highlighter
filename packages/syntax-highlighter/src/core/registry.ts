@@ -42,6 +42,18 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   graphql: () => import("../languages/graphql.ts").then((m) => m.default),
   dockerfile: () => import("../languages/dockerfile.ts").then((m) => m.default),
   diff: () => import("../languages/diff.ts").then((m) => m.default),
+  matlab: () => import("../languages/matlab.ts").then((m) => m.default),
+  clojure: () => import("../languages/clojure.ts").then((m) => m.default),
+  fsharp: () => import("../languages/fsharp.ts").then((m) => m.default),
+  groovy: () => import("../languages/groovy.ts").then((m) => m.default),
+  solidity: () => import("../languages/solidity.ts").then((m) => m.default),
+  makefile: () => import("../languages/makefile.ts").then((m) => m.default),
+  cmake: () => import("../languages/cmake.ts").then((m) => m.default),
+  nginx: () => import("../languages/nginx.ts").then((m) => m.default),
+  latex: () => import("../languages/latex.ts").then((m) => m.default),
+  regex: () => import("../languages/regex.ts").then((m) => m.default),
+  protobuf: () => import("../languages/protobuf.ts").then((m) => m.default),
+  hcl: () => import("../languages/hcl.ts").then((m) => m.default),
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
