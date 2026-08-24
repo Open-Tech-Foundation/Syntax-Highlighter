@@ -56,6 +56,7 @@ const typescript: LanguageDefinition = {
     "readonly",
     "require",
     "return",
+    "satisfies",
     "set",
     "static",
     "string",

@@ -2,8 +2,9 @@ import { assert, assertEquals, test } from "runtime:test";
 import { GenericTokenizer } from "../src/core/generic-tokenizer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
 import { Tokenizer } from "../src/core/tokenizer.ts";
-import sql from "../src/languages/sql.ts";
 import javascript from "../src/languages/javascript.ts";
+import sql from "../src/languages/sql.ts";
+import typescript from "../src/languages/typescript.ts";
 
 // Deliberately expressible as JSON — this is the shape a user pastes into
 // registerLanguage(), so the tests exercise the path custom languages take.
@@ -117,7 +118,10 @@ test("caseInsensitive languages match keywords in any case (SQL)", () => {
   const toks = new GenericTokenizer(sql).tokenize(src);
   const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
   for (const word of ["SELECT", "FROM", "WHERE", "AND", "IS", "NOT"]) {
-    assert(kinds.includes(`keyword:${word}`), `expected keyword:${word} in ${JSON.stringify(kinds)}`);
+    assert(
+      kinds.includes(`keyword:${word}`),
+      `expected keyword:${word} in ${JSON.stringify(kinds)}`,
+    );
   }
   assert(kinds.includes("boolean:TRUE"));
   assert(kinds.includes("null:NULL"));
@@ -127,5 +131,18 @@ test("case-sensitive languages keep exact matching (minilang)", () => {
   const src = "let If = 1;";
   const toks = new GenericTokenizer(minilang).tokenize(src);
   const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
-  assert(!kinds.some((k) => k.startsWith("keyword:If")), `unexpected keyword match: ${JSON.stringify(kinds)}`);
+  assert(
+    !kinds.some((k) => k.startsWith("keyword:If")),
+    `unexpected keyword match: ${JSON.stringify(kinds)}`,
+  );
+});
+
+test("typescript classifies satisfies as a keyword", () => {
+  const src = "const config = { port: 8080 } satisfies Options;";
+  const toks = new GenericTokenizer(typescript).tokenize(src);
+  const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
+  assert(
+    kinds.includes("keyword:satisfies"),
+    `expected keyword:satisfies in ${JSON.stringify(kinds)}`,
+  );
 });
