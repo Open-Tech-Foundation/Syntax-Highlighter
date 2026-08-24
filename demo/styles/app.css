@@ -642,3 +642,21 @@ select:focus {
 .html-preview-pane span[class^="sh-"] {
   font: inherit;
 }
+
+.ansi-pane {
+  padding: 0;
+  height: 100%;
+  min-height: 240px;
+  background: var(--bg-editor);
+  overflow: hidden;
+}
+
+.ansi-pane .xterm {
+  height: 100%;
+  padding: 0.5rem;
+}
+
+#terminal {
+  height: 100%;
+  min-height: 240px;
+}

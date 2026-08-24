@@ -6,6 +6,9 @@
  * language), and a status bar.
  */
 import {
+  ANSI_PALETTES,
+  ANSI_THEMES,
+  AnsiRenderer,
   CSSHighlightRenderer,
   createHighlighter,
   getRegisteredLanguages,
@@ -16,6 +19,8 @@ import {
   type LanguageDefinition,
   registerLanguage,
 } from "@opentf/syntax-highlighter";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 
 import { editHint, LEDE, LINKS, SAMPLES, statusMessage } from "./page.ts";
 
@@ -211,6 +216,7 @@ root.replaceChildren(
             panelTab("json", "JSON", ICONS.code),
             panelTab("html", "HTML", ICONS.file),
             panelTab("preview", "Preview", ICONS.sun),
+            panelTab("ansi", "Terminal", ICONS.code),
             element("span", { className: "spacer" }),
             element("button", {
               id: "preview-copy",
@@ -236,6 +242,15 @@ root.replaceChildren(
               className: "html-preview-pane",
               hidden: true,
             } as unknown as Record<string, unknown>),
+            element(
+              "div",
+              {
+                id: "ansi-pane",
+                className: "ansi-pane",
+                hidden: true,
+              } as unknown as Record<string, unknown>,
+              [element("div", { id: "terminal" })],
+            ),
           ]),
         ]),
       ]),
@@ -300,6 +315,8 @@ const tokenList = byId<HTMLOListElement>("token-list");
 const jsonPane = byId<HTMLPreElement>("json-pane");
 const htmlPane = byId<HTMLPreElement>("html-pane");
 const htmlPreviewPane = byId<HTMLDivElement>("html-preview-pane");
+const ansiPane = byId<HTMLElement>("ansi-pane");
+const terminalEl = byId<HTMLDivElement>("terminal");
 const languageSelect = byId<HTMLSelectElement>("select-language");
 const syntaxThemeSelect = byId<HTMLSelectElement>("select-syntax-theme");
 const sampleSelect = byId<HTMLSelectElement>("select-sample");
@@ -322,7 +339,7 @@ const previewTabs = [...document.querySelectorAll<HTMLButtonElement>(".preview .
 /* ------------------------------------------------------- highlight pipeline */
 
 let renderer: CSSHighlightRenderer | null = null;
-let activePreview: "tokens" | "json" | "html" | "preview" = "tokens";
+let activePreview: "tokens" | "json" | "html" | "preview" | "ansi" = "tokens";
 let currentSource = "";
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let renderSeq = 0;
@@ -394,6 +411,12 @@ function renderNow(source: string): void {
       htmlPane.textContent = "Invalid tokens";
       htmlPreviewPane.textContent = "Invalid tokens";
     }
+    try {
+      const ansi = new AnsiRenderer({ theme: resolveAnsiTheme() }).render(source, tokens);
+      setAnsiContent(ansi);
+    } catch {
+      setAnsiContent("Invalid tokens");
+    }
     statusTokens.textContent = `${significant.length} tokens`;
     syncScroll();
   });
@@ -425,12 +448,42 @@ function setStatus(kind: "ok" | "error", text: string): void {
   statusLeft.classList.toggle("error", kind === "error");
 }
 
+function getEffectiveMode(): "light" | "dark" {
+  const forced = document.documentElement.dataset.shTheme as ThemeMode | undefined;
+  if (forced === "light" || forced === "dark") return forced;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function resolveAnsiTheme() {
+  const syntax = syntaxThemeSelect.value;
+  // "default" switches palettes with light/dark for contrast; other themes use their own preset
+  if (syntax === "default") {
+    return getEffectiveMode() === "light" ? ANSI_PALETTES.light : ANSI_PALETTES.dark;
+  }
+  return (
+    (ANSI_THEMES as Record<string, unknown>)[syntax] ?? ANSI_THEMES.default ?? ANSI_PALETTES.dark
+  );
+}
+
+function rerenderAnsi(): void {
+  // Re-render ANSI through the pipeline so SGR codes match current light/dark + syntax theme
+  void highlighterFor(languageSelect.value)
+    .then((h) => {
+      const tokens = h.highlight(currentSource);
+      const ansi = new AnsiRenderer({ theme: resolveAnsiTheme() }).render(currentSource, tokens);
+      setAnsiContent(ansi);
+    })
+    .catch(() => setAnsiContent("Invalid tokens"));
+}
+
 function applyTheme(mode: ThemeMode): void {
   if (mode === "auto") delete document.documentElement.dataset.shTheme;
   else document.documentElement.dataset.shTheme = mode;
   themeToggle.innerHTML = THEME_ICONS[mode];
   themeToggle.title = `Theme: ${mode}`;
   statusTheme.textContent = `theme: ${mode}`;
+  syncTerminalTheme();
+  if (activePreview === "ansi") rerenderAnsi();
 }
 
 function cycleTheme(): void {
@@ -458,8 +511,15 @@ function activatePanel(tab: "editor" | "custom"): void {
           ? htmlPane
           : activePreview === "preview"
             ? htmlPreviewPane
-            : tokenList;
-    const text = (pane as unknown as HTMLElement).textContent ?? "";
+            : activePreview === "ansi"
+              ? ansiPane
+              : tokenList;
+    let text: string;
+    if (activePreview === "ansi") {
+      text = currentAnsi || (ansiPane.textContent ?? "");
+    } else {
+      text = (pane as unknown as HTMLElement).textContent ?? "";
+    }
     try {
       await navigator.clipboard.writeText(text);
       setStatus("ok", "copied");
@@ -477,13 +537,96 @@ function activatePanel(tab: "editor" | "custom"): void {
   customPane.hidden = !(open && tab === "custom");
 }
 
-function activatePreview(tab: "tokens" | "json" | "html" | "preview"): void {
+let terminal: Terminal | null = null;
+let fitAddon: FitAddon | null = null;
+let currentAnsi = "";
+
+function flushTerminal(): void {
+  if (!terminal) return;
+  terminal.clear();
+  if (!currentAnsi) return;
+  terminal.write(currentAnsi);
+}
+
+function setAnsiContent(ansi: string): void {
+  currentAnsi = ansi;
+  if (terminal) flushTerminal();
+}
+
+function syncTerminalTheme(): void {
+  if (!terminal) return;
+  const styles = getComputedStyle(document.documentElement);
+  const bg = styles.getPropertyValue("--bg-editor").trim() || "#1e1e1e";
+  const fg = styles.getPropertyValue("--fg").trim() || "#d4d4d4";
+  const selection = styles.getPropertyValue("--selection").trim() || "#264f78";
+  terminal.options.theme = {
+    ...terminal.options.theme,
+    background: bg,
+    foreground: fg,
+    cursor: fg,
+    selectionBackground: selection,
+  };
+}
+
+function ensureTerminal(): void {
+  if (terminal || !terminalEl) return;
+  terminal = new Terminal({
+    convertEol: true,
+    cursorBlink: false,
+    disableStdin: true,
+    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
+    fontSize: 12,
+    theme: {
+      background: "#1e1e1e",
+      foreground: "#d4d4d4",
+      cursor: "#d4d4d4",
+      selectionBackground: "#264f78",
+    },
+  });
+  syncTerminalTheme();
+  fitAddon = new FitAddon();
+  terminal.loadAddon(fitAddon);
+  terminal.open(terminalEl);
+  if (currentAnsi) flushTerminal();
+  try {
+    fitAddon.fit();
+  } catch {}
+  // keep terminal fitted on resize
+  window.addEventListener("resize", () => {
+    if (activePreview === "ansi") {
+      try {
+        fitAddon?.fit();
+      } catch {}
+    }
+  });
+  // sync when system theme changes in auto mode
+  try {
+    window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+      if (!document.documentElement.dataset.shTheme) {
+        syncTerminalTheme();
+        if (activePreview === "ansi") rerenderAnsi();
+      }
+    });
+  } catch {}
+}
+
+function activatePreview(tab: "tokens" | "json" | "html" | "preview" | "ansi"): void {
   activePreview = tab;
   for (const btn of previewTabs) btn.classList.toggle("active", btn.dataset.tab === tab);
   tokenList.hidden = tab !== "tokens";
   jsonPane.hidden = tab !== "json";
   htmlPane.hidden = tab !== "html";
   htmlPreviewPane.hidden = tab !== "preview";
+  ansiPane.hidden = tab !== "ansi";
+  if (tab === "ansi") {
+    ensureTerminal();
+    requestAnimationFrame(() => {
+      try {
+        fitAddon?.fit();
+      } catch {}
+    });
+    flushTerminal();
+  }
 }
 
 for (const btn of activityButtons) {
@@ -494,15 +637,24 @@ for (const btn of activityButtons) {
       | "json"
       | "html"
       | "preview"
+      | "ansi"
       | "custom";
-    if (target === "tokens" || target === "json" || target === "html" || target === "preview") {
-      activatePreview(target as "tokens" | "json" | "html" | "preview");
+    if (
+      target === "tokens" ||
+      target === "json" ||
+      target === "html" ||
+      target === "preview" ||
+      target === "ansi"
+    ) {
+      activatePreview(target as "tokens" | "json" | "html" | "preview" | "ansi");
       return;
     }
-    if (target !== "editor" && activePanel === target) {
-      activatePanel("editor");
-    } else {
-      activatePanel(target as "editor" | "custom");
+    if (target === "custom" || target === "editor") {
+      if (activePanel === target) {
+        activatePanel("editor");
+      } else {
+        activatePanel(target as "editor" | "custom");
+      }
     }
     if (activePanel === "editor") inputLayer.focus();
   });
@@ -522,15 +674,33 @@ for (const name of [...getRegisteredLanguages()].sort()) languageSelect.add(new 
 languageSelect.addEventListener("change", () => void switchLanguage(languageSelect.value));
 
 syntaxThemeSelect.addEventListener("change", () => {
-  const link = document.getElementById("sh-theme") as HTMLLinkElement | null;
-  if (link) {
-    // dist build serves themes from /assets/, dev serves from node_modules
-    const isDist = link.href.includes("/assets/");
-    link.href = isDist
-      ? `/assets/${syntaxThemeSelect.value}.css`
-      : `./node_modules/@opentf/syntax-highlighter/src/themes/${syntaxThemeSelect.value}.css`;
+  const value = syntaxThemeSelect.value;
+  // enable the selected theme, disable others (works for both dev and dist, hashed or not)
+  const links = [...document.querySelectorAll<HTMLLinkElement>("link[data-theme]")];
+  for (const l of links) {
+    const isSelected = l.getAttribute("data-theme") === value;
+    // also check disabled id for default
+    if (l.id === "sh-theme") {
+      l.disabled = value !== "default";
+      // keep href as is for default, but ensure enabled
+      if (value === "default") l.disabled = false;
+    } else {
+      l.disabled = !isSelected;
+    }
   }
-  setStatus("ok", `theme: ${syntaxThemeSelect.value}`);
+  // fallback for single-link mode (original): update href if no multi-links found
+  if (links.length <= 1) {
+    const link = document.getElementById("sh-theme") as HTMLLinkElement | null;
+    if (link) {
+      const isDist = link.href.includes("/assets/");
+      link.href = isDist
+        ? `/assets/${value}.css`
+        : `./node_modules/@opentf/syntax-highlighter/src/themes/${value}.css`;
+    }
+  }
+  setStatus("ok", `theme: ${value}`);
+  syncTerminalTheme();
+  if (activePreview === "ansi") rerenderAnsi();
 });
 
 sampleSelect.addEventListener("change", () => {
