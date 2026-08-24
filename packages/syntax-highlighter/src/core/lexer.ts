@@ -485,6 +485,21 @@ export class Lexer {
         continue;
       }
 
+      // Prefixed literals (rust `br#"…"#`, csharp `$"…"` …) must beat the
+      // identifier scan — an opener's first char can be an identifier char,
+      // so try the longest matching opener first.
+      const strDefs = this.stringOpeners.get(ch);
+      const strDef = strDefs?.find((def) => s.startsWith(def.open, this.pos));
+      if (strDef) {
+        if (strDef.template) {
+          frames.push({ kind: "template", def: strDef, start: this.pos });
+          this.pos += strDef.open.length;
+        } else {
+          this.scanString(strDef);
+        }
+        continue;
+      }
+
       this.identifierRe.lastIndex = this.pos;
       const id = this.identifierRe.exec(s);
       if (id) {
@@ -501,18 +516,6 @@ export class Lexer {
           this.pos = end;
           continue;
         }
-      }
-
-      const strDefs = this.stringOpeners.get(ch);
-      const strDef = strDefs?.find((def) => s.startsWith(def.open, this.pos));
-      if (strDef) {
-        if (strDef.template) {
-          frames.push({ kind: "template", def: strDef, start: this.pos });
-          this.pos += strDef.open.length;
-        } else {
-          this.scanString(strDef);
-        }
-        continue;
       }
 
       const commentDef = this.matchCommentOpen();
