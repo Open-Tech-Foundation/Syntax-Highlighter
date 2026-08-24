@@ -235,7 +235,7 @@ const aliasToCanonical: Record<string, string> = {
   "visual-basic": "vb",
   coffee: "coffeescript",
   styl: "stylus",
-  inifile: "conf",
+  inifile: "ini",
   conf: "ini",
   dotenv: "env",
   props: "properties",
@@ -412,8 +412,16 @@ export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
 
   let loader = builtinLoaders[key];
   if (!loader) {
-    const canonical = aliasToCanonical[key];
-    if (canonical) loader = builtinLoaders[canonical];
+    let canonical: string | undefined = aliasToCanonical[key];
+    // transitive: inifile -> conf -> ini etc.
+    while (canonical) {
+      const nextLoader = builtinLoaders[canonical];
+      if (nextLoader) {
+        loader = nextLoader;
+        break;
+      }
+      canonical = aliasToCanonical[canonical];
+    }
   }
   if (!loader) {
     throw new Error(`Unknown language: ${name}`);
