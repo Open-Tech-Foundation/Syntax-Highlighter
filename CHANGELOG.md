@@ -34,6 +34,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed lexer unknown-char fallback splitting astral characters — the last-resort branch advanced one UTF-16 code unit, so emoji etc. became two lone-surrogate `punctuation` tokens whose `source.slice` text breaks renderers; now advances by `codePointWidthAt()`.
 - Fixed SQL keyword matching case-sensitivity — uppercase `SELECT`/`FROM`/`WHERE` missed the lowercase word lists and were mis-tokenized as `constant`. Added opt-in `LanguageDefinition.caseInsensitive` flag folding keywords/booleans/nulls/constants in `GenericTokenizer` (set for SQL); moved `null` from keywords to `nulls` so `NULL` classifies as null.
 - Fixed TypeScript missing `satisfies` keyword (TS 4.9+ operator classified as variable).
+- Fixed string openers losing to identifier scan — prefixed literals now match first, enabling rust raw/byte forms (`br#"…"#`, `br"…"`, `r#"…"#`, `r"…"`, `b"…"`) and csharp interpolated (`$"…"`, `$@"…"`/`@$"…"`) literals as single string tokens; rust raw strings correctly terminate at the first quote (no escape processing).
+- Fixed multi-char string escapes consuming an extra character — C# verbatim `""` self-escapes swallowed following content until the literal ran unterminated; single-char backslash escapes keep covering the escaped char.
 
 ## [0.1.0] - 2026-08-23
 
