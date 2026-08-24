@@ -139,6 +139,10 @@ const csharp: LanguageDefinition = {
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ".", ":", "::", "@", "#", "$"],
   lex: {
     strings: [
+      // Prefixed forms first — openers match longest-first.
+      { open: '$@"', close: '"', escape: '""', multiline: true },
+      { open: '@$"', close: '"', escape: '""', multiline: true },
+      { open: '$"', close: '"', escape: "\\", multiline: false },
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
       { open: '@"', close: '"', escape: '""', multiline: true },
