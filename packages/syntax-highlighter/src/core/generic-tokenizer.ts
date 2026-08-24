@@ -25,10 +25,11 @@ export class GenericTokenizer {
   constructor(language: LanguageDefinition) {
     this.language = language;
     this.lexer = new Lexer(language);
-    this.keywords = new Set(language.keywords ?? []);
-    this.booleans = new Set(language.booleans ?? []);
-    this.nulls = new Set(language.nulls ?? []);
-    this.constants = new Set(language.constants ?? []);
+    const fold = language.caseInsensitive ? (w: string) => w.toLowerCase() : (w: string) => w;
+    this.keywords = new Set((language.keywords ?? []).map(fold));
+    this.booleans = new Set((language.booleans ?? []).map(fold));
+    this.nulls = new Set((language.nulls ?? []).map(fold));
+    this.constants = new Set((language.constants ?? []).map(fold));
   }
 
   tokenize(source: string): Token[] {
@@ -56,7 +57,7 @@ export class GenericTokenizer {
             out.push(createToken(TokenType.PROPERTY, raw.start, raw.end));
             break;
           }
-          const val = raw.value;
+          const val = this.language.caseInsensitive ? raw.value.toLowerCase() : raw.value;
           if (this.keywords.has(val)) {
             out.push(createToken(TokenType.KEYWORD, raw.start, raw.end));
           } else if (this.nulls.has(val)) {

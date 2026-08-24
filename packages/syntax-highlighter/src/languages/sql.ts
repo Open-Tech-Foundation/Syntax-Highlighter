@@ -4,6 +4,7 @@ const sql: LanguageDefinition = {
   name: "sql",
   aliases: ["pgsql", "postgres", "mysql", "sqlite"],
   semantic: "generic",
+  caseInsensitive: true,
   keywords: [
     "select",
     "from",
@@ -20,7 +21,6 @@ const sql: LanguageDefinition = {
     "not",
     "in",
     "is",
-    "null",
     "insert",
     "into",
     "values",
