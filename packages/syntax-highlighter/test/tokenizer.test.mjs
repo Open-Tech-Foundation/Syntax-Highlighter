@@ -297,3 +297,14 @@ test("unterminated constructs do not crash", () => {
   const toks = tokens('const s = "abc\n/* never closed');
   assert(toks.length > 0);
 });
+
+test("astral characters stay whole in the unknown-char fallback", () => {
+  const src = "const 🎉 = 1;";
+  for (const t of tokenizer.tokenize(src)) {
+    const text = src.slice(t.start, t.end);
+    assert(
+      !/[\uD800-\uDBFF](?:[^\uDC00-\uDFFF]|$)|(?:^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(text),
+      `token ${JSON.stringify(t)} splits a surrogate pair: ${JSON.stringify(text)}`,
+    );
+  }
+});

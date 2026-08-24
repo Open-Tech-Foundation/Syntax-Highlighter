@@ -587,7 +587,7 @@ export class Lexer {
         continue;
       }
 
-      this.pos += 1;
+      this.pos += codePointWidthAt(this.source, this.pos);
       this.emit("punctuation", start, this.pos, { unknown: true });
     }
   }
