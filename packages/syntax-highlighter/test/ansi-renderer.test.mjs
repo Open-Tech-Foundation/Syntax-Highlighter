@@ -2,13 +2,7 @@ import { assert, assertEquals, assertThrows, test } from "runtime:test";
 import { dracula } from "../src/ansi/themes/dracula.ts";
 import { monokai } from "../src/ansi/themes/monokai.ts";
 import { nord } from "../src/ansi/themes/nord.ts";
-import {
-  ANSI_RESET,
-  AnsiRenderer,
-  defaultTheme,
-  hexToAnsi,
-  renderANSI,
-} from "../src/core/ansi-renderer.ts";
+import { ANSI_RESET, defaultTheme, hexToAnsi, renderANSI } from "../src/core/ansi-renderer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
 import javascript from "../src/languages/javascript.ts";
 import { stripAnsi } from "./helpers/wcag.mjs";
@@ -16,10 +10,10 @@ import { stripAnsi } from "./helpers/wcag.mjs";
 const highlighter = new Highlighter(javascript);
 
 function render(src, opts) {
-  return new AnsiRenderer(opts).render(src, highlighter.highlight(src));
+  return renderANSI(src, highlighter.highlight(src), opts);
 }
 
-test("AnsiRenderer.render wraps semantic tokens with truecolor by default", () => {
+test("renderANSI wraps semantic tokens with truecolor by default", () => {
   const src = "const x = 42;";
   const ansi = render(src);
   const kwAnsi = hexToAnsi(defaultTheme.keyword);
@@ -32,33 +26,33 @@ test("AnsiRenderer.render wraps semantic tokens with truecolor by default", () =
   assert(ansi.includes(ANSI_RESET));
 });
 
-test("AnsiRenderer recovers text via source.slice", () => {
+test("renderANSI recovers text via source.slice", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
-  const ansi = new AnsiRenderer().render(src, toks);
+  const ansi = renderANSI(src, toks);
   assertEquals(stripAnsi(ansi), src);
 });
 
-test("AnsiRenderer handles surrogate pairs", () => {
+test("renderANSI handles surrogate pairs", () => {
   const src = "const \uD835\uDC9C = 1;";
   const ansi = render(src);
   assert(ansi.includes("\uD835\uDC9C"));
   const toks = highlighter.highlight(src);
-  const ansi2 = new AnsiRenderer().render(src, toks);
+  const ansi2 = renderANSI(src, toks);
   assertEquals(stripAnsi(ansi2), src);
 });
 
-test("AnsiRenderer fills gaps for non-contiguous tokens", () => {
+test("renderANSI fills gaps for non-contiguous tokens", () => {
   const src = "const x = 42;";
   const partial = [{ start: 0, end: 5, type: "keyword" }];
-  const ansi = new AnsiRenderer().render(src, partial);
+  const ansi = renderANSI(src, partial);
   const kwAnsi = hexToAnsi(defaultTheme.keyword);
   assert(ansi.includes(`${kwAnsi}const${ANSI_RESET}`));
   assertEquals(stripAnsi(ansi), src);
   assert(stripAnsi(ansi).includes("x = 42;"));
 });
 
-test("AnsiRenderer theme override (RGB) converts hex to truecolor", () => {
+test("renderANSI theme override (RGB) converts hex to truecolor", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
   const ansi = renderANSI(src, toks, { theme: dracula });
@@ -77,7 +71,7 @@ test("AnsiRenderer theme override (RGB) converts hex to truecolor", () => {
   assert(ansi3.includes(`${hexToAnsi(nord.keyword)}const${ANSI_RESET}`));
 });
 
-test("AnsiRenderer custom colors (legacy) and wrapWhitespace", () => {
+test("renderANSI custom colors (legacy) and wrapWhitespace", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
   const ansi = renderANSI(src, toks, { colors: { keyword: "\x1b[31m" } });
@@ -91,7 +85,7 @@ test("AnsiRenderer custom colors (legacy) and wrapWhitespace", () => {
     { start: 1, end: 2, type: "whitespace" },
     { start: 2, end: 3, type: "variable" },
   ];
-  const plain = new AnsiRenderer().render(src2, toks2);
+  const plain = renderANSI(src2, toks2);
   assertEquals(stripAnsi(plain), src2);
   assert(!plain.includes(`${ANSI_RESET} ${ANSI_RESET}`));
   const sgrCount = (plain.match(new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, "g")) ?? [])
@@ -113,15 +107,12 @@ test("AnsiRenderer custom colors (legacy) and wrapWhitespace", () => {
   assert(colored2.includes(`${hexToAnsi("#6272a4")} ${ANSI_RESET}`));
 });
 
-test("AnsiRenderer color:false disables color (plain output)", () => {
+test("renderANSI color:false disables color (plain output)", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
   const ansi = renderANSI(src, toks, { theme: dracula, color: false });
   assertEquals(ansi, src);
   assert(!ansi.includes(String.fromCharCode(27)));
-  // even with dracula theme, no ANSI
-  const ansi2 = new AnsiRenderer({ theme: dracula, color: false }).render(src, toks);
-  assertEquals(ansi2, src);
 
   // respects NO_COLOR env var
   const g = globalThis;
@@ -165,45 +156,28 @@ test("hexToAnsi converts hex to truecolor SGR", () => {
   assertEquals(hexToAnsi(dracula.keyword), "\x1b[38;2;255;121;198m");
 });
 
-test("AnsiRenderer tolerates unsorted and overlapping tokens", () => {
+test("renderANSI tolerates unsorted and overlapping tokens", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
   const reversed = [...toks].reverse();
-  const ansi = new AnsiRenderer().render(src, reversed);
+  const ansi = renderANSI(src, reversed);
   assertEquals(stripAnsi(ansi), src);
   assert(ansi.includes(`${hexToAnsi(defaultTheme.keyword)}const${ANSI_RESET}`));
 
   const dup = [...toks];
   dup.splice(1, 0, dup[1]);
-  const ansi2 = new AnsiRenderer().render(src, dup);
+  const ansi2 = renderANSI(src, dup);
   assertEquals(stripAnsi(ansi2), src);
 });
 
-test("AnsiRenderer validates source and tokens types", () => {
+test("renderANSI validates source and tokens types", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
   assertThrows(() => renderANSI(123, toks));
   assertThrows(() => renderANSI(src, "bad"));
-  assertThrows(() => new AnsiRenderer().render(123, toks));
-});
-
-test("AnsiRenderer class is canonical", () => {
-  const src = "const x = 42;";
-  const toks = highlighter.highlight(src);
-  const r = new AnsiRenderer();
-  assertEquals(r.render(src, toks), renderANSI(src, toks));
-  assertEquals(r.render(src, toks), new AnsiRenderer().render(src, toks));
-  const custom = new AnsiRenderer({ colors: { keyword: "\x1b[31m" } });
-  assertEquals(
-    custom.render(src, toks),
-    renderANSI(src, toks, { colors: { keyword: "\x1b[31m" } }),
-  );
-  const themed = new AnsiRenderer({ theme: dracula });
-  assertEquals(themed.render(src, toks), renderANSI(src, toks, { theme: dracula }));
 });
 
 test("empty source renders empty string", () => {
-  assertEquals(new AnsiRenderer().render("", []), "");
   assertEquals(renderANSI("", []), "");
 });
 
@@ -215,22 +189,22 @@ test("tokens are renderer-agnostic: no DOM Range used", () => {
     assert(!("text" in t));
     assert(!("value" in t));
   }
-  const ansi = new AnsiRenderer().render(src, toks);
+  const ansi = renderANSI(src, toks);
   assert(ansi.length >= src.length);
   assert(ansi.includes("\x1b["));
   assertEquals(stripAnsi(ansi), src);
 });
 
-test("AnsiRenderer does not emit ANSI for unknown types and emits plain gaps", () => {
+test("renderANSI does not emit ANSI for unknown types and emits plain gaps", () => {
   const src = "const x = 42;";
   const unknown = [{ start: 0, end: 5, type: "unknown" }];
-  const ansi = new AnsiRenderer().render(src, unknown);
+  const ansi = renderANSI(src, unknown);
   assert(!ansi.includes(`${hexToAnsi(defaultTheme.keyword)}const`));
   assert(!ansi.includes("\x1b[35mconst"));
   assertEquals(stripAnsi(ansi), src);
 
   const outOfBounds = [{ start: -1, end: 5, type: "keyword" }];
-  const ansi2 = new AnsiRenderer().render(src, outOfBounds);
+  const ansi2 = renderANSI(src, outOfBounds);
   assertEquals(stripAnsi(ansi2), src);
 });
 

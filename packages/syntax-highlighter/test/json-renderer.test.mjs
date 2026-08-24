@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows, test } from "runtime:test";
 import { Highlighter } from "../src/core/highlighter.ts";
-import { JsonRenderer, validateTokens } from "../src/core/json-renderer.ts";
+import { renderJSON, validateTokens } from "../src/core/json-renderer.ts";
 import javascript from "../src/languages/javascript.ts";
 
 const highlighter = new Highlighter(javascript);
@@ -9,10 +9,10 @@ function tokens(source) {
   return highlighter.highlight(source);
 }
 
-test("JsonRenderer.render preserves token JSON output", () => {
+test("renderJSON preserves token JSON output", () => {
   const src = "const x = 42;";
   const toks = tokens(src);
-  const json = new JsonRenderer().render(src, toks);
+  const json = renderJSON(src, toks);
   const parsed = JSON.parse(json);
   assertEquals(parsed, toks);
   for (const t of parsed) {
@@ -29,28 +29,28 @@ test("validateTokens accepts contiguous coverage and rejects gaps", () => {
   assertThrows(() => validateTokens(src, gapped));
 });
 
-test("JsonRenderer validates and rejects overlapping tokens", () => {
+test("renderJSON validates and rejects overlapping tokens", () => {
   const src = "const x = 42;";
   const dup = [...tokens(src)];
   dup.splice(1, 0, dup[1]);
-  assertThrows(() => new JsonRenderer().render(src, dup));
+  assertThrows(() => renderJSON(src, dup));
 });
 
-test("JsonRenderer rejects visual type leak", () => {
+test("renderJSON rejects visual type leak", () => {
   const src = "const x = 42;";
   const toks = tokens(src);
   const bad = toks.map((t) => ({ ...t }));
   bad[0] = { start: 0, end: 5, type: "blue-keyword" };
-  assertThrows(() => new JsonRenderer().render(src, bad));
+  assertThrows(() => renderJSON(src, bad));
 });
 
-test("JsonRenderer rejects text/value/modifiers fields", () => {
+test("renderJSON rejects text/value/modifiers fields", () => {
   const src = "const x = 42;";
   const bad = [{ start: 0, end: 5, type: "keyword", text: "const" }];
-  assertThrows(() => new JsonRenderer().render(src, bad));
+  assertThrows(() => renderJSON(src, bad));
 });
 
-test("JsonRenderer rejects split surrogate pair", () => {
+test("renderJSON rejects split surrogate pair", () => {
   const src = "const 𝒜 = 1;";
   const bad = [
     { start: 0, end: 5, type: "keyword" },
@@ -63,34 +63,26 @@ test("JsonRenderer rejects split surrogate pair", () => {
     { start: 11, end: 12, type: "number" },
     { start: 12, end: 13, type: "punctuation" },
   ];
-  assertThrows(() => new JsonRenderer().render(src, bad));
+  assertThrows(() => renderJSON(src, bad));
 });
 
-test("JsonRenderer rejects unsorted tokens", () => {
+test("renderJSON rejects unsorted tokens", () => {
   const src = "const x = 42;";
   const toks = [...tokens(src)].reverse();
-  assertThrows(() => new JsonRenderer().render(src, toks));
+  assertThrows(() => renderJSON(src, toks));
 });
 
-test("JsonRenderer rejects out-of-bounds end", () => {
+test("renderJSON rejects out-of-bounds end", () => {
   const src = "hi";
-  assertThrows(() => new JsonRenderer().render(src, [{ start: 0, end: 99, type: "variable" }]));
+  assertThrows(() => renderJSON(src, [{ start: 0, end: 99, type: "variable" }]));
 });
 
-test("JsonRenderer class API is canonical", () => {
-  const src = "const x = 42;";
-  const toks = tokens(src);
-  const r = new JsonRenderer();
-  r.validate(src, toks);
-  assertEquals(JSON.parse(r.render(src, toks)), toks);
-});
-
-test("empty source validates", () => {
-  assertEquals(new JsonRenderer().render("", []), "[]");
+test("empty source renders empty array", () => {
+  assertEquals(renderJSON("", []), "[]");
 });
 
 test("whitespace-only source validates", () => {
   const src = "   ";
   const toks = tokens(src);
-  assertEquals(JSON.parse(new JsonRenderer().render(src, toks)), toks);
+  assertEquals(JSON.parse(renderJSON(src, toks)), toks);
 });

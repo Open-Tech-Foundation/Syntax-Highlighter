@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **Breaking:** removed the stateless renderer classes `AnsiRenderer`, `HtmlRenderer`, and `JsonRenderer` in favor of their function forms — `renderANSI(source, tokens, options?)`, `renderHTML(source, tokens, options?)`, and `renderJSON(source, tokens)` — leaving one entry point per output format. Also removed `HtmlRenderer.renderDocument()` / `renderDocument()` (users compose `<pre><code>` themselves) and the now-unused `containerClass` option. Renamed option types for consistency: `AnsiRendererOptions` → `AnsiRenderOptions`, `HtmlRendererOptions` → `HtmlRenderOptions`. `CSSHighlightRenderer` remains a class (genuinely stateful: DOM node tracking, shared `CSS.highlights` registry, `clear()`/`dispose()` lifecycle). Updated READMEs (all four renderers + multi-package-manager install section), demo workbench, and unit tests to the function API.
 - Extracted shared `isValidToken`/`HIGHLIGHTABLE`/`iterateTokens`/`getSortedValidTokens` to `render-helpers.ts` (DRY html-renderer/ansi-renderer).
 - Deduplicated demo `terminal.clear()`/`write()` (4×) via `currentAnsi`/`flushTerminal()`/`setAnsiContent()` and moved `puppeteer-core` from `dependencies` to `devDependencies`; gitignored `verify_*.mjs` helpers (use `CHROME_PATH`/`PORT` env vars when needed).
 

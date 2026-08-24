@@ -10,8 +10,6 @@
 
 >  A fast, renderer-agnostic syntax highlighting library with semantic tokenization and support for CSS Custom Highlights, HTML/SSR, JSON, and ANSI terminal output.
 
-A modern syntax highlighting library that separates tokenization from rendering. A single semantic tokenizer produces renderer-agnostic token ranges that can power native browser highlighting, HTML/SSR output, JSON tooling, ANSI terminal output, and future custom renderers.
-
 ## Features
 
 * **Renderer-agnostic architecture** — one semantic tokenizer powers multiple output targets.
@@ -26,28 +24,115 @@ A modern syntax highlighting library that separates tokenization from rendering.
 * **Efficient updates** — designed for repeated highlighting and dynamic code content without rebuilding large DOM trees.
 * **Composable renderers** — add custom renderers without changing the tokenizer or language definitions.
 
-## Usage
+## Install
+
+```sh
+npm install @opentf/syntax-highlighter
+```
 
 ```sh
 pnpm add @opentf/syntax-highlighter
 ```
 
+```sh
+yarn add @opentf/syntax-highlighter
+```
+
+```sh
+bun add @opentf/syntax-highlighter
+```
+
+```sh
+deno add npm:@opentf/syntax-highlighter
+```
+
+## Usage
+
+Every renderer takes the same inputs — `source` plus the token array from `highlighter.highlight()`:
+
 ```ts
-import "@opentf/syntax-highlighter/themes/default.css";
-import { createHighlighter, CSSHighlightRenderer, HtmlRenderer, JsonRenderer } from "@opentf/syntax-highlighter";
+import { createHighlighter } from "@opentf/syntax-highlighter";
 
 const highlighter = await createHighlighter({ language: "javascript" });
 const tokens = highlighter.highlight(source);
+```
 
-// Browser — CSS Custom Highlights
-const css = new CSSHighlightRenderer(element);
-css.render(source, tokens);
+### Browser — CSS Custom Highlights
 
-// SSR / static HTML
-const html = new HtmlRenderer().render(source, tokens);
+Highlights the element's text natively via `CSS.highlights` — no `<span>` elements are injected. Requires a theme stylesheet that targets the `sh-{type}` classes.
 
-// JSON / tooling
-const json = new JsonRenderer().render(source, tokens);
+```css
+@import "@opentf/syntax-highlighter/themes/default.css";
+```
+
+```ts
+import { CSSHighlightRenderer, highlightElement } from "@opentf/syntax-highlighter";
+
+// One-shot setup for an editable/live element:
+const handle = await highlightElement(element, source, {
+  language: "javascript",
+  debounceMs: 50, // refresh() coalescing; 0 = synchronous
+});
+handle.refresh(nextSource); // re-highlight new content (debounced)
+handle.dispose(); // release highlights
+
+// Or drive it manually:
+const renderer = new CSSHighlightRenderer(element);
+renderer.render(source, tokens);
+renderer.clear();
+renderer.dispose();
+```
+
+### HTML / SSR
+
+Emits escaped HTML with semantic `<span class="sh-{type}">` wrappers. Safe for server rendering and static builds — compose your own `<pre><code>` wrapper as needed.
+
+```ts
+import { renderHTML } from "@opentf/syntax-highlighter";
+
+const html = renderHTML(source, tokens, {
+  prefix: "sh-", // CSS class prefix for token spans
+  wrapWhitespace: false, // wrap whitespace tokens too
+});
+```
+
+### ANSI terminal
+
+Truecolor output for CLIs and terminals. Themes are plain RGB objects converted to `ESC[38;2;R;G;Bm`; respects `NO_COLOR` unless `color` is explicit.
+
+```ts
+import { renderANSI } from "@opentf/syntax-highlighter";
+import { dracula } from "@opentf/syntax-highlighter/ansi/themes/dracula";
+
+const out = renderANSI(source, tokens, {
+  theme: dracula, // hex colors per token type; defaults to defaultTheme
+  color: true, // force on/off; undefined respects NO_COLOR
+  wrapWhitespace: false,
+});
+console.log(out);
+```
+
+Available ANSI themes: `default`, `default-light`, `dracula`, `github-dark`, `github-light`, `gruvbox-dark`, `monokai`, `nord`, `one-dark`, `solarized-dark`, `solarized-light`, `tokyo-night` — importable via `@opentf/syntax-highlighter/ansi/themes/{name}` or as a map from `ANSI_THEMES`.
+
+### JSON / tooling
+
+Serializes the token stream — useful for snapshots, tests, and editor integrations.
+
+```ts
+import { renderJSON } from "@opentf/syntax-highlighter";
+
+const json = renderJSON(source, tokens);
+```
+
+### Custom languages
+
+Register additional languages or aliases without touching the tokenizer or renderers:
+
+```ts
+import { registerLanguage, getRegisteredLanguages } from "@opentf/syntax-highlighter";
+
+registerLanguage(definition); // LanguageDefinition
+console.log(getRegisteredLanguages()); // ["javascript", "typescript", ...]
 ```
 
 ## Development

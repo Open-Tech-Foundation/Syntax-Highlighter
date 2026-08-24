@@ -67,7 +67,7 @@ function shouldUseColor(explicit: boolean | undefined): boolean {
   return true;
 }
 
-export interface AnsiRendererOptions {
+export interface AnsiRenderOptions {
   /** RGB theme: plain hex colors per token type. Defaults to `defaultTheme` (truecolor). */
   theme?: AnsiTheme;
   /** Explicitly enable/disable color. `false` disables even if theme is provided. Respects `NO_COLOR`. */
@@ -91,7 +91,7 @@ export interface AnsiRendererOptions {
 export function renderANSI(
   source: string,
   tokens: Token[],
-  options: AnsiRendererOptions = {},
+  options: AnsiRenderOptions = {},
 ): string {
   if (typeof source !== "string") throw new TypeError("source must be a string");
   if (!Array.isArray(tokens)) throw new TypeError("tokens must be an array");
@@ -142,37 +142,4 @@ export function renderANSI(
   }
 
   return out;
-}
-
-export class AnsiRenderer {
-  readonly theme: AnsiTheme;
-  readonly color: boolean | undefined;
-  readonly colors: Record<string, string | undefined>;
-  readonly wrapWhitespace: boolean;
-
-  constructor(options: AnsiRendererOptions = {}) {
-    this.theme = { ...defaultTheme, ...(options.theme ?? {}) };
-    if (options.theme?.type != null && options.theme?.class == null)
-      (this.theme as AnsiTheme).class = options.theme.type as string;
-    this.color = options.color;
-    const raw: AnsiTheme = { ...defaultTheme, ...(options.theme ?? {}) };
-    if (options.theme?.type != null && options.theme?.class == null)
-      (raw as AnsiTheme).class = options.theme.type as string;
-    const mapped: Record<string, string | undefined> = {};
-    for (const [k, v] of Object.entries(raw))
-      if (v != null) mapped[k] = themeValueToAnsi(v as string);
-    if (options.colors)
-      for (const [k, v] of Object.entries(options.colors)) if (v != null) mapped[k] = v as string;
-    this.colors = mapped;
-    this.wrapWhitespace = options.wrapWhitespace ?? false;
-  }
-
-  render(source: string, tokens: Token[]): string {
-    return renderANSI(source, tokens, {
-      theme: this.theme,
-      color: this.color,
-      colors: this.colors as Partial<Record<Token["type"], string>>,
-      wrapWhitespace: this.wrapWhitespace,
-    });
-  }
 }

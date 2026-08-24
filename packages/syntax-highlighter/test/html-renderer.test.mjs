@@ -1,15 +1,22 @@
 import { assert, assertEquals, test } from "runtime:test";
 import { Highlighter } from "../src/core/highlighter.ts";
-import { HtmlRenderer } from "../src/core/html-renderer.ts";
+import { escapeHtml, renderHTML } from "../src/core/html-renderer.ts";
 import javascript from "../src/languages/javascript.ts";
 
 const highlighter = new Highlighter(javascript);
 
 function render(src) {
-  return new HtmlRenderer().render(src, highlighter.highlight(src));
+  return renderHTML(src, highlighter.highlight(src));
 }
 
-test("HtmlRenderer.render wraps semantic tokens with sh- prefix", () => {
+test("escapeHtml escapes HTML entities", () => {
+  assertEquals(
+    escapeHtml(`<div class="a" & 'b'>`),
+    "&lt;div class=&quot;a&quot; &amp; &#39;b&#39;&gt;",
+  );
+});
+
+test("renderHTML wraps semantic tokens with sh- prefix", () => {
   const src = "const x = 42;";
   const html = render(src);
   assert(html.includes('<span class="sh-keyword">const</span>'));
@@ -18,7 +25,7 @@ test("HtmlRenderer.render wraps semantic tokens with sh- prefix", () => {
   assert(!html.includes('<span class="sh-whitespace"'));
 });
 
-test("HtmlRenderer escapes HTML entities", () => {
+test("renderHTML escapes HTML entities", () => {
   const src = "const s = \"<div> & 'x'\";";
   const html = render(src);
   assert(html.includes("&lt;div&gt;"));
@@ -27,10 +34,10 @@ test("HtmlRenderer escapes HTML entities", () => {
   assert(html.includes("&quot;") || html.includes("&#39;"));
 });
 
-test("HtmlRenderer recovers text via source.slice", () => {
+test("renderHTML recovers text via source.slice", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
-  const html = new HtmlRenderer().render(src, toks);
+  const html = renderHTML(src, toks);
   const text = html
     .replaceAll(/<[^>]+>/g, "")
     .replaceAll("&lt;", "<")
@@ -41,12 +48,12 @@ test("HtmlRenderer recovers text via source.slice", () => {
   assertEquals(text, src);
 });
 
-test("HtmlRenderer handles surrogate pairs", () => {
+test("renderHTML handles surrogate pairs", () => {
   const src = "const 𝒜 = 1;";
   const html = render(src);
   assert(html.includes("𝒜"));
   const toks = highlighter.highlight(src);
-  const html2 = new HtmlRenderer().render(src, toks);
+  const html2 = renderHTML(src, toks);
   assertEquals(
     html2
       .replaceAll(/<[^>]+>/g, "")
@@ -57,42 +64,25 @@ test("HtmlRenderer handles surrogate pairs", () => {
   );
 });
 
-test("HtmlRenderer fills gaps for non-contiguous tokens", () => {
+test("renderHTML fills gaps for non-contiguous tokens", () => {
   const src = "const x = 42;";
   const partial = [{ start: 0, end: 5, type: "keyword" }];
-  const html = new HtmlRenderer().render(src, partial);
+  const html = renderHTML(src, partial);
   assert(html.includes('<span class="sh-keyword">const</span>'));
   assert(html.includes("x = 42;"));
 });
 
-test("HtmlRenderer custom prefix and wrapWhitespace", () => {
+test("renderHTML custom prefix and wrapWhitespace", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);
-  const html = new HtmlRenderer({ prefix: "tok-" }).render(src, toks);
+  const html = renderHTML(src, toks, { prefix: "tok-" });
   assert(html.includes('<span class="tok-keyword">'));
-  const html2 = new HtmlRenderer({ wrapWhitespace: true }).render(src, toks);
+  const html2 = renderHTML(src, toks, { wrapWhitespace: true });
   assert(html2.includes('<span class="sh-whitespace">'));
 });
 
-test("HtmlRenderer.renderDocument wraps in pre code", () => {
-  const src = "const x = 42;";
-  const doc = new HtmlRenderer().renderDocument(src, highlighter.highlight(src));
-  assert(doc.startsWith("<pre"));
-  assert(doc.includes("<code>"));
-  assert(doc.includes("</code></pre>"));
-  assert(doc.includes('<span class="sh-keyword">const</span>'));
-});
-
-test("HtmlRenderer class is canonical", () => {
-  const src = "const x = 42;";
-  const toks = highlighter.highlight(src);
-  const r = new HtmlRenderer();
-  assertEquals(r.render(src, toks), new HtmlRenderer().render(src, toks));
-});
-
 test("empty source renders empty string", () => {
-  assertEquals(new HtmlRenderer().render("", []), "");
-  assertEquals(new HtmlRenderer().renderDocument("", []), "<pre><code></code></pre>");
+  assertEquals(renderHTML("", []), "");
 });
 
 test("tokens are renderer-agnostic: no DOM Range used", () => {
@@ -102,6 +92,6 @@ test("tokens are renderer-agnostic: no DOM Range used", () => {
     assertEquals(Object.keys(t).sort(), ["end", "start", "type"]);
     assert(!("text" in t));
   }
-  const html = new HtmlRenderer().render(src, toks);
+  const html = renderHTML(src, toks);
   assert(html.length > 0);
 });

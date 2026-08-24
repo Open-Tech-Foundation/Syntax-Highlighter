@@ -8,16 +8,16 @@
 import {
   ANSI_PALETTES,
   ANSI_THEMES,
-  AnsiRenderer,
   CSSHighlightRenderer,
   createHighlighter,
   getRegisteredLanguages,
   type Highlighter,
-  HtmlRenderer,
   isSignificant,
-  JsonRenderer,
   type LanguageDefinition,
   registerLanguage,
+  renderANSI,
+  renderHTML,
+  renderJSON,
 } from "@opentf/syntax-highlighter";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
@@ -395,16 +395,12 @@ function renderNow(source: string): void {
       ),
     );
     try {
-      jsonPane.textContent = JSON.stringify(
-        JSON.parse(new JsonRenderer().render(source, tokens)),
-        null,
-        2,
-      );
+      jsonPane.textContent = JSON.stringify(renderJSON(source, tokens), null, 2);
     } catch {
       jsonPane.textContent = "Invalid tokens";
     }
     try {
-      const html = new HtmlRenderer().render(source, tokens);
+      const html = renderHTML(source, tokens);
       htmlPane.textContent = html;
       htmlPreviewPane.innerHTML = html;
     } catch {
@@ -412,7 +408,7 @@ function renderNow(source: string): void {
       htmlPreviewPane.textContent = "Invalid tokens";
     }
     try {
-      const ansi = new AnsiRenderer({ theme: resolveAnsiTheme() }).render(source, tokens);
+      const ansi = renderANSI(source, tokens, { theme: resolveAnsiTheme() });
       setAnsiContent(ansi);
     } catch {
       setAnsiContent("Invalid tokens");
@@ -470,7 +466,7 @@ function rerenderAnsi(): void {
   void highlighterFor(languageSelect.value)
     .then((h) => {
       const tokens = h.highlight(currentSource);
-      const ansi = new AnsiRenderer({ theme: resolveAnsiTheme() }).render(currentSource, tokens);
+      const ansi = renderANSI(currentSource, tokens, { theme: resolveAnsiTheme() });
       setAnsiContent(ansi);
     })
     .catch(() => setAnsiContent("Invalid tokens"));

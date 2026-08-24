@@ -92,13 +92,3 @@ export function renderJSON(source: string, tokens: Token[]): string {
   validateTokens(source, tokens);
   return JSON.stringify(tokens);
 }
-
-export class JsonRenderer {
-  validate(source: string, tokens: Token[]): void {
-    validateTokens(source, tokens);
-  }
-
-  render(source: string, tokens: Token[]): string {
-    return renderJSON(source, tokens);
-  }
-}

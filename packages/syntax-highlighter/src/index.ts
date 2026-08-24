@@ -3,12 +3,11 @@ import { Highlighter } from "./core/highlighter.ts";
 import { loadLanguage } from "./core/registry.ts";
 
 export type { AnsiTheme as AnsiThemeType, AnsiThemeName } from "./ansi/themes/types.ts";
-export type { AnsiRendererOptions, AnsiTheme } from "./core/ansi-renderer.ts";
+export type { AnsiRenderOptions, AnsiTheme } from "./core/ansi-renderer.ts";
 export {
   ANSI_PALETTES,
   ANSI_RESET,
   ANSI_THEMES,
-  AnsiRenderer,
   DEFAULT_ANSI_COLORS,
   defaultLight,
   defaultTheme,
@@ -19,9 +18,9 @@ export { CSSHighlightRenderer } from "./core/css-renderer.ts";
 export { GenericTokenizer } from "./core/generic-tokenizer.ts";
 export type { TokenizerLike } from "./core/highlighter.ts";
 export { Highlighter } from "./core/highlighter.ts";
-export type { HtmlRendererOptions } from "./core/html-renderer.ts";
-export { HtmlRenderer } from "./core/html-renderer.ts";
-export { JsonRenderer } from "./core/json-renderer.ts";
+export type { HtmlRenderOptions } from "./core/html-renderer.ts";
+export { renderHTML } from "./core/html-renderer.ts";
+export { renderJSON, validateTokens } from "./core/json-renderer.ts";
 export type {
   CommentDef,
   LanguageDefinition,

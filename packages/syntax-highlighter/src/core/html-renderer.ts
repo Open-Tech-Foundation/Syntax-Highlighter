@@ -1,13 +1,11 @@
 import { HIGHLIGHTABLE, iterateTokens } from "./render-helpers.ts";
 import { type Token, WHITESPACE } from "./tokens.ts";
 
-export interface HtmlRendererOptions {
+export interface HtmlRenderOptions {
   /** CSS class prefix for token spans. Defaults to `sh-`. */
   prefix?: string;
   /** Whether to wrap whitespace tokens. Defaults to false (whitespace is emitted plain). */
   wrapWhitespace?: boolean;
-  /** Optional class for the outer `<pre>` when using `renderDocument`. */
-  containerClass?: string;
 }
 
 const DEFAULT_PREFIX = "sh-";
@@ -32,7 +30,7 @@ export function escapeHtml(text: string): string {
 export function renderHTML(
   source: string,
   tokens: Token[],
-  options: HtmlRendererOptions = {},
+  options: HtmlRenderOptions = {},
 ): string {
   if (typeof source !== "string") throw new TypeError("source must be a string");
   if (!Array.isArray(tokens)) throw new TypeError("tokens must be an array");
@@ -62,45 +60,4 @@ export function renderHTML(
   }
 
   return html;
-}
-
-/**
- * Wrap rendered HTML in a `<pre><code>` block suitable for static docs.
- */
-export function renderDocument(
-  source: string,
-  tokens: Token[],
-  options: HtmlRendererOptions = {},
-): string {
-  const inner = renderHTML(source, tokens, options);
-  const cls = options.containerClass ? ` class="${escapeHtml(options.containerClass)}"` : "";
-  return `<pre${cls}><code>${inner}</code></pre>`;
-}
-
-export class HtmlRenderer {
-  readonly prefix: string;
-  readonly wrapWhitespace: boolean;
-  readonly containerClass?: string;
-
-  constructor(options: HtmlRendererOptions = {}) {
-    this.prefix = options.prefix ?? DEFAULT_PREFIX;
-    this.wrapWhitespace = options.wrapWhitespace ?? false;
-    this.containerClass = options.containerClass;
-  }
-
-  render(source: string, tokens: Token[]): string {
-    return renderHTML(source, tokens, {
-      prefix: this.prefix,
-      wrapWhitespace: this.wrapWhitespace,
-      containerClass: this.containerClass,
-    });
-  }
-
-  renderDocument(source: string, tokens: Token[]): string {
-    return renderDocument(source, tokens, {
-      prefix: this.prefix,
-      wrapWhitespace: this.wrapWhitespace,
-      containerClass: this.containerClass,
-    });
-  }
 }
