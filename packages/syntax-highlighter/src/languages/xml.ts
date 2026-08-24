@@ -3,7 +3,7 @@ import type { LanguageDefinition } from "../core/lexer.ts";
 const xml: LanguageDefinition = {
   name: "xml",
   aliases: ["xsl", "xslt", "svg", "rss", "atom"],
-  semantic: "generic",
+  semantic: "html",
   keywords: ["xml", "xmlns"],
   operators: ["="],
   punctuation: [

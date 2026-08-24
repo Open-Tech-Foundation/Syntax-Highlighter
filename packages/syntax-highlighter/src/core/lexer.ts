@@ -37,8 +37,11 @@ export interface LanguageDefinition {
   regexKeywords?: string[];
   operators?: string[];
   punctuation?: string[];
-  /** Semantic classifier. Defaults to `generic`; JavaScript opts into `javascript`. */
-  semantic?: "javascript" | "generic";
+  /**
+   * Semantic classifier. Defaults to `generic`; JavaScript opts into
+   * `javascript`, HTML/XML into `html`.
+   */
+  semantic?: "javascript" | "html" | "generic";
   /**
    * Match the word lists (keywords/booleans/nulls/constants) ignoring ASCII
    * case — for case-insensitive languages like SQL. Defaults to false.

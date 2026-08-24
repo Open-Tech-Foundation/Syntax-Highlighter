@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added HTML semantic tokenization — new `HtmlTokenizer` (`semantic: "html"`, wired for `html` and `xml`): tag names emit `tag`, attribute names `attribute`, text content plain `text`; closing tags parse as a single unit; `<!doctype …>` names are `keyword`; XML prologs `<?…?>` and CDATA handled. `<script>` bodies are tokenized with the JavaScript tokenizer and `<style>` bodies with the CSS one. Three new semantic token types (`tag`, `attribute`, `text`) added to the token set; `shared.css` gains `sh-tag`/`sh-attribute` selectors falling back to `--sh-tag`→`--sh-keyword` / `--sh-attribute`→`--sh-property` (themes need no changes; `text` renders unstyled by design). Token streams keep full-source coverage so the JSON contract holds. Covered by new `test/html-tokenizer.test.mjs`.
+
+### Added
+
 - Added TypeScript semantic tokenization — `typescript` now runs the JS-aware tokenizer (`semantic: "javascript"`) instead of the generic one. Type-declaration names (`type X = …`, `interface X`, `enum X`) highlight as `class`; their bodies highlight members as `property`; parameter/return type annotations are transparent to binding analysis so typed params (`(name: string) =>`, methods, generic declarations like `function f<T>(arg: T): T`) still highlight as `parameter`, including optional (`a?: T`) and nested-generic (`Map<string, number>`) annotations. Also aligned TS punctuation with JS (`:` is punctuation, not an operator), fixing property highlighting in plain TS object literals. Covered by new `test/typescript-tokenizer.test.mjs`.
 
 ### Added

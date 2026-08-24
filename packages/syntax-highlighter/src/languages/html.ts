@@ -3,7 +3,7 @@ import type { LanguageDefinition } from "../core/lexer.ts";
 const html: LanguageDefinition = {
   name: "html",
   aliases: ["htm", "xhtml"],
-  semantic: "generic",
+  semantic: "html",
   keywords: [],
   operators: ["=", "/"],
   punctuation: ["<", ">", "(", ")", "{", "}", "[", "]", ";", ",", ":", ".", "-", "!", "?", "&"],

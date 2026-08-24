@@ -76,3 +76,11 @@
 .sh-null {
   color: var(--sh-null);
 }
+::highlight(sh-tag),
+.sh-tag {
+  color: var(--sh-tag, var(--sh-keyword));
+}
+::highlight(sh-attribute),
+.sh-attribute {
+  color: var(--sh-attribute, var(--sh-property));
+}

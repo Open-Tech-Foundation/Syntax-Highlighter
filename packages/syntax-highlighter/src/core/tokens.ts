@@ -16,6 +16,9 @@ export interface TokenTypeConst {
   readonly DECORATOR: "decorator";
   readonly BOOLEAN: "boolean";
   readonly NULL: "null";
+  readonly TAG: "tag";
+  readonly ATTRIBUTE: "attribute";
+  readonly TEXT: "text";
 }
 
 export const TokenType: TokenTypeConst = Object.freeze({
@@ -36,6 +39,9 @@ export const TokenType: TokenTypeConst = Object.freeze({
   DECORATOR: "decorator",
   BOOLEAN: "boolean",
   NULL: "null",
+  TAG: "tag",
+  ATTRIBUTE: "attribute",
+  TEXT: "text",
 });
 
 export type TokenType = TokenTypeConst[keyof TokenTypeConst];

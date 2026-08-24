@@ -1,4 +1,5 @@
 import { GenericTokenizer } from "./generic-tokenizer.ts";
+import { HtmlTokenizer } from "./html-tokenizer.ts";
 import type { LanguageDefinition } from "./lexer.ts";
 import { Tokenizer } from "./tokenizer.ts";
 import type { Token } from "./tokens.ts";
@@ -17,7 +18,11 @@ export class Highlighter {
     }
     this.language = language;
     this.tokenizer =
-      language.semantic === "javascript" ? new Tokenizer(language) : new GenericTokenizer(language);
+      language.semantic === "javascript"
+        ? new Tokenizer(language)
+        : language.semantic === "html"
+          ? new HtmlTokenizer(language)
+          : new GenericTokenizer(language);
   }
 
   highlight(source: string): Token[] {
