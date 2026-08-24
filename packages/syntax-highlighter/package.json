@@ -9,11 +9,15 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./themes/*": "./src/themes/*"
+    "./themes/*": "./src/themes/*",
+    "./ansi/themes/*": "./src/ansi/themes/*",
+    "./ansi/*": "./src/ansi/*"
   },
   "files": [
     "dist",
-    "src/themes"
+    "src/themes",
+    "src/ansi/themes",
+    "src/ansi"
   ],
   "devDependencies": {
     "@opentf/esrun-types": "latest",

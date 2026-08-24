@@ -2,6 +2,19 @@ import { CSSHighlightRenderer } from "./core/css-renderer.ts";
 import { Highlighter } from "./core/highlighter.ts";
 import { loadLanguage } from "./core/registry.ts";
 
+export type { AnsiTheme as AnsiThemeType, AnsiThemeName } from "./ansi/themes/types.ts";
+export type { AnsiRendererOptions, AnsiTheme } from "./core/ansi-renderer.ts";
+export {
+  ANSI_PALETTES,
+  ANSI_RESET,
+  ANSI_THEMES,
+  AnsiRenderer,
+  DEFAULT_ANSI_COLORS,
+  defaultLight,
+  defaultTheme,
+  hexToAnsi,
+  renderANSI,
+} from "./core/ansi-renderer.ts";
 export { CSSHighlightRenderer } from "./core/css-renderer.ts";
 export { GenericTokenizer } from "./core/generic-tokenizer.ts";
 export type { TokenizerLike } from "./core/highlighter.ts";
