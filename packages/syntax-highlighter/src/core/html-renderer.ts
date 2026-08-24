@@ -1,6 +1,5 @@
-import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
-
-const HIGHLIGHTABLE = new Set<string>(Object.values(TokenType));
+import { HIGHLIGHTABLE, iterateTokens } from "./render-helpers.ts";
+import { type Token, WHITESPACE } from "./tokens.ts";
 
 export interface HtmlRendererOptions {
   /** CSS class prefix for token spans. Defaults to `sh-`. */
@@ -22,18 +21,6 @@ export function escapeHtml(text: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function isValidToken(token: unknown): token is Token {
-  if (token == null || typeof token !== "object") return false;
-  const t = token as Record<string, unknown>;
-  return (
-    typeof t.start === "number" &&
-    typeof t.end === "number" &&
-    typeof t.type === "string" &&
-    Number.isInteger(t.start) &&
-    Number.isInteger(t.end)
-  );
-}
-
 /**
  * HTML renderer — SSR / static / docs.
  *
@@ -53,23 +40,16 @@ export function renderHTML(
   const prefix = options.prefix ?? DEFAULT_PREFIX;
   const wrapWhitespace = options.wrapWhitespace ?? false;
 
-  // Lenient: tolerate unsorted tokens by sorting; fill gaps with plain text.
-  const sorted = [...tokens].filter(isValidToken).sort((a, b) => a.start - b.start);
-
+  // Lenient: iterateTokens sorts, skips invalid/overlapping tokens, and yields gaps as plain text.
   let html = "";
-  let pos = 0;
 
-  for (const token of sorted) {
-    if (token.start < 0 || token.end > source.length || token.end <= token.start) continue;
-    if (token.start < pos) continue; // overlapping — skip stale
-
-    // gap before token (uncovered source)
-    if (token.start > pos) {
-      html += escapeHtml(source.slice(pos, token.start));
-      pos = token.start;
+  for (const part of iterateTokens(source, tokens)) {
+    if (part.kind === "gap") {
+      html += escapeHtml(part.text);
+      continue;
     }
 
-    const text = source.slice(token.start, token.end);
+    const { token, text } = part;
     const escaped = escapeHtml(text);
 
     if (token.type === WHITESPACE) {
@@ -79,11 +59,6 @@ export function renderHTML(
     } else {
       html += escaped;
     }
-    pos = token.end;
-  }
-
-  if (pos < source.length) {
-    html += escapeHtml(source.slice(pos));
   }
 
   return html;

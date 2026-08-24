@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertThrows, test } from "runtime:test";
+import { assertEquals, assertThrows, test } from "runtime:test";
 import { Highlighter } from "../src/core/highlighter.ts";
 import { JsonRenderer, validateTokens } from "../src/core/json-renderer.ts";
 import javascript from "../src/languages/javascript.ts";
