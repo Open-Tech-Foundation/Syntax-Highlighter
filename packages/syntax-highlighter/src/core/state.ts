@@ -77,6 +77,8 @@ export interface HighlightState {
   afterArrow: boolean;
   lastClosedParams: boolean;
   pendingParams: string[] | null;
+  /** The previous identifier was a `type`/`interface`/`enum` declaration name. */
+  afterTypeDecl: boolean;
 }
 
 export function createState(): HighlightState {
@@ -91,5 +93,6 @@ export function createState(): HighlightState {
     afterArrow: false,
     lastClosedParams: false,
     pendingParams: null,
+    afterTypeDecl: false,
   };
 }

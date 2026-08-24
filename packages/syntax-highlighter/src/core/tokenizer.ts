@@ -13,6 +13,9 @@ const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
 const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
 
+/** Keywords whose following identifier declares a named type (highlighted as `class`). */
+const TYPE_DECL_KEYWORDS = new Set(["interface", "enum", "type"]);
+
 const OBJECT_STARTERS = new Set([
   "return",
   "throw",
@@ -86,7 +89,12 @@ export class Tokenizer {
     if (!isArrow) ctx.afterArrow = false;
 
     const ch = src[raw.start];
-    if (ch !== "{" && ch !== ")") ctx.lastClosedParams = false;
+    if (ch !== "{" && ch !== ")") {
+      ctx.lastClosedParams = false;
+      // `afterTypeDecl` survives generic params and `=` (`type X<T> = { … }`)
+      // until consumed by #braceKind or a statement terminator.
+      if (ch === ";") ctx.afterTypeDecl = false;
+    }
 
     let tok: Token;
     switch (raw.type) {
@@ -200,6 +208,16 @@ export class Tokenizer {
       return createToken(TokenType.CLASS, raw.start, raw.end);
     }
 
+    if (
+      prev?.type === TokenType.KEYWORD &&
+      ctx.previousValue != null &&
+      TYPE_DECL_KEYWORDS.has(ctx.previousValue) &&
+      (ctx.previousValue !== "type" || this.#isTypeAliasName(raws, idx))
+    ) {
+      ctx.afterTypeDecl = true;
+      return createToken(TokenType.CLASS, raw.start, raw.end);
+    }
+
     const decl = ctx.declarations.get(val);
     if (decl === "function") return createToken(TokenType.FUNCTION, raw.start, raw.end);
     if (decl === "class") return createToken(TokenType.CLASS, raw.start, raw.end);
@@ -215,6 +233,18 @@ export class Tokenizer {
 
     if (CONSTANT_RE.test(val)) return createToken(TokenType.CONSTANT, raw.start, raw.end);
     return createToken(TokenType.VARIABLE, raw.start, raw.end);
+  }
+
+  /**
+   * `type X = …` / `type X<T> = …` — the identifier after a `type` keyword is
+   * an alias declaration only when followed by `=` or generic `<`. Guards the
+   * contextual-keyword use (`{ type: x }` values stay plain identifiers).
+   */
+  #isTypeAliasName(raws: RawToken[], idx: number): boolean {
+    const nxt = this.#nextSig(raws, idx);
+    if (!nxt) return false;
+    // `<` is lexed as an operator in TS, so accept both operator and punctuation.
+    return nxt.type === "operator" && (nxt.value === "=" || nxt.value === "<");
   }
 
   #operator(raw: RawToken, ctx: HighlightState, out: Token[], src: string): Token {
@@ -368,6 +398,10 @@ export class Tokenizer {
     if (ctx.afterArrow) {
       ctx.afterArrow = false;
       return ContextKind.FUNCTION;
+    }
+    if (ctx.afterTypeDecl) {
+      ctx.afterTypeDecl = false;
+      return ContextKind.OBJECT;
     }
     if (ctx.lastClosedParams) return ContextKind.FUNCTION;
 
@@ -526,6 +560,14 @@ export class Tokenizer {
     return i < raws.length ? raws[i] : null;
   }
 
+  #prevSigIndex(raws: RawToken[], idx: number): number {
+    for (let i = Math.min(idx, raws.length - 1); i >= 0; i--) {
+      const type = raws[i].type;
+      if (type !== WHITESPACE && type !== "comment") return i;
+    }
+    return -1;
+  }
+
   #nextSigIndex(raws: RawToken[], idx: number): number {
     return this.#sigIndex[idx] ?? raws.length;
   }
@@ -558,12 +600,21 @@ export class Tokenizer {
         const prevAtOpen = prevStack.pop();
         if (open != null && prevAtOpen !== undefined) {
           parens.set(open, i);
-          const after = this.#nextSig(raws, i);
-          const previous = prevAtOpen >= 0 ? raws[prevAtOpen] : null;
+          let afterIdx = this.#nextSigIndex(raws, i + 1);
+          // See through a TS return annotation: `(...): Type =>` / `(...): Type {`
+          if (raws[afterIdx]?.value === ":") {
+            afterIdx = this.#nextSigIndex(
+              raws,
+              this.#skipTypeAnnotation(raws, afterIdx + 1, raws.length, true),
+            );
+          }
+          const after = afterIdx < raws.length ? raws[afterIdx] : null;
+          const previous = this.#effectiveHeaderPrev(raws, prevAtOpen);
           const isArrow = after?.value === "=>";
           const isBodyHeader =
             after?.value === "{" &&
-            previous?.type === "identifier" &&
+            previous != null &&
+            previous.type === "identifier" &&
             !CONTROL_HEADER_KEYWORDS.has(previous.value);
           if (isArrow || isBodyHeader) {
             this.#collectBindings(raws, open + 1, i, parameterBindings);
@@ -576,6 +627,36 @@ export class Tokenizer {
     }
 
     return { parens, parameterBindings };
+  }
+
+  /**
+   * The identifier that owns a parameter list — skipping generic parameters
+   * (`identity<T>(…)`, `Map#entries<V>(…)`-style declarations) so the token
+   * right before `(` is still recognized as the declaration name.
+   */
+  #effectiveHeaderPrev(raws: RawToken[], prevIdx: number): RawToken | null {
+    if (prevIdx < 0) return null;
+    let i = prevIdx;
+    if (raws[i].value === ">" || raws[i].value === ">>" || raws[i].value === ">>>") {
+      // Nested-generic closers are greedily lexed as shift operators.
+      let depth = 0;
+      while (i >= 0) {
+        const v = raws[i].value;
+        if (v === ">") depth += 1;
+        else if (v === ">>") depth += 2;
+        else if (v === ">>>") depth += 3;
+        else if (v === "<") {
+          depth -= 1;
+          if (depth <= 0) break;
+        } else if (v === "<<") {
+          depth -= 2;
+          if (depth <= 0) break;
+        }
+        i -= 1;
+      }
+      i = this.#prevSigIndex(raws, i - 1);
+    }
+    return i >= 0 ? raws[i] : null;
   }
 
   #collectBindings(raws: RawToken[], start: number, end: number, bindings: Set<number>): void {
@@ -605,12 +686,57 @@ export class Tokenizer {
     if (token.type === "identifier") {
       bindings.add(i);
       const next = this.#nextSigIndex(raws, i + 1);
-      if (raws[next]?.value === "=") {
+      const nraw = raws[next];
+      if (nraw?.value === "=") {
         return this.#skipDefault(raws, next + 1, end, new Set([",", ")"]));
+      }
+      // Type annotations — `x: T`, `x?: T` — bind the name, then skip the type.
+      if (nraw?.value === "?") {
+        const colonIdx = this.#nextSigIndex(raws, next + 1);
+        if (raws[colonIdx]?.value === ":") {
+          return this.#skipTypeAnnotation(raws, colonIdx + 1, end);
+        }
+        return next;
+      }
+      if (nraw?.value === ":") {
+        return this.#skipTypeAnnotation(raws, next + 1, end);
       }
       return next;
     }
     return this.#skipDefault(raws, i + 1, end, new Set([",", ")"]));
+  }
+
+  /**
+   * Consume a type annotation: balanced over `()[]{}<>`, stopping at a
+   * depth-0 `,`, or at the closing paren that ends the parameter list.
+   * With `stopArrows` (return-annotation position), also stops at `=>` and
+   * the body `{` — e.g. `(...): string => …`.
+   */
+  #skipTypeAnnotation(raws: RawToken[], start: number, end: number, stopArrows = false): number {
+    let depth = 0;
+    let i = start;
+    while (i < end) {
+      const v = raws[i].value;
+      // Depth-0 terminators — checked before opener tracking so that a
+      // function body `{` ends the scan instead of balancing as a group.
+      if (
+        depth === 0 &&
+        (v === "," ||
+          v === ")" ||
+          v === "]" ||
+          v === "}" ||
+          (stopArrows && (v === "=>" || v === "{")))
+      ) {
+        return i;
+      }
+      if (v === "(" || v === "[" || v === "{" || v === "<") depth += 1;
+      else if ((v === ">" || v === ">>" || v === ">>>") && depth > 0) {
+        // The lexer greedily lexes nested-generic closers (`>>`) as shift operators.
+        depth = Math.max(0, depth - v.length);
+      }
+      i += 1;
+    }
+    return i;
   }
 
   #parseObjectBinding(raws: RawToken[], open: number, end: number, bindings: Set<number>): number {

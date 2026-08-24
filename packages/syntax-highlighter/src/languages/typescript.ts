@@ -3,7 +3,7 @@ import type { LanguageDefinition } from "../core/lexer.ts";
 const typescript: LanguageDefinition = {
   name: "typescript",
   aliases: ["ts", "tsx", "mts", "cts"],
-  semantic: "generic",
+  semantic: "javascript",
   keywords: [
     "abstract",
     "as",
@@ -129,9 +129,8 @@ const typescript: LanguageDefinition = {
     "<",
     ">",
     "?",
-    ":",
   ],
-  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "."],
+  punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ":", "."],
   lex: {
     strings: [
       { open: "'", close: "'", escape: "\\", multiline: false },
