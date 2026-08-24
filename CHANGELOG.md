@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added ANSI truecolor theme system — plain RGB data (no ANSI codes in themes), truecolor-only (`ESC[38;2;R;G;Bm`), tree-shakeable separate modules `src/ansi/themes/{default,default-light,dracula,github,monokai,nord,solarized,one-dark,gruvbox-dark,tokyo-night,github-dark/light,solarized-dark/light}.ts` with `defaultTheme` (dark) + `defaultLight` (light) and `ANSI_THEMES`/`ANSI_PALETTES` (`{dark,light}`) presets derived from CSS `--sh-*`; renderer converts hex → truecolor via `hexToAnsi()`. Usage: `import { dracula } from "@opentf/syntax-highlighter/ansi/themes/dracula"` and `renderANSI(source, tokens, { theme: dracula })` (or `new AnsiRenderer({ theme: dracula })`); `color: false` or `NO_COLOR` disables color (plain `source.slice` reassembly). Added `type` → `class` alias. Keeps `DEFAULT_ANSI_COLORS`/`colors` for backwards compat. 16-test suite `ansi-renderer.test.mjs` covers truecolor, theme overrides, `color:false`/`NO_COLOR`, `hexToAnsi`, `type` alias, and tree-shakeability.
+- Added demo terminal tab with xterm.js (`@xterm/xterm@5.5.0` + `@xterm/addon-fit@0.10.0`) preview, theme-synced via `syncTerminalTheme()` reading `getComputedStyle(--bg-editor/--fg/--selection)` and `data-theme` disabled toggling for all 11 syntax themes.
+- Added ANSI theme contrast gate (`test/ansi-theme-contrast.test.mjs`) — pairs each of the 14 `ANSI_THEMES` entries with its canonical editor background and enforces: universal visibility floor ≥ 2:1 for every token color, WCAG AA-Large ≥ 3:1 for all non-comment tokens (5 authentic solarized-light colors below 3:1 are explicitly allowlisted with measured ratios; stale allowlist entries fail), and comments ≥ 2:1. Uses `@opentf/std`'s `colorContrast`/`stripANSI` via a single re-export point (`test/helpers/wcag.mjs`); enabled moving `tasks.toml`'s `[tasks.test]` to run `esdev test` from the workspace root, since esdev's module sandbox pins resolution to the process working directory and rejected pnpm's hoisted `.pnpm` store paths when run from the package dir.
+
+### Fixed
+
+- Fixed chained alias resolution (`inifile` → `conf` → `ini`): corrected `aliasToCanonical.inifile` to `"ini"` and made `loadLanguage()` transitive (while loop) so `loadLanguage("inifile")` no longer throws `Unknown language`.
+- Fixed demo theme loading (hashed `/assets/*.css` 404 and disabled toggle) by adding all 11 theme links with `data-theme` and `disabled` to `index.html` and switching via `link[data-theme]` toggling; fixed xterm ESM import (`@xterm/xterm`).
+- Fixed demo terminal theme sync — `syncTerminalTheme()` on `applyTheme()`, `syntaxThemeSelect` change, `matchMedia` and `flushTerminal()` DRY via `currentAnsi`/`setAnsiContent()` instead of repeated `dataset.ansi` clears.
+- Fixed ANSI light-mode contrast and theme switching — added `default-light` palette and `ANSI_PALETTES`/`ANSI_THEMES` (11 presets mirroring CSS themes); demo now resolves `resolveAnsiTheme()` by `getEffectiveMode()` (forced `data-sh-theme` or `prefers-color-scheme`) and re-renders ANSI via `rerenderAnsi()` on `applyTheme`/`syntaxThemeSelect`/`matchMedia` instead of `flushTerminal()` cached SGR, so `default` on light uses `#24292f` (~15:1) not `#abb2bf` (1.6:1) and palette is not baked at edit time; fixed stale terminal on empty source (`flushTerminal` clears even when `!currentAnsi`), removed double `\n→\r\n` (`convertEol:true` suffices), and trimmed `dataset.ansi` mirror / 3-way copy fallback to single `currentAnsi`.
+
+### Changed
+
+- Extracted shared `isValidToken`/`HIGHLIGHTABLE`/`iterateTokens`/`getSortedValidTokens` to `render-helpers.ts` (DRY html-renderer/ansi-renderer).
+- Deduplicated demo `terminal.clear()`/`write()` (4×) via `currentAnsi`/`flushTerminal()`/`setAnsiContent()` and moved `puppeteer-core` from `dependencies` to `devDependencies`; gitignored `verify_*.mjs` helpers (use `CHROME_PATH`/`PORT` env vars when needed).
+
 ### Fixed
 
 - Fixed `pnpm/action-setup` version conflict in CI/release workflows — removed `with: version:` (now resolves via `packageManager: pnpm@11.21.0`) to avoid `ERR_PNPM_BAD_PM_VERSION` / `Multiple versions of pnpm specified` on `pnpm/action-setup@v4`.
