@@ -2,7 +2,9 @@ import { assert, assertEquals, test } from "runtime:test";
 import { GenericTokenizer } from "../src/core/generic-tokenizer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
 import { Tokenizer } from "../src/core/tokenizer.ts";
+import csharp from "../src/languages/csharp.ts";
 import javascript from "../src/languages/javascript.ts";
+import rust from "../src/languages/rust.ts";
 import sql from "../src/languages/sql.ts";
 import typescript from "../src/languages/typescript.ts";
 
@@ -145,4 +147,46 @@ test("typescript classifies satisfies as a keyword", () => {
     kinds.includes("keyword:satisfies"),
     `expected keyword:satisfies in ${JSON.stringify(kinds)}`,
   );
+});
+
+function kindsFor(def, src) {
+  return new GenericTokenizer(def)
+    .tokenize(src)
+    .map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
+}
+
+test("rust prefixed literals stay whole strings", () => {
+  for (const [src, literal] of [
+    ['let b = br"x\\x00";', 'br"x\\x00"'],
+    ['let s = b"byte";', 'b"byte"'],
+    ['let h = r#"he"llo"#;', 'r#"he"llo"#'],
+    ['let m = r"a\nb";', 'r"a\nb"'],
+    ['let p = "plain \\"q\\"";', '"plain \\"q\\""'],
+  ]) {
+    const kinds = kindsFor(rust, src);
+    assert(
+      kinds.includes(`string:${literal}`),
+      `expected string:${literal} in ${JSON.stringify(kinds)}`,
+    );
+  }
+  // raw strings have no escapes: the first quote terminates
+  const raw = kindsFor(rust, 'let r = r"a\\"b";');
+  assert(
+    raw.includes('string:r"a\\"'),
+    `raw string should end at first quote: ${JSON.stringify(raw)}`,
+  );
+});
+
+test("csharp interpolated and verbatim strings stay whole", () => {
+  for (const [src, literal] of [
+    ['var s = $"hi {name}";', '$"hi {name}"'],
+    ['var v = @"c:\\temp\\";', '@"c:\\temp\\"'],
+    ['var m = $@"a {x}\nb ""q""";', '$@"a {x}\nb ""q"""'],
+  ]) {
+    const kinds = kindsFor(csharp, src);
+    assert(
+      kinds.includes(`string:${literal}`),
+      `expected string:${literal} in ${JSON.stringify(kinds)}`,
+    );
+  }
 });

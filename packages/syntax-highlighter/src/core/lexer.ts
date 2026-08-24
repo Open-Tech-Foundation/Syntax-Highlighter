@@ -381,8 +381,10 @@ export class Lexer {
     while (this.pos < this.length) {
       const c = s[this.pos];
       if (escape && s.startsWith(escape, this.pos)) {
+        // Single-char escapes (backslash style) also cover the escaped char;
+        // multi-char escapes like C# verbatim `""` stand alone.
         this.pos += escape.length;
-        if (this.pos < this.length) this.pos += 1;
+        if (escape.length === 1 && this.pos < this.length) this.pos += 1;
         continue;
       }
       if (!def.multiline && c === "\n") break;
@@ -441,7 +443,7 @@ export class Lexer {
         const escape = def.escape ?? "\\";
         if (escape && s.startsWith(escape, this.pos)) {
           this.pos += escape.length;
-          if (this.pos < this.length) this.pos += 1;
+          if (escape.length === 1 && this.pos < this.length) this.pos += 1;
           continue;
         }
         if (s.startsWith(def.close, this.pos)) {

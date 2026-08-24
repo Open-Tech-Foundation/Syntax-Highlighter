@@ -104,6 +104,12 @@ const rust: LanguageDefinition = {
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "@"],
   lex: {
     strings: [
+      // Prefixed forms first — openers match longest-first.
+      { open: 'br#"', close: '"#', escape: "", multiline: true },
+      { open: 'r#"', close: '"#', escape: "", multiline: true },
+      { open: 'br"', close: '"', escape: "\\", multiline: false },
+      { open: 'b"', close: '"', escape: "\\", multiline: false },
+      { open: 'r"', close: '"', escape: "", multiline: true },
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
