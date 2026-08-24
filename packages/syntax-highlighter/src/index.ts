@@ -14,12 +14,14 @@ export {
   renderANSI,
 } from "./core/ansi-renderer.ts";
 export { CSSHighlightRenderer } from "./core/css-renderer.ts";
-export { GenericTokenizer } from "./core/generic-tokenizer.ts";
-export type { TokenizerLike } from "./core/highlighter.ts";
-export { Highlighter } from "./core/highlighter.ts";
-export { HtmlTokenizer } from "./core/html-tokenizer.ts";
-export type { HtmlRenderOptions } from "./core/html-renderer.ts";
+export {
+  type EmbedTokenizerFactory,
+  GenericTokenizer,
+  type TokenizerLike,
+} from "./core/generic-tokenizer.ts";
+export { createTokenizer, Highlighter } from "./core/highlighter.ts";
 export { renderHTML } from "./core/html-renderer.ts";
+export type { HtmlRenderOptions } from "./core/html-renderer.ts";
 export { renderJSON, validateTokens } from "./core/json-renderer.ts";
 export type {
   CommentDef,

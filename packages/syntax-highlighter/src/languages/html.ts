@@ -1,9 +1,15 @@
 import type { LanguageDefinition } from "../core/lexer.ts";
+import javascript from "./javascript.ts";
+import css from "./css.ts";
 
 const html: LanguageDefinition = {
   name: "html",
   aliases: ["htm", "xhtml"],
-  semantic: "html",
+  semantic: "generic",
+  markup: {
+    tags: true,
+    embed: { script: javascript, style: css },
+  },
   keywords: [],
   operators: ["=", "/"],
   punctuation: ["<", ">", "(", ")", "{", "}", "[", "]", ";", ",", ":", ".", "-", "!", "?", "&"],

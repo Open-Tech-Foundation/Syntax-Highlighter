@@ -39,15 +39,27 @@ export interface LanguageDefinition {
   punctuation?: string[];
   /**
    * Semantic classifier. Defaults to `generic`; JavaScript opts into
-   * `javascript`, HTML/XML into `html`.
+   * `javascript` (context-aware subclass of the generic tokenizer).
    */
-  semantic?: "javascript" | "html" | "generic";
-  /**
-   * Match the word lists (keywords/booleans/nulls/constants) ignoring ASCII
+  semantic?: "javascript" | "generic";
+  /** Match the word lists (keywords/booleans/nulls/constants) ignoring ASCII
    * case — for case-insensitive languages like SQL. Defaults to false.
    */
   caseInsensitive?: boolean;
   lex?: LexDefinition;
+  /**
+   * Markup structure (HTML/XML-like languages). When `tags` is set, the
+   * generic tokenizer scans tags, attributes, and text instead of running
+   * the identifier-based path.
+   */
+  markup?: MarkupConfig;
+}
+
+export interface MarkupConfig {
+  /** Emit `tag`/`attribute`/`text` tokens for markup structure. */
+  tags?: boolean;
+  /** Raw-text elements whose bodies are tokenized by another definition. */
+  embed?: Record<string, LanguageDefinition>;
 }
 
 export type RawTokenType =

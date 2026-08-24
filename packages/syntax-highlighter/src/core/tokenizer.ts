@@ -1,4 +1,5 @@
-import { type LanguageDefinition, Lexer, type RawToken } from "./lexer.ts";
+import { GenericTokenizer, type TokenizerLike } from "./generic-tokenizer.ts";
+import type { RawToken } from "./lexer.ts";
 import {
   type Context,
   ContextKind,
@@ -35,27 +36,10 @@ const OBJECT_STARTERS = new Set([
 
 const CONTROL_HEADER_KEYWORDS = new Set(["if", "for", "while", "switch", "with"]);
 
-export class Tokenizer {
-  readonly language: LanguageDefinition;
-  private lexer: Lexer;
-  private keywords: Set<string>;
-  private booleans: Set<string>;
-  private nulls: Set<string>;
-  private constants: Set<string>;
-  #sigIndex: Int32Array = new Int32Array(1);
-
-  constructor(language: LanguageDefinition) {
-    this.language = language;
-    this.lexer = new Lexer(language);
-    this.keywords = new Set(language.keywords ?? []);
-    this.booleans = new Set(language.booleans ?? []);
-    this.nulls = new Set(language.nulls ?? []);
-    this.constants = new Set(language.constants ?? []);
-  }
-
-  tokenize(source: string): Token[] {
+export class Tokenizer extends GenericTokenizer implements TokenizerLike {
+  override tokenize(source: string): Token[] {
     const raws = this.lexer.tokenize(source);
-    this.#buildSigIndex(raws);
+    this.buildSigIndex(raws);
     const ctx = createState();
     const out: Token[] = [];
     const { parens, parameterBindings } = this.#analyze(raws);
@@ -222,7 +206,7 @@ export class Tokenizer {
     if (decl === "function") return createToken(TokenType.FUNCTION, raw.start, raw.end);
     if (decl === "class") return createToken(TokenType.CLASS, raw.start, raw.end);
 
-    const nxt = this.#nextSig(raws, idx);
+    const nxt = this.nextSig(raws, idx);
     if (nxt?.type === "punctuation" && src[nxt.start] === "(") {
       return createToken(TokenType.FUNCTION, raw.start, raw.end);
     }
@@ -241,7 +225,7 @@ export class Tokenizer {
    * contextual-keyword use (`{ type: x }` values stay plain identifiers).
    */
   #isTypeAliasName(raws: RawToken[], idx: number): boolean {
-    const nxt = this.#nextSig(raws, idx);
+    const nxt = this.nextSig(raws, idx);
     if (!nxt) return false;
     // `<` is lexed as an operator in TS, so accept both operator and punctuation.
     return nxt.type === "operator" && (nxt.value === "=" || nxt.value === "<");
@@ -284,7 +268,7 @@ export class Tokenizer {
 
       case "(": {
         const closeIdx = parens.get(idx);
-        const after = closeIdx != null ? this.#nextSig(raws, closeIdx) : null;
+        const after = closeIdx != null ? this.nextSig(raws, closeIdx) : null;
         const nextIsBrace = after?.type === "punctuation" && src[after.start] === "{";
         const prevIsControl =
           ctx.previousToken?.type === TokenType.KEYWORD &&
@@ -552,11 +536,11 @@ export class Tokenizer {
       const type = raws[i].type;
       next[i] = type === WHITESPACE || type === "comment" ? next[i + 1]! : i;
     }
-    this.#sigIndex = next;
+    this.sigIndex = next;
   }
 
   #nextSig(raws: RawToken[], idx: number): RawToken | null {
-    const i = this.#sigIndex[idx + 1] ?? raws.length;
+    const i = this.sigIndex[idx + 1] ?? raws.length;
     return i < raws.length ? raws[i] : null;
   }
 
@@ -569,7 +553,7 @@ export class Tokenizer {
   }
 
   #nextSigIndex(raws: RawToken[], idx: number): number {
-    return this.#sigIndex[idx] ?? raws.length;
+    return this.sigIndex[idx] ?? raws.length;
   }
 
   #analyze(raws: RawToken[]): {
