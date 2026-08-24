@@ -71,14 +71,7 @@ test("renderANSI theme override (RGB) converts hex to truecolor", () => {
   assert(ansi3.includes(`${hexToAnsi(nord.keyword)}const${ANSI_RESET}`));
 });
 
-test("renderANSI custom colors (legacy) and wrapWhitespace", () => {
-  const src = "const x = 42;";
-  const toks = highlighter.highlight(src);
-  const ansi = renderANSI(src, toks, { colors: { keyword: "\x1b[31m" } });
-  assert(ansi.includes("\x1b[31mconst\x1b[0m"));
-  const defaultKw = hexToAnsi(defaultTheme.keyword);
-  assert(!ansi.includes(`${defaultKw}const`));
-
+test("renderANSI wrapWhitespace and raw SGR theme values", () => {
   const src2 = "a b";
   const toks2 = [
     { start: 0, end: 1, type: "variable" },
@@ -92,9 +85,10 @@ test("renderANSI custom colors (legacy) and wrapWhitespace", () => {
     .length;
   assertEquals(sgrCount, 4);
 
+  // theme values may be raw SGR sequences as well as hex
   const colored = renderANSI(src2, toks2, {
     wrapWhitespace: true,
-    colors: { whitespace: "\x1b[90m" },
+    theme: { whitespace: "\x1b[90m" },
   });
   assert(colored.includes("\x1b[90m \x1b[0m"));
   assertEquals(stripAnsi(colored), src2);

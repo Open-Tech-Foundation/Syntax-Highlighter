@@ -7,29 +7,6 @@ import { type Token, WHITESPACE } from "./tokens.ts";
 
 export const ANSI_RESET = "\x1b[0m";
 
-/**
- * @deprecated Use `defaultTheme` from "../ansi/themes/default.ts" — this 16-color map is kept for backwards compat.
- */
-export const DEFAULT_ANSI_COLORS: Record<string, string> = {
-  keyword: "\x1b[35m",
-  string: "\x1b[32m",
-  number: "\x1b[33m",
-  comment: "\x1b[90m",
-  function: "\x1b[34m",
-  class: "\x1b[33m",
-  variable: "\x1b[37m",
-  identifier: "\x1b[37m",
-  constant: "\x1b[33m",
-  property: "\x1b[36m",
-  parameter: "\x1b[33m",
-  operator: "\x1b[35m",
-  punctuation: "\x1b[37m",
-  decorator: "\x1b[33m",
-  boolean: "\x1b[35m",
-  null: "\x1b[35m",
-  regex: "\x1b[32m",
-};
-
 export type { AnsiTheme };
 export { ANSI_PALETTES, ANSI_THEMES, defaultLight, defaultTheme };
 
@@ -72,8 +49,6 @@ export interface AnsiRenderOptions {
   theme?: AnsiTheme;
   /** Explicitly enable/disable color. `false` disables even if theme is provided. Respects `NO_COLOR`. */
   color?: boolean;
-  /** @deprecated Use `theme` with hex colors. Kept for backwards compat — raw ANSI codes per token type. */
-  colors?: Partial<Record<Token["type"], string>>;
   /** Whether to wrap whitespace tokens with ANSI codes. Defaults to false. */
   wrapWhitespace?: boolean;
 }
@@ -110,11 +85,6 @@ export function renderANSI(
   const colors: Record<string, string | undefined> = {};
   for (const [k, v] of Object.entries(rawTheme)) {
     if (v != null) colors[k] = themeValueToAnsi(v as string);
-  }
-  if (options.colors) {
-    for (const [k, v] of Object.entries(options.colors)) {
-      if (v != null) colors[k] = v as string;
-    }
   }
 
   const wrapWhitespace = options.wrapWhitespace ?? false;

@@ -8,7 +8,6 @@ export {
   ANSI_PALETTES,
   ANSI_RESET,
   ANSI_THEMES,
-  DEFAULT_ANSI_COLORS,
   defaultLight,
   defaultTheme,
   hexToAnsi,
