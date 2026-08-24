@@ -21,9 +21,13 @@ dir = "packages/syntax-highlighter"
 packages = ["packages/*"]
 run = "tsc --noEmit"
 
+# Tests run from the workspace root (not the package dir) so esdev's module
+# sandbox — which pins resolution to the process working directory — can reach
+# pnpm's hoisted store under root node_modules/.pnpm. This lets tests import
+# devDependencies like @opentf/std; running `esdev test` inside the package
+# dir rejects them ("escapes the sandbox root").
 [tasks.test]
-packages = ["packages/syntax-highlighter"]
-run = "esdev test"
+run = "esdev test packages/syntax-highlighter"
 
 [tasks."test:e2e"]
 run = "esdev test highlight.e2e"
