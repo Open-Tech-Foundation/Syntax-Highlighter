@@ -21,6 +21,7 @@
   ],
   "devDependencies": {
     "@opentf/esrun-types": "latest",
+    "@opentf/std": "0.18.0",
     "typescript": "^7.0.2"
   },
   "repository": {
