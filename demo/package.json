@@ -4,7 +4,8 @@
   "type": "module",
   "devDependencies": {
     "@opentf/esrun-types": "latest",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "puppeteer-core": "24.15.0"
   },
   "dependencies": {
     "@opentf/syntax-highlighter": "workspace:*",
