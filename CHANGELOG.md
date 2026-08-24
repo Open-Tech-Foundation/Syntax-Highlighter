@@ -29,6 +29,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed `pnpm/action-setup` version conflict in CI/release workflows — removed `with: version:` (now resolves via `packageManager: pnpm@11.21.0`) to avoid `ERR_PNPM_BAD_PM_VERSION` / `Multiple versions of pnpm specified` on `pnpm/action-setup@v4`.
 - Fixed npm package README — `tsr build` / `release.toml` now `cp ../../README.md README.md` into `packages/syntax-highlighter/` so `pnpm pack` includes `README.md` (was missing; root README outside package not auto-included).
 
+### Fixed
+
+- Fixed lexer unknown-char fallback splitting astral characters — the last-resort branch advanced one UTF-16 code unit, so emoji etc. became two lone-surrogate `punctuation` tokens whose `source.slice` text breaks renderers; now advances by `codePointWidthAt()`.
+- Fixed SQL keyword matching case-sensitivity — uppercase `SELECT`/`FROM`/`WHERE` missed the lowercase word lists and were mis-tokenized as `constant`. Added opt-in `LanguageDefinition.caseInsensitive` flag folding keywords/booleans/nulls/constants in `GenericTokenizer` (set for SQL); moved `null` from keywords to `nulls` so `NULL` classifies as null.
+- Fixed TypeScript missing `satisfies` keyword (TS 4.9+ operator classified as variable).
+
 ## [0.1.0] - 2026-08-23
 
 ### Added
