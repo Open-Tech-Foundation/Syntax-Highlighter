@@ -354,10 +354,21 @@ let activePanel: "editor" | "tokens" | "custom" = "editor";
 const highlighters = new Map<string, Promise<Highlighter>>();
 let shikiHighlighterPromise: Promise<any> | null = null;
 
+const SHIKI_LANGS = [
+  "javascript", "typescript", "html", "css", "json", "python", "bash",
+  "sql", "yaml", "markdown", "java", "go", "rust", "php", "ruby",
+  "c", "cpp", "csharp", "swift", "kotlin", "dart", "scala", "lua",
+  "perl", "r", "powershell", "objectivec", "haskell", "elixir", "zig",
+  "scss", "vue", "svelte", "toml", "xml", "graphql", "dockerfile",
+  "diff", "matlab", "clojure", "fsharp", "groovy", "solidity",
+  "makefile", "cmake", "nginx", "latex", "protobuf", "hcl",
+  "erlang", "julia", "nim", "crystal", "less", "ini", "jsx", "tsx",
+];
+
 async function getShikiHighlighter() {
   if (!shikiHighlighterPromise) {
     shikiHighlighterPromise = import("shiki").then((m) =>
-      m.createHighlighter({ themes: ["dark-plus"], langs: [] }),
+      m.createHighlighter({ themes: ["dark-plus"], langs: SHIKI_LANGS }),
     );
   }
   return shikiHighlighterPromise;
