@@ -354,11 +354,13 @@ let activePanel: "editor" | "tokens" | "custom" = "editor";
 const highlighters = new Map<string, Promise<Highlighter>>();
 let shikiHighlighterPromise: Promise<any> | null = null;
 
+const SHIKI_LANG_MAP: Record<string, string> = { objectivec: "objective-c" };
+
 const SHIKI_LANGS = [
   "javascript", "typescript", "html", "css", "json", "python", "bash",
   "sql", "yaml", "markdown", "java", "go", "rust", "php", "ruby",
   "c", "cpp", "csharp", "swift", "kotlin", "dart", "scala", "lua",
-  "perl", "r", "powershell", "objectivec", "haskell", "elixir", "zig",
+  "perl", "r", "powershell", "objective-c", "haskell", "elixir", "zig",
   "scss", "vue", "svelte", "toml", "xml", "graphql", "dockerfile",
   "diff", "matlab", "clojure", "fsharp", "groovy", "solidity",
   "makefile", "cmake", "nginx", "latex", "protobuf", "hcl",
@@ -449,7 +451,7 @@ function renderNow(source: string): void {
       setAnsiContent("Invalid tokens");
     }
     // Shiki comparison
-    const shikiLang = languageSelect.value;
+    const shikiLang = SHIKI_LANG_MAP[languageSelect.value] ?? languageSelect.value;
     getShikiHighlighter()
       .then((h) => h.codeToHtml(source, { lang: shikiLang, theme: "dark-plus" }))
       .then((html) => {
