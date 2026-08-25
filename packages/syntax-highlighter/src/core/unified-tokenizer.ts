@@ -163,9 +163,7 @@ export class UnifiedTokenizer {
       }
       const subTokens = sub.tokenize(source.slice(start, end));
       for (const t of subTokens) {
-        if (t.type !== WHITESPACE) {
-          out.push(createToken(t.type, t.start + start, t.end + start));
-        }
+        out.push(createToken(t.type, t.start + start, t.end + start));
       }
     }
 

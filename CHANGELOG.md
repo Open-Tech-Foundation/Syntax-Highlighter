@@ -11,11 +11,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Fixed greedy dot consumption in `defaultScanNumber` — numbers like `0.` no longer consume the trailing dot, fixing range operators (`..`, `..=`) in Rust, Ruby, Kotlin, Dart, and other languages that use double-dot syntax.
 - Fixed Biome lint noise in `css-renderer.ts` — replaced `!` non-null assertions with proper null guards.
 - Added `UnknownLanguageError` class with `code: "UNKNOWN_LANGUAGE"` for typed error handling in `loadLanguage()`.
+- **CRITICAL:** Fixed HTML embedded `<script>`/`<style>` dropping leading whitespace — sub-tokenizer whitespace tokens are now emitted, fixing `validateTokens`/`renderJSON` for HTML with embeds.
+- **HIGH:** Fixed Rust lifetimes (`'a`, `'static`) being parsed as strings — added `scanString` hook to Lexer and Rust-specific handler that distinguishes char literals from lifetimes.
+- **MEDIUM:** Fixed Python f-string/r-string/b-string prefixes being tokenized as separate variables — added prefixed string definitions (f', r', b', rb', rf', fr', etc.) to Python language.
+- **MEDIUM:** Fixed TS generic arrow return type `T` being classified as parameter — `retroParams` now skips the `): Type` annotation when walking backward from `=>`.
 
 ### Changed
 
 - Extracted `retroactive-params.ts`, `binding-analyzer.ts`, `context-helpers.ts` from `unified-tokenizer.ts` (982→~530 LOC). Moved `pushCtx`/`popCtx` to `state.ts`.
 - Added `..=` (inclusive range) operator to Rust language definition.
+- Added `lex.scanString` hook to `LexDefinition` interface and Lexer class for language-specific string scanning.
 - Added 88 advanced test cases covering embedded languages, nested structures, template literals, edge cases, and cross-language range operators.
 
 ## [0.2.0] - 2026-08-25

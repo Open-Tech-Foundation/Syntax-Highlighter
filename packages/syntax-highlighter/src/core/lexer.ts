@@ -25,6 +25,7 @@ export interface LexDefinition {
   regexAfterParenKeywords?: string[];
   shebang?: boolean;
   scanNumber?: ScanNumberFn;
+  scanString?: (def: StringDef, source: string, pos: number) => number;
 }
 
 export interface LanguageDefinition {
@@ -238,6 +239,7 @@ export class Lexer {
   regexAfterParenKeywords: Set<string>;
   shebang: boolean;
   scanNumber: ScanNumberFn;
+  scanStringFn: ((def: StringDef, source: string, pos: number) => number) | null;
   regexKeywords: Set<string>;
 
   private stringOpeners: Map<string, StringDef[]>;
@@ -265,6 +267,7 @@ export class Lexer {
     this.regexAfterParenKeywords = new Set(lex.regexAfterParenKeywords ?? []);
     this.shebang = lex.shebang === true;
     this.scanNumber = lex.scanNumber ?? defaultScanNumber;
+    this.scanStringFn = lex.scanString ?? null;
     this.regexKeywords = new Set(language.regexKeywords ?? []);
 
     this.stringOpeners = new Map();
@@ -412,6 +415,22 @@ export class Lexer {
   scanString(def: StringDef): void {
     const s = this.source;
     const start = this.pos;
+
+    // Custom scanString hook: if it returns > 0, it handled the token
+    if (this.scanStringFn) {
+      const end = this.scanStringFn(def, s, start);
+      if (end > start) {
+        this.pos = end;
+        if (end === start + def.open.length) {
+          // Hook only consumed the opener (e.g. Rust lifetime) → punctuation
+          this.emit("punctuation", start, end);
+        } else {
+          this.emit("string", start, end, { quote: def.open });
+        }
+        return;
+      }
+    }
+
     this.pos += def.open.length;
     const escape = def.escape ?? "\\";
     while (this.pos < this.length) {

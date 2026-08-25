@@ -21,12 +21,71 @@ export function retroParams(out: Token[], ctx: HighlightState, src: string): voi
 
   const last = out[i];
   if (nameLike(last)) {
-    mark(last);
-    addParams(ctx, names);
-    return;
+    // Check if this is actually a return type: look ahead for `):` pattern
+    // Walk backward past this name to find what precedes it
+    let k = i - 1;
+    while (k >= 0 && out[k].type === WHITESPACE) k--;
+    if (
+      k >= 0 &&
+      out[k].type === TokenType.PUNCTUATION &&
+      src[out[k].start] === ":"
+    ) {
+      // Pattern: `: Name` — could be return type. Check for `)` before the `:`
+      let m = k - 1;
+      while (m >= 0 && out[m].type === WHITESPACE) m--;
+      if (
+        m >= 0 &&
+        out[m].type === TokenType.PUNCTUATION &&
+        src[out[m].start] === ")"
+      ) {
+        // This is a return type annotation `): Type`, not a parameter.
+        // Skip backward past the type, then process the `)` as closing paren.
+        i = m; // point to `)`
+        // Now fall through to the `)` handling below
+      } else {
+        mark(last);
+        addParams(ctx, names);
+        return;
+      }
+    } else {
+      mark(last);
+      addParams(ctx, names);
+      return;
+    }
   }
 
   if (last.type !== TokenType.PUNCTUATION || src[last.start] !== ")") return;
+
+  // Skip return-type annotation between ) and =>
+  // Walk backward past `: <type>` before collecting params
+  let j = i - 1;
+  while (j >= 0 && out[j].type === WHITESPACE) j--;
+  if (j >= 0 && out[j].type === TokenType.PUNCTUATION && src[out[j].start] === ":") {
+    // Skip backward past the type annotation tokens
+    j--;
+    let depth = 0;
+    while (j >= 0) {
+      const t = out[j];
+      if (t.type === WHITESPACE) { j--; continue; }
+      if (t.type === TokenType.PUNCTUATION) {
+        const ch = src[t.start];
+        if (ch === ">" || ch === "]" || ch === "}") depth++;
+        else if (ch === "<" || ch === "[" || ch === "{") {
+          if (depth === 0) break;
+          depth--;
+        } else if (ch === "," || ch === ")") break;
+      } else if (nameLike(t) || t.type === TokenType.OPERATOR) {
+        // type name or operator like |, &
+      }
+      j--;
+    }
+    i = j;
+    // Skip whitespace
+    while (i >= 0 && out[i].type === WHITESPACE) i--;
+    if (i < 0) return;
+    // Re-check: we should be at `)` now
+    if (out[i].type !== TokenType.PUNCTUATION || src[out[i].start] !== ")") return;
+  }
 
   let depth = 0;
   while (i >= 0) {
