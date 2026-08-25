@@ -1,5 +1,13 @@
 import type { LanguageDefinition } from "./lexer.ts";
 
+export class UnknownLanguageError extends Error {
+  readonly code = "UNKNOWN_LANGUAGE";
+  constructor(name: string) {
+    super(`Unknown language: ${name}`);
+    this.name = "UnknownLanguageError";
+  }
+}
+
 const registered = new Map<string, LanguageDefinition>();
 
 const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
@@ -424,7 +432,7 @@ export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
     }
   }
   if (!loader) {
-    throw new Error(`Unknown language: ${name}`);
+    throw new UnknownLanguageError(String(name ?? "unknown"));
   }
   return registerLanguage(await loader());
 }

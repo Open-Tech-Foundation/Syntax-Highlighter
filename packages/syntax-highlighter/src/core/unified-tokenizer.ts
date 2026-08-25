@@ -6,34 +6,33 @@ import {
   createState,
   Expectation,
   type HighlightState,
+  pushCtx,
+  popCtx,
 } from "./state.ts";
 import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 import { UnifiedLexer } from "./unified-lexer.ts";
+import { retroParams } from "./retroactive-params.ts";
+import {
+  analyzeBindings,
+  skipTypeAnnotation,
+  isTypeAliasName,
+} from "./binding-analyzer.ts";
+import {
+  setKeywordState,
+  braceKind,
+  popBrace,
+  popLang,
+  isControl,
+  topCtx,
+  isParam,
+  nearestParameterContext,
+} from "./context-helpers.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
 const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
 
 const TYPE_DECL_KEYWORDS = new Set(["interface", "enum", "type"]);
-
-const OBJECT_STARTERS = new Set([
-  "return",
-  "throw",
-  "case",
-  "typeof",
-  "void",
-  "delete",
-  "in",
-  "of",
-  "yield",
-  "await",
-  "default",
-  "const",
-  "let",
-  "var",
-]);
-
-const CONTROL_HEADER_KEYWORDS = new Set(["if", "for", "while", "switch", "with"]);
 
 /**
  * Resolve feature flags: when `semantic === "javascript"`, all features
@@ -104,7 +103,7 @@ export class UnifiedTokenizer {
     let parens: Map<number, number> = new Map();
     let parameterBindings: Set<number> = new Set();
     if (this.features.parameterBindings) {
-      const analysis = this.analyzeBindings(raws);
+      const analysis = analyzeBindings(raws, this.sigIndex);
       parens = analysis.parens;
       parameterBindings = analysis.parameterBindings;
     }
@@ -142,7 +141,7 @@ export class UnifiedTokenizer {
     let parens: Map<number, number> = new Map();
     let parameterBindings: Set<number> = new Set();
     if (this.features.parameterBindings) {
-      const analysis = this.analyzeBindings(raws);
+      const analysis = analyzeBindings(raws, this.sigIndex);
       parens = analysis.parens;
       parameterBindings = analysis.parameterBindings;
     }
@@ -279,7 +278,7 @@ export class UnifiedTokenizer {
 
     // ---- JS features: parameter bindings from pre-analysis ----
     if (parameterBindings.has(idx)) {
-      const params = this.nearestParameterContext(ctx);
+      const params = nearestParameterContext(ctx);
       if (params) params.names.push(val);
       ctx.expectation = Expectation.NONE;
       return createToken(TokenType.PARAMETER, raw.start, raw.end);
@@ -304,7 +303,7 @@ export class UnifiedTokenizer {
 
     // ---- Word-list classification (all modes) ----
     if (this.keywords.has(val)) {
-      if (this.features.contextStack) this.setKeywordState(val, ctx);
+      if (this.features.contextStack) setKeywordState(val, ctx);
       return createToken(TokenType.KEYWORD, raw.start, raw.end);
     }
     if (this.nulls.has(val)) {
@@ -322,7 +321,7 @@ export class UnifiedTokenizer {
 
     // ---- JS features: context-aware classification ----
     if (this.features.contextStack) {
-      const top = this.topCtx(ctx);
+      const top = topCtx(ctx);
       if (top?.kind === ContextKind.PARAMETERS && top.expectName && top.names) {
         top.expectName = false;
         top.names.push(val);
@@ -330,7 +329,7 @@ export class UnifiedTokenizer {
         return createToken(TokenType.PARAMETER, raw.start, raw.end);
       }
 
-      if (this.isParam(val, ctx)) {
+      if (isParam(val, ctx)) {
         return createToken(TokenType.PARAMETER, raw.start, raw.end);
       }
 
@@ -347,7 +346,7 @@ export class UnifiedTokenizer {
         prev?.type === TokenType.KEYWORD &&
         ctx.previousValue != null &&
         TYPE_DECL_KEYWORDS.has(ctx.previousValue) &&
-        (ctx.previousValue !== "type" || this.isTypeAliasName(raws, idx))
+        (ctx.previousValue !== "type" || isTypeAliasName(raws, idx, this.sigIndex))
       ) {
         ctx.afterTypeDecl = true;
         return createToken(TokenType.CLASS, raw.start, raw.end);
@@ -371,7 +370,7 @@ export class UnifiedTokenizer {
     }
 
     // JS: identifier before `:` inside an object → property key
-    if (this.features.contextStack && nxt?.type === "punctuation" && src[nxt.start] === ":" && this.topCtx(ctx)?.kind === ContextKind.OBJECT) {
+    if (this.features.contextStack && nxt?.type === "punctuation" && src[nxt.start] === ":" && topCtx(ctx)?.kind === ContextKind.OBJECT) {
       return createToken(TokenType.PROPERTY, raw.start, raw.end);
     }
 
@@ -398,7 +397,7 @@ export class UnifiedTokenizer {
     if (op === "=>") {
       ctx.afterArrow = true;
       if (this.features.retroactiveRewrite) {
-        this.retroParams(out, ctx, src);
+        retroParams(out, ctx, src);
       }
     } else if (op === "?.") {
       ctx.expectation = Expectation.PROPERTY;
@@ -438,7 +437,7 @@ export class UnifiedTokenizer {
         const prevIsControl =
           ctx.previousToken?.type === TokenType.KEYWORD &&
           ctx.previousValue != null &&
-          this.isControl(ctx.previousValue);
+          isControl(ctx.previousValue);
         const binds = nextIsBrace && !prevIsControl;
 
         pushCtx(
@@ -471,10 +470,10 @@ export class UnifiedTokenizer {
         ctx.expectation = Expectation.NONE;
         break;
       case "{": {
-        const kind = this.braceKind(ctx);
+        const kind = braceKind(ctx, ctx.previousToken, ctx.previousValue);
         pushCtx(ctx, createContext(kind));
         if (ctx.pendingParams) {
-          const set = (this.topCtx(ctx)!.params ??= new Set());
+          const set = (topCtx(ctx)!.params ??= new Set());
           for (const n of ctx.pendingParams) set.add(n);
           ctx.pendingParams = null;
         }
@@ -486,23 +485,23 @@ export class UnifiedTokenizer {
         if (raw.detail?.templateClose) {
           while (
             ctx.contexts.length &&
-            this.topCtx(ctx)?.kind !== ContextKind.TEMPLATE_EXPRESSION
+            topCtx(ctx)?.kind !== ContextKind.TEMPLATE_EXPRESSION
           ) {
             ctx.contexts.pop();
           }
           if (ctx.contexts.length) ctx.contexts.pop();
         } else {
-          this.popBrace(ctx);
+          popBrace(ctx);
         }
         ctx.expectation = Expectation.NONE;
         break;
       case ";":
         ctx.pendingParams = null;
-        this.popLang(ctx);
+        popLang(ctx);
         ctx.expectation = Expectation.NONE;
         break;
       case ",": {
-        const top = this.topCtx(ctx);
+        const top = topCtx(ctx);
         if (top?.kind === ContextKind.PARAMETERS && top.bindsNames) {
           top.expectName = true;
         }
@@ -528,422 +527,6 @@ export class UnifiedTokenizer {
   }
 
   // ----------------------------------------------------------------
-  // JS-specific helpers (only called when ctx is non-null)
-  // ----------------------------------------------------------------
-
-  private setKeywordState(val: string, ctx: HighlightState): void {
-    if (val === "function") ctx.expectation = Expectation.FUNCTION_NAME;
-    else if (val === "class") ctx.expectation = Expectation.CLASS_NAME;
-    else if (val === "import") {
-      pushCtx(ctx, createContext(ContextKind.IMPORT));
-      ctx.expectation = Expectation.NONE;
-    } else if (val === "export") {
-      pushCtx(ctx, createContext(ContextKind.EXPORT));
-      ctx.expectation = Expectation.NONE;
-    } else {
-      ctx.expectation = Expectation.NONE;
-    }
-  }
-
-  private braceKind(ctx: HighlightState): ContextKind {
-    if (ctx.afterArrow) {
-      ctx.afterArrow = false;
-      return ContextKind.FUNCTION;
-    }
-    if (ctx.afterTypeDecl) {
-      ctx.afterTypeDecl = false;
-      return ContextKind.OBJECT;
-    }
-    if (ctx.lastClosedParams) return ContextKind.FUNCTION;
-
-    const prev = ctx.previousToken;
-    if (prev?.type === TokenType.FUNCTION) return ContextKind.FUNCTION;
-    if (prev?.type === TokenType.CLASS) return ContextKind.CLASS;
-    if (this.isObjectStart(prev, ctx.previousValue)) return ContextKind.OBJECT;
-    return ContextKind.BLOCK;
-  }
-
-  private isObjectStart(prev: Token | null, val: string | null): boolean {
-    if (!prev) return false;
-    if (prev.type === TokenType.OPERATOR) return true;
-    if (prev.type === TokenType.PUNCTUATION) {
-      const ch = val?.[0];
-      if (ch === "(" || ch === "[" || ch === "{" || ch === "," || ch === ":" || ch === "?")
-        return true;
-    }
-    if (prev.type === TokenType.KEYWORD && val != null && OBJECT_STARTERS.has(val)) return true;
-    return false;
-  }
-
-  private popBrace(ctx: HighlightState): void {
-    const top = this.topCtx(ctx);
-    if (!top) return;
-    if (
-      top.kind === ContextKind.OBJECT ||
-      top.kind === ContextKind.BLOCK ||
-      top.kind === ContextKind.FUNCTION ||
-      top.kind === ContextKind.CLASS
-    ) {
-      ctx.contexts.pop();
-    }
-  }
-
-  private popLang(ctx: HighlightState): void {
-    const top = this.topCtx(ctx);
-    if (top?.kind === ContextKind.IMPORT || top?.kind === ContextKind.EXPORT) {
-      ctx.contexts.pop();
-    }
-  }
-
-  private isControl(val: string): boolean {
-    return val === "if" || val === "while" || val === "for" || val === "switch";
-  }
-
-  private topCtx(ctx: HighlightState): Context | null {
-    return ctx.contexts[ctx.contexts.length - 1] ?? null;
-  }
-
-  private isParam(val: string, ctx: HighlightState): boolean {
-    if (ctx.globalParams.has(val)) return true;
-    if (ctx.pendingParams?.includes(val)) return true;
-    for (let i = ctx.contexts.length - 1; i >= 0; i--) {
-      if (ctx.contexts[i].params?.has(val)) return true;
-    }
-    return false;
-  }
-
-  private nearestParameterContext(ctx: HighlightState): Context | null {
-    for (let i = ctx.contexts.length - 1; i >= 0; i--) {
-      if (ctx.contexts[i].kind === ContextKind.PARAMETERS) return ctx.contexts[i];
-    }
-    return null;
-  }
-
-  // ----------------------------------------------------------------
-  // Retroactive parameter rewriting (triggered by `=>`)
-  // ----------------------------------------------------------------
-
-  private retroParams(out: Token[], ctx: HighlightState, src: string): void {
-    const nameLike = (t: Token): boolean =>
-      t.type === TokenType.VARIABLE ||
-      t.type === TokenType.CONSTANT ||
-      t.type === TokenType.IDENTIFIER ||
-      t.type === TokenType.PARAMETER;
-
-    let i = out.length - 1;
-    while (i >= 0 && out[i].type === WHITESPACE) i--;
-    if (i < 0) return;
-
-    const names: string[] = [];
-    const mark = (t: Token): void => {
-      t.type = TokenType.PARAMETER;
-      names.push(src.slice(t.start, t.end));
-    };
-
-    const last = out[i];
-    if (nameLike(last)) {
-      mark(last);
-      this.addParams(ctx, names);
-      return;
-    }
-
-    if (last.type !== TokenType.PUNCTUATION || src[last.start] !== ")") return;
-
-    let depth = 0;
-    while (i >= 0) {
-      const t = out[i];
-      if (t.type === WHITESPACE) {
-        i--;
-        continue;
-      }
-      if (t.type === TokenType.PUNCTUATION) {
-        const p = src[t.start];
-        if (p === ")") {
-          depth++;
-          i--;
-          continue;
-        }
-        if (p === "(") {
-          if (depth === 1) this.addParams(ctx, names);
-          else if (depth > 1) {
-            depth--;
-            i--;
-            continue;
-          }
-          return;
-        }
-        if (depth > 0 && p === ",") {
-          i--;
-          continue;
-        }
-        return;
-      }
-      if (depth > 0 && nameLike(t)) {
-        mark(t);
-        i--;
-        continue;
-      }
-      return;
-    }
-  }
-
-  private addParams(ctx: HighlightState, names: string[]): void {
-    let target: Context | null = null;
-    for (let i = ctx.contexts.length - 1; i >= 0; i--) {
-      const c = ctx.contexts[i].kind;
-      if (c === ContextKind.FUNCTION || c === ContextKind.CLASS || c === ContextKind.BLOCK) {
-        target = ctx.contexts[i];
-        break;
-      }
-    }
-    const set = target ? (target.params ??= new Set()) : ctx.globalParams;
-    for (const n of names) set.add(n);
-  }
-
-  // ----------------------------------------------------------------
-  // Pre-analysis: parameter bindings (JS feature)
-  // ----------------------------------------------------------------
-
-  private analyzeBindings(raws: RawToken[]): {
-    parens: Map<number, number>;
-    parameterBindings: Set<number>;
-  } {
-    const parens = new Map<number, number>();
-    const parameterBindings = new Set<number>();
-    const stack: number[] = [];
-    const prevStack: number[] = [];
-    let prevSig = -1;
-
-    for (let i = 0; i < raws.length; i++) {
-      const raw = raws[i];
-      if (raw.type === "whitespace") continue;
-      if (raw.type !== "punctuation") {
-        prevSig = i;
-        continue;
-      }
-      if (raw.value === "(") {
-        stack.push(i);
-        prevStack.push(prevSig);
-        prevSig = i;
-        continue;
-      }
-      if (raw.value === ")") {
-        const open = stack.pop();
-        const prevAtOpen = prevStack.pop();
-        if (open != null && prevAtOpen !== undefined) {
-          parens.set(open, i);
-          let afterIdx = this.sigIndex[i + 1] ?? raws.length;
-          // See through a TS return annotation: `(...): Type =>` / `(...): Type {`
-          if (raws[afterIdx]?.value === ":") {
-            afterIdx = this.sigIndex[
-              this.skipTypeAnnotation(raws, afterIdx + 1, raws.length, true)
-            ] ?? raws.length;
-          }
-          const after = afterIdx < raws.length ? raws[afterIdx] : null;
-          const previous = this.effectiveHeaderPrev(raws, prevAtOpen);
-          const isArrow = after?.value === "=>";
-          const isBodyHeader =
-            after?.value === "{" &&
-            previous != null &&
-            previous.type === "identifier" &&
-            !CONTROL_HEADER_KEYWORDS.has(previous.value);
-          if (isArrow || isBodyHeader) {
-            this.collectBindings(raws, open + 1, i, parameterBindings);
-          }
-        }
-        prevSig = i;
-        continue;
-      }
-      prevSig = i;
-    }
-
-    return { parens, parameterBindings };
-  }
-
-  private effectiveHeaderPrev(raws: RawToken[], prevIdx: number): RawToken | null {
-    if (prevIdx < 0) return null;
-    let i = prevIdx;
-    if (raws[i].value === ">" || raws[i].value === ">>" || raws[i].value === ">>>") {
-      let depth = 0;
-      while (i >= 0) {
-        const v = raws[i].value;
-        if (v === ">") depth += 1;
-        else if (v === ">>") depth += 2;
-        else if (v === ">>>") depth += 3;
-        else if (v === "<") {
-          depth -= 1;
-          if (depth <= 0) break;
-        } else if (v === "<<") {
-          depth -= 2;
-          if (depth <= 0) break;
-        }
-        i -= 1;
-      }
-      i = this.prevSigIndex(raws, i - 1);
-    }
-    return i >= 0 ? raws[i] : null;
-  }
-
-  private collectBindings(raws: RawToken[], start: number, end: number, bindings: Set<number>): void {
-    let i = this.sigIndex[start] ?? raws.length;
-    while (i < end) {
-      i = this.parseBinding(raws, i, end, bindings);
-      i = this.sigIndex[i] ?? raws.length;
-      if (raws[i]?.value === ",") i = this.sigIndex[i + 1] ?? raws.length;
-      else if (i < end) i += 1;
-    }
-  }
-
-  private parseBinding(raws: RawToken[], index: number, end: number, bindings: Set<number>): number {
-    const i = this.sigIndex[index] ?? raws.length;
-    if (i >= end) return i;
-    const token = raws[i];
-
-    if (token.type === "operator" && token.value === "...") {
-      return this.parseBinding(raws, i + 1, end, bindings);
-    }
-    if (token.type === "punctuation" && token.value === "{") {
-      return this.parseObjectBinding(raws, i, end, bindings);
-    }
-    if (token.type === "punctuation" && token.value === "[") {
-      return this.parseArrayBinding(raws, i, end, bindings);
-    }
-    if (token.type === "identifier") {
-      bindings.add(i);
-      const next = this.sigIndex[i + 1] ?? raws.length;
-      const nraw = raws[next];
-      if (nraw?.value === "=") {
-        return this.skipDefault(raws, next + 1, end, new Set([",", ")"]));
-      }
-      if (nraw?.value === "?") {
-        const colonIdx = this.sigIndex[next + 1] ?? raws.length;
-        if (raws[colonIdx]?.value === ":") {
-          return this.skipTypeAnnotation(raws, colonIdx + 1, end);
-        }
-        return next;
-      }
-      if (nraw?.value === ":") {
-        return this.skipTypeAnnotation(raws, next + 1, end);
-      }
-      return next;
-    }
-    return this.skipDefault(raws, i + 1, end, new Set([",", ")"]));
-  }
-
-  private parseObjectBinding(raws: RawToken[], open: number, end: number, bindings: Set<number>): number {
-    let i = this.sigIndex[open + 1] ?? raws.length;
-    while (i < end && raws[i].value !== "}") {
-      if (raws[i].type === "operator" && raws[i].value === "...") {
-        i = this.parseBinding(raws, i + 1, end, bindings);
-      } else if (raws[i].value === "[") {
-        i = this.skipBalanced(raws, i, end, "[", "]");
-        i = this.sigIndex[i] ?? raws.length;
-        if (raws[i]?.value === ":") {
-          i = this.parseBinding(raws, i + 1, end, bindings);
-        }
-      } else if (raws[i].type === "identifier") {
-        const key = i;
-        const next = this.sigIndex[i + 1] ?? raws.length;
-        if (raws[next]?.value === ":") {
-          i = this.parseBinding(raws, next + 1, end, bindings);
-        } else {
-          bindings.add(key);
-          i =
-            raws[next]?.value === "="
-              ? this.skipDefault(raws, next + 1, end, new Set([",", "}"]))
-              : next;
-        }
-      } else {
-        i += 1;
-      }
-      i = this.sigIndex[i] ?? raws.length;
-      if (raws[i]?.value === ",") i = this.sigIndex[i + 1] ?? raws.length;
-    }
-    return i < end ? i + 1 : i;
-  }
-
-  private parseArrayBinding(raws: RawToken[], open: number, end: number, bindings: Set<number>): number {
-    let i = this.sigIndex[open + 1] ?? raws.length;
-    while (i < end && raws[i].value !== "]") {
-      if (raws[i].value === ",") {
-        i = this.sigIndex[i + 1] ?? raws.length;
-        continue;
-      }
-      i = this.parseBinding(raws, i, end, bindings);
-      i = this.sigIndex[i] ?? raws.length;
-      if (raws[i]?.value === ",") i = this.sigIndex[i + 1] ?? raws.length;
-    }
-    return i < end ? i + 1 : i;
-  }
-
-  private skipDefault(raws: RawToken[], index: number, end: number, stops: Set<string>): number {
-    let i = this.sigIndex[index] ?? raws.length;
-    let depth = 0;
-    while (i < end) {
-      const value = raws[i].value;
-      if (value === "(" || value === "[" || value === "{") depth += 1;
-      else if (value === ")" || value === "]" || value === "}") {
-        if (depth === 0 && stops.has(value)) return i;
-        depth = Math.max(0, depth - 1);
-      } else if (depth === 0 && stops.has(value)) {
-        return i;
-      }
-      i = this.sigIndex[i + 1] ?? raws.length;
-    }
-    return i;
-  }
-
-  private skipBalanced(
-    raws: RawToken[],
-    open: number,
-    end: number,
-    opening: string,
-    closing: string,
-  ): number {
-    let depth = 0;
-    let i = open;
-    while (i < end) {
-      if (raws[i].value === opening) depth += 1;
-      else if (raws[i].value === closing) {
-        depth -= 1;
-        if (depth === 0) return i + 1;
-      }
-      i += 1;
-    }
-    return i;
-  }
-
-  private skipTypeAnnotation(raws: RawToken[], start: number, end: number, stopArrows = false): number {
-    let depth = 0;
-    let i = start;
-    while (i < end) {
-      const v = raws[i].value;
-      if (
-        depth === 0 &&
-        (v === "," ||
-          v === ")" ||
-          v === "]" ||
-          v === "}" ||
-          (stopArrows && (v === "=>" || v === "{")))
-      ) {
-        return i;
-      }
-      if (v === "(" || v === "[" || v === "{" || v === "<") depth += 1;
-      else if ((v === ">" || v === ">>" || v === ">>>") && depth > 0) {
-        depth = Math.max(0, depth - v.length);
-      }
-      i += 1;
-    }
-    return i;
-  }
-
-  private isTypeAliasName(raws: RawToken[], idx: number): boolean {
-    const nxt = this.nextSig(raws, idx);
-    if (!nxt) return false;
-    return nxt.type === "operator" && (nxt.value === "=" || nxt.value === "<");
-  }
-
-  // ----------------------------------------------------------------
   // Sig index — O(1) lookahead past whitespace/comments
   // ----------------------------------------------------------------
 
@@ -961,22 +544,4 @@ export class UnifiedTokenizer {
     const i = this.sigIndex[idx + 1] ?? raws.length;
     return i < raws.length ? raws[i] : null;
   }
-
-  private prevSigIndex(raws: RawToken[], idx: number): number {
-    for (let i = Math.min(idx, raws.length - 1); i >= 0; i--) {
-      const type = raws[i].type;
-      if (type !== "whitespace" && type !== "comment") return i;
-    }
-    return -1;
-  }
-}
-
-function pushCtx(ctx: HighlightState, c: Context): void {
-  ctx.contexts.push(c);
-}
-
-function popCtx(ctx: HighlightState, kind: ContextKind): Context | null {
-  const top = ctx.contexts[ctx.contexts.length - 1];
-  if (top && top.kind === kind) return ctx.contexts.pop() ?? null;
-  return null;
 }

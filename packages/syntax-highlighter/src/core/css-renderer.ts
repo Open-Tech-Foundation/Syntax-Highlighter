@@ -39,7 +39,8 @@ export class CSSHighlightRenderer {
         ranges = [];
         byType.set(token.type, ranges);
       }
-      ranges.push(this.#range(token.start, token.end));
+      const range = this.#range(token.start, token.end);
+      if (range) ranges.push(range);
     }
 
     this.#ranges = byType;
@@ -91,18 +92,19 @@ export class CSSHighlightRenderer {
     }
   }
 
-  #range(start: number, end: number): AbstractRange {
+  #range(start: number, end: number): AbstractRange | null {
+    if (!this.textNode) return null;
     if (typeof StaticRange === "function") {
       return new StaticRange({
-        startContainer: this.textNode!,
+        startContainer: this.textNode,
         startOffset: start,
-        endContainer: this.textNode!,
+        endContainer: this.textNode,
         endOffset: end,
       });
     }
     const range = document.createRange();
-    range.setStart(this.textNode!, start);
-    range.setEnd(this.textNode!, end);
+    range.setStart(this.textNode, start);
+    range.setEnd(this.textNode, end);
     return range;
   }
 }

@@ -96,3 +96,13 @@ export function createState(): HighlightState {
     afterTypeDecl: false,
   };
 }
+
+export function pushCtx(ctx: HighlightState, c: Context): void {
+  ctx.contexts.push(c);
+}
+
+export function popCtx(ctx: HighlightState, kind: ContextKind): Context | null {
+  const top = ctx.contexts[ctx.contexts.length - 1];
+  if (top && top.kind === kind) return ctx.contexts.pop() ?? null;
+  return null;
+}

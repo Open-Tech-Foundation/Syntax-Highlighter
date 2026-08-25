@@ -33,6 +33,7 @@ export {
   getRegisteredLanguages,
   loadLanguage,
   registerLanguage,
+  UnknownLanguageError,
 } from "./core/registry.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
