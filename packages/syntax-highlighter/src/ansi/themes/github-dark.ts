@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const githubDark: AnsiTheme = {
   comment: "#8b949e",
   keyword: "#ff7b72",
-  control: "#ff7b72",
+  control: "#ff928b",
   string: "#a5d6ff",
   number: "#79c0ff",
   regex: "#7ee787",
@@ -13,7 +13,7 @@ export const githubDark: AnsiTheme = {
   identifier: "#c9d1d9",
   constant: "#79c0ff",
   property: "#7ee787",
-  method: "#d2a8ff",
+  method: "#d7b2ff",
   key: "#79c0ff",
   parameter: "#ffa657",
   operator: "#ff7b72",

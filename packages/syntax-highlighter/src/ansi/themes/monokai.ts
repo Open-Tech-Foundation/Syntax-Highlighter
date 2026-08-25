@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const monokai: AnsiTheme = {
   comment: "#75715e",
   keyword: "#f92672",
-  control: "#f92672",
+  control: "#fa4d8b",
   string: "#e6db74",
   number: "#ae81ff",
   regex: "#e6db74",
@@ -13,7 +13,7 @@ export const monokai: AnsiTheme = {
   identifier: "#f8f8f2",
   constant: "#ae81ff",
   property: "#a6e22e",
-  method: "#a6e22e",
+  method: "#b0e547",
   key: "#66d9ef",
   parameter: "#fd971f",
   operator: "#f92672",

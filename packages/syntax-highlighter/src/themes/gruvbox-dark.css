@@ -4,10 +4,12 @@
 :root {
   --sh-comment: #928374;
   --sh-keyword: #fb4934;
+  --sh-control: #fb6958;
   --sh-string: #b8bb26;
   --sh-number: #d3869b;
   --sh-regex: #b8bb26;
   --sh-function: #fabd2f;
+  --sh-method: #fac447;
   --sh-class: #8ec07c;
   --sh-variable: #ebdbb2;
   --sh-identifier: #ebdbb2;

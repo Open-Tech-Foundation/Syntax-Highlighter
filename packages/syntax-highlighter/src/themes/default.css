@@ -17,10 +17,12 @@
 :root {
   --sh-comment: #6e7781;
   --sh-keyword: #cf222e;
+  --sh-control: #d74953;
   --sh-string: #0a3069;
   --sh-number: #0550ae;
   --sh-regex: #116329;
   --sh-function: #8250df;
+  --sh-method: #9165e2;
   --sh-class: #953800;
   --sh-variable: #24292f;
   --sh-identifier: #24292f;
@@ -39,10 +41,12 @@
   :root:not([data-sh-theme="light"]) {
     --sh-comment: #7f848e;
     --sh-keyword: #c678dd;
+  --sh-control: #d090e3;
     --sh-string: #98c379;
     --sh-number: #d19a66;
     --sh-regex: #56b6c2;
     --sh-function: #61afef;
+  --sh-method: #73b8f0;
     --sh-class: #e5c07b;
     --sh-variable: #abb2bf;
     --sh-identifier: #abb2bf;
@@ -61,10 +65,12 @@
 :root[data-sh-theme="dark"] {
   --sh-comment: #7f848e;
   --sh-keyword: #c678dd;
+  --sh-control: #d090e3;
   --sh-string: #98c379;
   --sh-number: #d19a66;
   --sh-regex: #56b6c2;
   --sh-function: #61afef;
+  --sh-method: #73b8f0;
   --sh-class: #e5c07b;
   --sh-variable: #abb2bf;
   --sh-identifier: #abb2bf;

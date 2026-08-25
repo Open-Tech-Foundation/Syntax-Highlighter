@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const defaultLight: AnsiTheme = {
   comment: "#6e7781",
   keyword: "#cf222e",
-  control: "#cf222e",
+  control: "#d74953",
   string: "#0a3069",
   number: "#0550ae",
   regex: "#116329",
@@ -13,7 +13,7 @@ export const defaultLight: AnsiTheme = {
   identifier: "#24292f",
   constant: "#0550ae",
   property: "#116329",
-  method: "#8250df",
+  method: "#9165e2",
   key: "#0550ae",
   parameter: "#953800",
   operator: "#0550ae",

@@ -3,6 +3,7 @@
 
 :root {
   --sh-keyword: #0000ff;
+  --sh-control: #2d2dff;
   --sh-string: #a31515;
   --sh-number: #098658;
   --sh-boolean: #0000ff;
@@ -10,6 +11,7 @@
   --sh-constant: #0070c1;
   --sh-comment: #008000;
   --sh-function: #795e26;
+  --sh-method: #897140;
   --sh-class: #267f99;
   --sh-variable: #001080;
   --sh-identifier: #000000;
