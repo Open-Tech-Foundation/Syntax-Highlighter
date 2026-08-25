@@ -36,7 +36,8 @@ export function analyzeBindings(
         let afterIdx = sigIndex[i + 1] ?? raws.length;
         // See through a TS return annotation: `(...): Type =>` / `(...): Type {`
         if (raws[afterIdx]?.value === ":") {
-          afterIdx = sigIndex[skipTypeAnnotation(raws, afterIdx + 1, raws.length, true)] ?? raws.length;
+          afterIdx =
+            sigIndex[skipTypeAnnotation(raws, afterIdx + 1, raws.length, true)] ?? raws.length;
         }
         const after = afterIdx < raws.length ? raws[afterIdx] : null;
         const previous = effectiveHeaderPrev(raws, prevAtOpen, sigIndex);
@@ -59,7 +60,11 @@ export function analyzeBindings(
   return { parens, parameterBindings };
 }
 
-function effectiveHeaderPrev(raws: RawToken[], prevIdx: number, sigIndex: Int32Array): RawToken | null {
+function effectiveHeaderPrev(
+  raws: RawToken[],
+  prevIdx: number,
+  _sigIndex: Int32Array,
+): RawToken | null {
   if (prevIdx < 0) return null;
   let i = prevIdx;
   if (raws[i].value === ">" || raws[i].value === ">>" || raws[i].value === ">>>") {

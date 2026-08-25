@@ -9,12 +9,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Fixed greedy dot consumption in `defaultScanNumber` — numbers like `0.` no longer consume the trailing dot, fixing range operators (`..`, `..=`) in Rust, Ruby, Kotlin, Dart, and other languages that use double-dot syntax.
-- Fixed Biome lint noise in `css-renderer.ts` — replaced `!` non-null assertions with proper null guards.
+- Fixed Biome lint noise in `css-renderer.ts` — replaced `!` non-null assertions with proper null guards and added `noTemplateCurlyInString` override for test files, fixed unused imports/params and organized imports across 47 files.
 - Added `UnknownLanguageError` class with `code: "UNKNOWN_LANGUAGE"` for typed error handling in `loadLanguage()`.
 - **CRITICAL:** Fixed HTML embedded `<script>`/`<style>` dropping leading whitespace — sub-tokenizer whitespace tokens are now emitted, fixing `validateTokens`/`renderJSON` for HTML with embeds.
 - **HIGH:** Fixed Rust lifetimes (`'a`, `'static`) being parsed as strings — added `scanString` hook to Lexer and Rust-specific handler that distinguishes char literals from lifetimes.
 - **MEDIUM:** Fixed Python f-string/r-string/b-string prefixes being tokenized as separate variables — added prefixed string definitions (f', r', b', rb', rf', fr', etc.) to Python language.
 - **MEDIUM:** Fixed TS generic arrow return type `T` being classified as parameter — `retroParams` now skips the `): Type` annotation when walking backward from `=>`.
+- Fixed property/method conflation — `a.prop` vs `a.method()` now emit distinct `property` vs `method` types; Shiki fidelity improves for method calls.
+
+### Added
+
+- Added `METHOD` semantic token type (`TokenType.METHOD`) for callable property accesses — `a.method()` highlights as `method` distinct from `a.prop` field reads.
+- Added `method` CSS (`::highlight(sh-method)`/`.sh-method`) and ANSI theme (`method: "#61afef"`) support with fallback to `function` color; all 13 ANSI themes and `shared.css` updated.
 
 ### Changed
 

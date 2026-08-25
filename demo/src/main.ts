@@ -354,7 +354,7 @@ let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let renderSeq = 0;
 let activePanel: "editor" | "tokens" | "custom" = "editor";
 const highlighters = new Map<string, Promise<Highlighter>>();
-let shikiHighlighterPromise: Promise<any> | null = null;
+let shikiHighlighterPromise: Promise<import("shiki").Highlighter | null> | null = null;
 
 const SHIKI_LANG_MAP: Record<string, string> = { objectivec: "objective-c" };
 

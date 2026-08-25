@@ -1,6 +1,6 @@
 import type { LanguageDefinition } from "./lexer.ts";
-import { UnifiedTokenizer } from "./unified-tokenizer.ts";
 import type { Token } from "./tokens.ts";
+import { UnifiedTokenizer } from "./unified-tokenizer.ts";
 
 export class Highlighter {
   readonly language: LanguageDefinition;

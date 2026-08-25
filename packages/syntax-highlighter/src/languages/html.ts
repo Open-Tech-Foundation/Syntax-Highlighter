@@ -1,6 +1,6 @@
 import type { LanguageDefinition } from "../core/lexer.ts";
-import javascript from "./javascript.ts";
 import css from "./css.ts";
+import javascript from "./javascript.ts";
 
 const html: LanguageDefinition = {
   name: "html",

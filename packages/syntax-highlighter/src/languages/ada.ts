@@ -86,9 +86,7 @@ const ada: LanguageDefinition = {
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
-    comments: [
-      { open: "--", close: "\n", line: true },
-    ],
+    comments: [{ open: "--", close: "\n", line: true }],
     regex: false,
   },
 };

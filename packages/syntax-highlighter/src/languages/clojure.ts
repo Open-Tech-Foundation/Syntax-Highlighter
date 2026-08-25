@@ -116,9 +116,7 @@ const clojure: LanguageDefinition = {
   ],
   lex: {
     strings: [{ open: '"', close: '"', escape: "\\", multiline: false }],
-    comments: [
-      { open: ";", close: "\n", line: true },
-    ],
+    comments: [{ open: ";", close: "\n", line: true }],
     regex: false,
   },
 };

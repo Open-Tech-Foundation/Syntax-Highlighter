@@ -1,4 +1,4 @@
-import type { CommentDef, LanguageDefinition, RawToken, StringDef } from "./lexer.ts";
+import type { LanguageDefinition, RawToken, StringDef } from "./lexer.ts";
 import { Lexer } from "./lexer.ts";
 
 const NAME_RE = /[a-zA-Z][a-zA-Z0-9-]*/y;
@@ -55,7 +55,12 @@ export class UnifiedLexer extends Lexer {
     const tokens: RawToken[] = [];
     const push = (type: string, start: number, end: number): void => {
       if (end > start)
-        tokens.push({ type: type as RawToken["type"], start, end, value: source.slice(start, end) });
+        tokens.push({
+          type: type as RawToken["type"],
+          start,
+          end,
+          value: source.slice(start, end),
+        });
     };
 
     try {
@@ -154,7 +159,13 @@ export class UnifiedLexer extends Lexer {
             if (strDef) {
               this.scanString(strDef);
               const end = this.pos;
-              tokens.push({ type: "string", start: i, end, value: source.slice(i, end), detail: { quote: ch } });
+              tokens.push({
+                type: "string",
+                start: i,
+                end,
+                value: source.slice(i, end),
+                detail: { quote: ch },
+              });
               i = end;
             } else {
               // Fallback: find closing quote manually.
@@ -269,12 +280,7 @@ export class UnifiedLexer extends Lexer {
    * raw-text body with the embedded language's lexer and emit those tokens
    * with adjusted offsets.
    */
-  #scanEmbedBody(
-    source: string,
-    start: number,
-    tagName: string,
-    tokens: RawToken[],
-  ): number {
+  #scanEmbedBody(source: string, start: number, tagName: string, tokens: RawToken[]): number {
     if (!this.embed) return start;
     const embedDef = this.embed[tagName];
     if (!embedDef) return start;

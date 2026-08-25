@@ -15,10 +15,8 @@ export {
 } from "./core/ansi-renderer.ts";
 export { CSSHighlightRenderer } from "./core/css-renderer.ts";
 export { Highlighter } from "./core/highlighter.ts";
-export { UnifiedLexer } from "./core/unified-lexer.ts";
-export { UnifiedTokenizer } from "./core/unified-tokenizer.ts";
-export { renderHTML } from "./core/html-renderer.ts";
 export type { HtmlRenderOptions } from "./core/html-renderer.ts";
+export { renderHTML } from "./core/html-renderer.ts";
 export { renderJSON, validateTokens } from "./core/json-renderer.ts";
 export type {
   CommentDef,
@@ -37,6 +35,8 @@ export {
 } from "./core/registry.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
+export { UnifiedLexer } from "./core/unified-lexer.ts";
+export { UnifiedTokenizer } from "./core/unified-tokenizer.ts";
 
 export interface HighlightOptions {
   language?: string;

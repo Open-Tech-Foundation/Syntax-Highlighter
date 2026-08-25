@@ -77,9 +77,7 @@ const smalltalk: LanguageDefinition = {
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
-    comments: [
-      { open: '"', close: '"' },
-    ],
+    comments: [{ open: '"', close: '"' }],
     regex: false,
   },
 };

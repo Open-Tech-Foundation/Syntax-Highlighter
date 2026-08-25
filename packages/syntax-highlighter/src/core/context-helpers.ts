@@ -1,9 +1,4 @@
-import {
-  type Context,
-  ContextKind,
-  createContext,
-  type HighlightState,
-} from "./state.ts";
+import { type Context, ContextKind, createContext, type HighlightState } from "./state.ts";
 import { type Token, TokenType } from "./tokens.ts";
 
 const OBJECT_STARTERS = new Set([

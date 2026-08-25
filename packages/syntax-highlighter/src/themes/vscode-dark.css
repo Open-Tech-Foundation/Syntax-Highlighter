@@ -2,22 +2,22 @@
 @import "./shared.css";
 
 :root {
-  --sh-keyword: #569CD6;
-  --sh-string: #CE9178;
-  --sh-number: #B5CEA8;
-  --sh-boolean: #569CD6;
-  --sh-null: #569CD6;
-  --sh-constant: #4FC1FF;
-  --sh-comment: #6A9955;
-  --sh-function: #DCDCAA;
-  --sh-class: #4EC9B0;
-  --sh-variable: #9CDCFE;
-  --sh-identifier: #D4D4D4;
-  --sh-property: #9CDCFE;
-  --sh-key: #4EC9B0;
-  --sh-parameter: #9CDCFE;
-  --sh-operator: #D4D4D4;
-  --sh-punctuation: #D4D4D4;
-  --sh-decorator: #DCDCAA;
-  --sh-regex: #D16969;
+  --sh-keyword: #569cd6;
+  --sh-string: #ce9178;
+  --sh-number: #b5cea8;
+  --sh-boolean: #569cd6;
+  --sh-null: #569cd6;
+  --sh-constant: #4fc1ff;
+  --sh-comment: #6a9955;
+  --sh-function: #dcdcaa;
+  --sh-class: #4ec9b0;
+  --sh-variable: #9cdcfe;
+  --sh-identifier: #d4d4d4;
+  --sh-property: #9cdcfe;
+  --sh-key: #4ec9b0;
+  --sh-parameter: #9cdcfe;
+  --sh-operator: #d4d4d4;
+  --sh-punctuation: #d4d4d4;
+  --sh-decorator: #dcdcaa;
+  --sh-regex: #d16969;
 }

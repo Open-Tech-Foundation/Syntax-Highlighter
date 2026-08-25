@@ -1,6 +1,6 @@
 import type { Context, HighlightState } from "./state.ts";
 import { ContextKind } from "./state.ts";
-import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
+import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 export function retroParams(out: Token[], ctx: HighlightState, src: string): void {
   const nameLike = (t: Token): boolean =>
@@ -25,19 +25,11 @@ export function retroParams(out: Token[], ctx: HighlightState, src: string): voi
     // Walk backward past this name to find what precedes it
     let k = i - 1;
     while (k >= 0 && out[k].type === WHITESPACE) k--;
-    if (
-      k >= 0 &&
-      out[k].type === TokenType.PUNCTUATION &&
-      src[out[k].start] === ":"
-    ) {
+    if (k >= 0 && out[k].type === TokenType.PUNCTUATION && src[out[k].start] === ":") {
       // Pattern: `: Name` — could be return type. Check for `)` before the `:`
       let m = k - 1;
       while (m >= 0 && out[m].type === WHITESPACE) m--;
-      if (
-        m >= 0 &&
-        out[m].type === TokenType.PUNCTUATION &&
-        src[out[m].start] === ")"
-      ) {
+      if (m >= 0 && out[m].type === TokenType.PUNCTUATION && src[out[m].start] === ")") {
         // This is a return type annotation `): Type`, not a parameter.
         // Skip backward past the type, then process the `)` as closing paren.
         i = m; // point to `)`
@@ -66,7 +58,10 @@ export function retroParams(out: Token[], ctx: HighlightState, src: string): voi
     let depth = 0;
     while (j >= 0) {
       const t = out[j];
-      if (t.type === WHITESPACE) { j--; continue; }
+      if (t.type === WHITESPACE) {
+        j--;
+        continue;
+      }
       if (t.type === TokenType.PUNCTUATION) {
         const ch = src[t.start];
         if (ch === ">" || ch === "]" || ch === "}") depth++;

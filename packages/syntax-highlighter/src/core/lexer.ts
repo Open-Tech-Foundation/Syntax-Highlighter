@@ -487,8 +487,12 @@ export class Lexer {
       if (!frame) break;
 
       if (frame.kind === "template") {
-        const def = frame.def!;
-        const start = frame.start!;
+        const def = frame.def;
+        const start = frame.start;
+        if (!def || start == null) {
+          frames.pop();
+          continue;
+        }
         if (this.pos >= this.length) {
           this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
           frames.pop();
