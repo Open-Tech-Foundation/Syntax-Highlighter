@@ -486,6 +486,8 @@ async function switchLanguage(name: string): Promise<void> {
 }
 
 inputLayer.addEventListener("input", () => queueRender());
+inputLayer.addEventListener("paste", () => setTimeout(queueRender, 0));
+inputLayer.addEventListener("cut", () => setTimeout(queueRender, 0));
 inputLayer.addEventListener("scroll", () => syncScroll());
 
 /* --------------------------------------------------------------- controls */
