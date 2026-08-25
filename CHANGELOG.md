@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-25
+
 ### Fixed
 
 - Fixed greedy dot consumption in `defaultScanNumber` — numbers like `0.` no longer consume the trailing dot, fixing range operators (`..`, `..=`) in Rust, Ruby, Kotlin, Dart, and other languages that use double-dot syntax.
