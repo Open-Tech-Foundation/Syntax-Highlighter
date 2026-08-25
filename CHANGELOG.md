@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed greedy dot consumption in `defaultScanNumber` — numbers like `0.` no longer consume the trailing dot, fixing range operators (`..`, `..=`) in Rust, Ruby, Kotlin, Dart, and other languages that use double-dot syntax.
+
+### Added
+
+- Added `..=` (inclusive range) operator to Rust language definition.
+- Added 88 advanced test cases covering embedded languages (JS/CSS inside HTML), nested structures, template literals, edge cases, and cross-language range operators.
+
 ## [0.2.0] - 2026-08-25
 
 ### Changed

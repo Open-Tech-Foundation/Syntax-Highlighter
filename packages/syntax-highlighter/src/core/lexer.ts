@@ -202,7 +202,7 @@ export function defaultScanNumber(source: string, pos: number): number {
   }
 
   eat(isDigit);
-  if (source[i] === ".") {
+  if (source[i] === "." && i + 1 < len && isDigit(source[i + 1])) {
     i += 1;
     eat(isDigit);
   }
