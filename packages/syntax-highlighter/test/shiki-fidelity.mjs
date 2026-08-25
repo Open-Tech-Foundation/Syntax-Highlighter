@@ -1,17 +1,17 @@
 import { createHighlighterCoreSync } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
-import jsLang from "shiki/langs/javascript.mjs";
-import tsLang from "shiki/langs/typescript.mjs";
-import htmlLang from "shiki/langs/html.mjs";
 import cssLang from "shiki/langs/css.mjs";
+import htmlLang from "shiki/langs/html.mjs";
+import jsLang from "shiki/langs/javascript.mjs";
 import jsonLang from "shiki/langs/json.mjs";
+import tsLang from "shiki/langs/typescript.mjs";
 import theme from "shiki/themes/github-dark.mjs";
 
 import { UnifiedTokenizer } from "../dist/index.js";
-import jsDef from "../dist/languages/javascript.js";
-import tsDef from "../dist/languages/typescript.js";
 import htmlDef from "../dist/languages/html.js";
+import jsDef from "../dist/languages/javascript.js";
 import jsonDef from "../dist/languages/json.js";
+import tsDef from "../dist/languages/typescript.js";
 
 const shiki = createHighlighterCoreSync({
   themes: [theme],
@@ -253,7 +253,7 @@ function isSemanticEquiv(a, b) {
     ["keyword", "storage"],
     ["variable", "constant", "parameter"],
     ["class", "type"],
-    ["function"],
+    ["function", "method"],
     ["number"],
     ["string"],
     ["comment"],
@@ -287,9 +287,12 @@ const JS_SAMPLES = [
   { name: "spread operator", src: "const merged = { ...a, ...b };" },
   { name: "optional chaining", src: "const v = obj?.prop?.method();" },
   { name: "arrow in callback", src: "[1,2,3].map(n => n * 2).filter(n => n > 2);" },
-  { name: "nested function", src: "function outer() { function inner() { return 1; } return inner(); }" },
+  {
+    name: "nested function",
+    src: "function outer() { function inner() { return 1; } return inner(); }",
+  },
   { name: "string concatenation", src: '"hello" + " " + "world"' },
-  { name: "regex literal", src: 'const match = str.match(/^[a-z]+$/);' },
+  { name: "regex literal", src: "const match = str.match(/^[a-z]+$/);" },
   { name: "switch statement", src: "switch (x) { case 1: break; default: break; }" },
   { name: "try/catch", src: "try { foo(); } catch (e) { console.error(e); }" },
   { name: "for-of loop", src: "for (const item of items) { process(item); }" },
@@ -297,9 +300,15 @@ const JS_SAMPLES = [
   { name: "new expression", src: "const d = new Date();" },
   { name: "computed property", src: "const o = { [key]: value };" },
   { name: "method shorthand", src: "const obj = { method() { return this; } };" },
-  { name: "getter/setter", src: "const obj = { get x() { return 1; }, set x(v) { this._x = v; } };" },
+  {
+    name: "getter/setter",
+    src: "const obj = { get x() { return 1; }, set x(v) { this._x = v; } };",
+  },
   { name: "number formats", src: "const a = 0xFF; const b = 1_000; const c = 3.14;" },
-  { name: "label statement", src: "outer: for (let i = 0; i < 10; i++) { inner: for (let j = 0; j < 10; j++) { if (i === j) break outer; } }" },
+  {
+    name: "label statement",
+    src: "outer: for (let i = 0; i < 10; i++) { inner: for (let j = 0; j < 10; j++) { if (i === j) break outer; } }",
+  },
 ];
 
 const TS_SAMPLES = [
@@ -314,20 +323,29 @@ const TS_SAMPLES = [
   { name: "non-null assertion", src: "const len = str!.length;" },
   { name: "mapped type", src: "type Readonly<T> = { readonly [K in keyof T]: T[K]; };" },
   { name: "conditional type", src: "type IsString<T> = T extends string ? true : false;" },
-  { name: "namespace", src: "namespace Util { export function pad(s: string): string { return s; } }" },
-  { name: "access modifiers", src: "class Foo { private _x: number; protected y: string; public z: boolean; }" },
-  { name: "readonly modifier", src: "interface Config { readonly apiUrl: string; readonly timeout: number; }" },
+  {
+    name: "namespace",
+    src: "namespace Util { export function pad(s: string): string { return s; } }",
+  },
+  {
+    name: "access modifiers",
+    src: "class Foo { private _x: number; protected y: string; public z: boolean; }",
+  },
+  {
+    name: "readonly modifier",
+    src: "interface Config { readonly apiUrl: string; readonly timeout: number; }",
+  },
   { name: "satisfies operator", src: 'const config = { apiUrl: "x" } satisfies Config;' },
 ];
 
 const HTML_SAMPLES = [
-  { name: "basic element", src: "<div class=\"app\"><p>Hello</p></div>" },
+  { name: "basic element", src: '<div class="app"><p>Hello</p></div>' },
   { name: "self-closing tag", src: '<img src="photo.jpg" alt="photo" />' },
-  { name: "script tag", src: '<script>const x = 42;</script>' },
-  { name: "style tag", src: '<style>.app { color: red; }</style>' },
+  { name: "script tag", src: "<script>const x = 42;</script>" },
+  { name: "style tag", src: "<style>.app { color: red; }</style>" },
   { name: "comment", src: "<!-- this is a comment -->" },
   { name: "attribute without value", src: '<input type="checkbox" disabled />' },
-  { name: "template expression", src: '<div>${variable}</div>' },
+  { name: "template expression", src: "<div>${variable}</div>" },
   { name: "nested elements", src: '<div><span><a href="#">link</a></span></div>' },
 ];
 
@@ -370,18 +388,21 @@ function runComparison(name, samples, shikiLang, unifiedLang) {
       allMismatches.push({ sample: sample.name, src: sample.src, details: cmp.details });
     }
 
-    const pct = cmp.match + cmp.mismatch > 0
-      ? ((cmp.match / (cmp.match + cmp.mismatch)) * 100).toFixed(1)
-      : "N/A";
+    const pct =
+      cmp.match + cmp.mismatch > 0
+        ? ((cmp.match / (cmp.match + cmp.mismatch)) * 100).toFixed(1)
+        : "N/A";
     const status = cmp.mismatch === 0 ? "✓" : "✗";
     console.log(
-      `  ${status} ${sample.name.padEnd(30)} ${pct}% match (${cmp.match}/${cmp.match + cmp.mismatch})`
+      `  ${status} ${sample.name.padEnd(30)} ${pct}% match (${cmp.match}/${cmp.match + cmp.mismatch})`,
     );
   }
 
   const total = totalMatch + totalMismatch;
   const pct = total > 0 ? ((totalMatch / total) * 100).toFixed(1) : "N/A";
-  console.log(`\n  Total: ${totalMatch}/${total} tokens match (${pct}%) | ${totalTokens} unified tokens | ${totalMismatch} mismatches`);
+  console.log(
+    `\n  Total: ${totalMatch}/${total} tokens match (${pct}%) | ${totalTokens} unified tokens | ${totalMismatch} mismatches`,
+  );
 
   if (allMismatches.length > 0) {
     console.log(`\n  Detailed mismatches:`);
@@ -404,14 +425,27 @@ const jsonResults = runComparison("JSON", JSON_SAMPLES, "json", "json");
 console.log(`\n${"=".repeat(60)}`);
 console.log(`  OVERALL SUMMARY`);
 console.log(`${"=".repeat(60)}`);
-const grandMatch = jsResults.totalMatch + tsResults.totalMatch + htmlResults.totalMatch + jsonResults.totalMatch;
-const grandMismatch = jsResults.totalMismatch + tsResults.totalMismatch + htmlResults.totalMismatch + jsonResults.totalMismatch;
+const grandMatch =
+  jsResults.totalMatch + tsResults.totalMatch + htmlResults.totalMatch + jsonResults.totalMatch;
+const grandMismatch =
+  jsResults.totalMismatch +
+  tsResults.totalMismatch +
+  htmlResults.totalMismatch +
+  jsonResults.totalMismatch;
 const grandTotal = grandMatch + grandMismatch;
 const grandPct = grandTotal > 0 ? ((grandMatch / grandTotal) * 100).toFixed(1) : "N/A";
-console.log(`  JS:   ${jsResults.totalMatch}/${jsResults.totalMatch + jsResults.totalMismatch} (${((jsResults.totalMatch / (jsResults.totalMatch + jsResults.totalMismatch)) * 100).toFixed(1)}%)`);
-console.log(`  TS:   ${tsResults.totalMatch}/${tsResults.totalMatch + tsResults.totalMismatch} (${((tsResults.totalMatch / (tsResults.totalMatch + tsResults.totalMismatch)) * 100).toFixed(1)}%)`);
-console.log(`  HTML: ${htmlResults.totalMatch}/${htmlResults.totalMatch + htmlResults.totalMismatch} (${((htmlResults.totalMatch / (htmlResults.totalMatch + htmlResults.totalMismatch)) * 100).toFixed(1)}%)`);
-console.log(`  JSON: ${jsonResults.totalMatch}/${jsonResults.totalMatch + jsonResults.totalMismatch} (${((jsonResults.totalMatch / (jsonResults.totalMatch + jsonResults.totalMismatch)) * 100).toFixed(1)}%)`);
+console.log(
+  `  JS:   ${jsResults.totalMatch}/${jsResults.totalMatch + jsResults.totalMismatch} (${((jsResults.totalMatch / (jsResults.totalMatch + jsResults.totalMismatch)) * 100).toFixed(1)}%)`,
+);
+console.log(
+  `  TS:   ${tsResults.totalMatch}/${tsResults.totalMatch + tsResults.totalMismatch} (${((tsResults.totalMatch / (tsResults.totalMatch + tsResults.totalMismatch)) * 100).toFixed(1)}%)`,
+);
+console.log(
+  `  HTML: ${htmlResults.totalMatch}/${htmlResults.totalMatch + htmlResults.totalMismatch} (${((htmlResults.totalMatch / (htmlResults.totalMatch + htmlResults.totalMismatch)) * 100).toFixed(1)}%)`,
+);
+console.log(
+  `  JSON: ${jsonResults.totalMatch}/${jsonResults.totalMatch + jsonResults.totalMismatch} (${((jsonResults.totalMatch / (jsonResults.totalMatch + jsonResults.totalMismatch)) * 100).toFixed(1)}%)`,
+);
 console.log(`  ────────────────────────────`);
 console.log(`  Grand Total: ${grandMatch}/${grandTotal} (${grandPct}%)`);
 

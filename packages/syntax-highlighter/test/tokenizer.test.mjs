@@ -66,7 +66,7 @@ test("class declaration, extends, methods and constructor call", () => {
   assertEquals(findToken(src, "move", 0).type, "function");
   assertEquals(findToken(src, "x", 0).type, "parameter");
   assertEquals(findToken(src, "Point", 1).type, "class");
-  assertEquals(findToken(src, "move", 1).type, "property");
+  assertEquals(findToken(src, "move", 1).type, "method");
 });
 
 test("property access after dot and optional chaining", () => {
@@ -75,7 +75,7 @@ test("property access after dot and optional chaining", () => {
     "punctuation:.",
     "property:foo",
     "punctuation:.",
-    "property:bar",
+    "method:bar",
     "punctuation:(",
     "punctuation:)",
   ]);

@@ -1,10 +1,10 @@
 import { assert, assertEquals, test } from "runtime:test";
 import { UnifiedTokenizer } from "../src/core/unified-tokenizer.ts";
-import javascript from "../src/languages/javascript.ts";
 import html from "../src/languages/html.ts";
+import javascript from "../src/languages/javascript.ts";
 import python from "../src/languages/python.ts";
-import typescript from "../src/languages/typescript.ts";
 import rust from "../src/languages/rust.ts";
+import typescript from "../src/languages/typescript.ts";
 
 // ----------------------------------------------------------------
 // Helpers
@@ -15,9 +15,7 @@ function whitespaceless(tokenizer, source) {
 }
 
 function kinds(tokenizer, source) {
-  return whitespaceless(tokenizer, source).map(
-    (t) => `${t.type}:${source.slice(t.start, t.end)}`,
-  );
+  return whitespaceless(tokenizer, source).map((t) => `${t.type}:${source.slice(t.start, t.end)}`);
 }
 
 function types(tokenizer, source) {
@@ -78,7 +76,7 @@ test("JS: property access", () => {
     "punctuation:.",
     "property:foo",
     "punctuation:.",
-    "property:bar",
+    "method:bar",
     "punctuation:(",
     "punctuation:)",
   ]);
@@ -86,13 +84,7 @@ test("JS: property access", () => {
 
 test("JS: template literals", () => {
   const src = "`a${ x }b`";
-  assertEquals(types(js, src), [
-    "string",
-    "punctuation",
-    "variable",
-    "punctuation",
-    "string",
-  ]);
+  assertEquals(types(js, src), ["string", "punctuation", "variable", "punctuation", "string"]);
 });
 
 test("JS: arrow function parameters", () => {
@@ -196,7 +188,7 @@ test("HTML: comments", () => {
 });
 
 test("HTML: embedded script", () => {
-  const src = '<script>const x = 42;</script>';
+  const src = "<script>const x = 42;</script>";
   assertEquals(findToken(htmlTok, src, "const").type, "keyword");
   assertEquals(findToken(htmlTok, src, "42").type, "number");
 });

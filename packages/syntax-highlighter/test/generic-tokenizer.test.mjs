@@ -1,6 +1,6 @@
 import { assert, assertEquals, test } from "runtime:test";
-import { UnifiedTokenizer as Tokenizer } from "../src/core/unified-tokenizer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
+import { UnifiedTokenizer as Tokenizer } from "../src/core/unified-tokenizer.ts";
 import csharp from "../src/languages/csharp.ts";
 import javascript from "../src/languages/javascript.ts";
 import rust from "../src/languages/rust.ts";
@@ -110,9 +110,7 @@ test("one tokenizer class handles every definition", () => {
   // single class — dispatch is internal, driven by the definition's data
   assert(new Highlighter(javascript).tokenizer instanceof Tokenizer);
   assert(new Highlighter(minilang).tokenizer instanceof Tokenizer);
-  assert(
-    new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof Tokenizer,
-  );
+  assert(new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof Tokenizer);
   const k = new Highlighter(minilang)
     .highlight("fn call()")
     .map((t) => `${t.type}`)
@@ -155,9 +153,7 @@ test("typescript classifies satisfies as a keyword", () => {
 });
 
 function kindsFor(def, src) {
-  return new Tokenizer(def)
-    .tokenize(src)
-    .map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
+  return new Tokenizer(def).tokenize(src).map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
 }
 
 test("rust prefixed literals stay whole strings", () => {

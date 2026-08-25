@@ -7,22 +7,22 @@
 
 import { assert, assertEquals, test } from "runtime:test";
 import { UnifiedTokenizer } from "../src/core/unified-tokenizer.ts";
-import javascript from "../src/languages/javascript.ts";
-import typescript from "../src/languages/typescript.ts";
-import html from "../src/languages/html.ts";
-import css from "../src/languages/css.ts";
-import json from "../src/languages/json.ts";
-import python from "../src/languages/python.ts";
-import go from "../src/languages/go.ts";
-import rust from "../src/languages/rust.ts";
-import java from "../src/languages/java.ts";
+import bashLang from "../src/languages/bash.ts";
 import cLang from "../src/languages/c.ts";
 import cpp from "../src/languages/cpp.ts";
-import ruby from "../src/languages/ruby.ts";
+import css from "../src/languages/css.ts";
+import go from "../src/languages/go.ts";
+import html from "../src/languages/html.ts";
+import java from "../src/languages/java.ts";
+import javascript from "../src/languages/javascript.ts";
+import json from "../src/languages/json.ts";
 import php from "../src/languages/php.ts";
-import bashLang from "../src/languages/bash.ts";
-import yamlLang from "../src/languages/yaml.ts";
+import python from "../src/languages/python.ts";
+import ruby from "../src/languages/ruby.ts";
+import rust from "../src/languages/rust.ts";
 import sqlLang from "../src/languages/sql.ts";
+import typescript from "../src/languages/typescript.ts";
+import yamlLang from "../src/languages/yaml.ts";
 
 // ----------------------------------------------------------------
 // Helpers
@@ -33,12 +33,10 @@ function whitespaceless(tokenizer, source) {
 }
 
 function kinds(tokenizer, source) {
-  return whitespaceless(tokenizer, source).map(
-    (t) => `${t.type}:${source.slice(t.start, t.end)}`,
-  );
+  return whitespaceless(tokenizer, source).map((t) => `${t.type}:${source.slice(t.start, t.end)}`);
 }
 
-function types(tokenizer, source) {
+function _types(tokenizer, source) {
   return whitespaceless(tokenizer, source).map((t) => t.type);
 }
 
@@ -70,11 +68,7 @@ test("JS: keywords", () => {
 });
 
 test("JS: booleans and null", () => {
-  assertEquals(kinds(js, "true false null"), [
-    "boolean:true",
-    "boolean:false",
-    "null:null",
-  ]);
+  assertEquals(kinds(js, "true false null"), ["boolean:true", "boolean:false", "null:null"]);
 });
 
 test("JS: constants (UPPER_CASE and globals)", () => {
@@ -120,7 +114,7 @@ test("JS: property access", () => {
     "punctuation:.",
     "property:foo",
     "punctuation:.",
-    "property:bar",
+    "method:bar",
     "punctuation:(",
     "punctuation:)",
   ]);
@@ -129,7 +123,7 @@ test("JS: property access", () => {
 test("JS: method call", () => {
   const src = "obj.run()";
   assertEquals(findToken(js, src, "obj").type, "variable");
-  assertEquals(findToken(js, src, "run").type, "property");
+  assertEquals(findToken(js, src, "run").type, "method");
 });
 
 test("JS: template literals", () => {
@@ -155,11 +149,7 @@ test("JS: numbers", () => {
 
 test("JS: regex", () => {
   assertEquals(kinds(js, "/^[a-z]+$/gi"), ["regex:/^[a-z]+$/gi"]);
-  assertEquals(kinds(js, "return /test/;"), [
-    "keyword:return",
-    "regex:/test/",
-    "punctuation:;",
-  ]);
+  assertEquals(kinds(js, "return /test/;"), ["keyword:return", "regex:/test/", "punctuation:;"]);
 });
 
 test("JS: operators", () => {
@@ -324,7 +314,7 @@ test("HTML: attributes", () => {
 });
 
 test("HTML: self-closing", () => {
-  assertEquals(findToken(htmlTok, '<br/>', "br").type, "tag");
+  assertEquals(findToken(htmlTok, "<br/>", "br").type, "tag");
   assertEquals(findToken(htmlTok, '<img src="x"/>', "img").type, "tag");
 });
 
@@ -333,7 +323,7 @@ test("HTML: comments", () => {
 });
 
 test("HTML: embedded script", () => {
-  const src = '<script>const x = 42;</script>';
+  const src = "<script>const x = 42;</script>";
   assertEquals(findToken(htmlTok, src, "const").type, "keyword");
   assertEquals(findToken(htmlTok, src, "42").type, "number");
 });
@@ -389,7 +379,10 @@ test("CSS: numbers", () => {
 });
 
 test("CSS: at-rules use decorator", () => {
-  assertEquals(kinds(cssTok, "@media (max-width: 768px) { .app { display: none; } }")[0], "decorator:@media");
+  assertEquals(
+    kinds(cssTok, "@media (max-width: 768px) { .app { display: none; } }")[0],
+    "decorator:@media",
+  );
 });
 
 // ================================================================
@@ -435,11 +428,7 @@ test("Python: keywords", () => {
 });
 
 test("Python: booleans and None", () => {
-  assertEquals(kinds(py, "True False None"), [
-    "boolean:True",
-    "boolean:False",
-    "null:None",
-  ]);
+  assertEquals(kinds(py, "True False None"), ["boolean:True", "boolean:False", "null:None"]);
 });
 
 test("Python: strings", () => {
@@ -470,7 +459,10 @@ test("Python: list comprehension", () => {
 test("Python: f-strings", () => {
   const src = "f'hello {name}'";
   const k = kinds(py, src);
-  assert(k.some((x) => x.includes("name")), `expected "name" token in ${JSON.stringify(k)}`);
+  assert(
+    k.some((x) => x.includes("name")),
+    `expected "name" token in ${JSON.stringify(k)}`,
+  );
 });
 
 test("Python: type hints", () => {
@@ -582,12 +574,18 @@ test("Rust: trait", () => {
 
 test("Rust: raw strings", () => {
   const k = kinds(rustTok, 'r#"raw string"#');
-  assert(k.some((x) => x.startsWith("string:")), `expected string token in ${JSON.stringify(k)}`);
+  assert(
+    k.some((x) => x.startsWith("string:")),
+    `expected string token in ${JSON.stringify(k)}`,
+  );
 });
 
 test("Rust: byte strings", () => {
   const k = kinds(rustTok, 'b"bytes"');
-  assert(k.some((x) => x.startsWith("string:")), `expected string token in ${JSON.stringify(k)}`);
+  assert(
+    k.some((x) => x.startsWith("string:")),
+    `expected string token in ${JSON.stringify(k)}`,
+  );
 });
 
 // ================================================================
@@ -698,10 +696,7 @@ test("Ruby: basics", () => {
 });
 
 test("Ruby: booleans and nil", () => {
-  assertEquals(kinds(rubyTok, "true nil"), [
-    "keyword:true",
-    "keyword:nil",
-  ]);
+  assertEquals(kinds(rubyTok, "true nil"), ["keyword:true", "keyword:nil"]);
 });
 
 test("Ruby: class", () => {
@@ -902,7 +897,7 @@ test("advanced: <script> basic JS", () => {
 
 test("advanced: <script> with function", () => {
   const src = '<script>function greet(name) { return "hi " + name; }</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "function").type, "keyword");
   assertEquals(findToken(htmlTok, src, "greet").type, "function");
   assertEquals(findToken(htmlTok, src, "name").type, "parameter");
@@ -910,17 +905,17 @@ test("advanced: <script> with function", () => {
 });
 
 test("advanced: <script> with if/else", () => {
-  const src = '<script>if (x > 0) { console.log(x); } else { console.log(0); }</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<script>if (x > 0) { console.log(x); } else { console.log(0); }</script>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "if").type, "keyword");
   assertEquals(findToken(htmlTok, src, "else").type, "keyword");
   assertEquals(findToken(htmlTok, src, "console").type, "constant");
-  assertEquals(findToken(htmlTok, src, "log").type, "property");
+  assertEquals(findToken(htmlTok, src, "log").type, "method");
 });
 
 test("advanced: <script> with class", () => {
-  const src = '<script>class Foo { constructor() { this.x = 1; } }</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<script>class Foo { constructor() { this.x = 1; } }</script>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "class").type, "keyword");
   assertEquals(findToken(htmlTok, src, "Foo").type, "class");
   assertEquals(findToken(htmlTok, src, "constructor").type, "function");
@@ -928,25 +923,25 @@ test("advanced: <script> with class", () => {
 });
 
 test("advanced: <script> with arrow and spread", () => {
-  const src = '<script>const arr = [1, 2, 3]; arr.map(x => x * 2);</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<script>const arr = [1, 2, 3]; arr.map(x => x * 2);</script>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "arr").type, "variable");
-  assertEquals(findToken(htmlTok, src, "map").type, "property");
+  assertEquals(findToken(htmlTok, src, "map").type, "method");
   assertEquals(findToken(htmlTok, src, "x").type, "parameter");
   assertEquals(findToken(htmlTok, src, "=>").type, "operator");
 });
 
 test("advanced: <script> with comments", () => {
-  const src = '<script>/* block */ // line\nconst a = 1;</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<script>/* block */ // line\nconst a = 1;</script>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "/* block */").type, "comment");
   assertEquals(findToken(htmlTok, src, "// line").type, "comment");
   assertEquals(findToken(htmlTok, src, "const").type, "keyword");
 });
 
 test("advanced: <script> with regex", () => {
-  const src = '<script>const re = /^[a-z]+$/gi;</script>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<script>const re = /^[a-z]+$/gi;</script>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "re").type, "variable");
   assertEquals(findToken(htmlTok, src, "/^[a-z]+$/gi").type, "regex");
 });
@@ -956,8 +951,8 @@ test("advanced: <script> with regex", () => {
 // ================================================================
 
 test("advanced: <style> basic CSS", () => {
-  const src = '<style>.app { color: red; }</style>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<style>.app { color: red; }</style>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "style").type, "tag");
   assertEquals(findToken(htmlTok, src, ".").type, "punctuation");
   assertEquals(findToken(htmlTok, src, "app").type, "property");
@@ -966,8 +961,8 @@ test("advanced: <style> basic CSS", () => {
 });
 
 test("advanced: <style> ID and class selectors", () => {
-  const src = '<style>#title { font-size: 24px; } .active { display: flex; }</style>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<style>#title { font-size: 24px; } .active { display: flex; }</style>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "#").type, "punctuation");
   assertEquals(findToken(htmlTok, src, "title").type, "property");
   assertEquals(findToken(htmlTok, src, "24").type, "number");
@@ -977,8 +972,8 @@ test("advanced: <style> ID and class selectors", () => {
 });
 
 test("advanced: <style> with @media", () => {
-  const src = '<style>@media (max-width: 768px) { .app { display: none; } }</style>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src = "<style>@media (max-width: 768px) { .app { display: none; } }</style>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "@media").type, "decorator");
   assertEquals(findToken(htmlTok, src, "max-width").type, "variable");
   assertEquals(findToken(htmlTok, src, "768").type, "number");
@@ -987,8 +982,9 @@ test("advanced: <style> with @media", () => {
 });
 
 test("advanced: mixed <style> and <script>", () => {
-  const src = '<html><head><style>.x{color:red}</style></head><body><script>var y=1;</script></body></html>';
-  const tokens = whitespaceless(htmlTok, src);
+  const src =
+    "<html><head><style>.x{color:red}</style></head><body><script>var y=1;</script></body></html>";
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "html").type, "tag");
   assertEquals(findToken(htmlTok, src, "style").type, "tag");
   assertEquals(findToken(htmlTok, src, "color").type, "variable");
@@ -1004,7 +1000,7 @@ test("advanced: mixed <style> and <script>", () => {
 
 test("advanced: multiple attributes", () => {
   const src = '<div class="app" id="root" data-value="42">Hello <strong>World</strong></div>';
-  const tokens = whitespaceless(htmlTok, src);
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "div").type, "tag");
   assertEquals(findToken(htmlTok, src, "class").type, "attribute");
   assertEquals(findToken(htmlTok, src, '"app"').type, "string");
@@ -1018,7 +1014,7 @@ test("advanced: multiple attributes", () => {
 
 test("advanced: boolean and self-closing attributes", () => {
   const src = '<input type="text" disabled required autocomplete="off" />';
-  const tokens = whitespaceless(htmlTok, src);
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "input").type, "tag");
   assertEquals(findToken(htmlTok, src, "disabled").type, "attribute");
   assertEquals(findToken(htmlTok, src, "required").type, "attribute");
@@ -1028,7 +1024,7 @@ test("advanced: boolean and self-closing attributes", () => {
 
 test("advanced: self-closing img with many attrs", () => {
   const src = '<img src="photo.jpg" alt="Photo" width="300" height="200" />';
-  const tokens = whitespaceless(htmlTok, src);
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "img").type, "tag");
   assertEquals(findToken(htmlTok, src, "src").type, "attribute");
   assertEquals(findToken(htmlTok, src, "alt").type, "attribute");
@@ -1038,7 +1034,7 @@ test("advanced: self-closing img with many attrs", () => {
 
 test("advanced: anchor with URL query and hash", () => {
   const src = '<a href="/path?q=1&r=2#section">Link</a>';
-  const tokens = whitespaceless(htmlTok, src);
+  const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "a").type, "tag");
   assertEquals(findToken(htmlTok, src, "href").type, "attribute");
   assertEquals(findToken(htmlTok, src, '"/path?q=1&r=2#section"').type, "string");
@@ -1051,14 +1047,14 @@ test("advanced: anchor with URL query and hash", () => {
 
 test("advanced: nested template literals", () => {
   const src = "`hello ${`nested ${x}`}`";
-  const tokens = whitespaceless(js, src);
+  const _tokens = whitespaceless(js, src);
   assertEquals(findToken(js, src, "`hello ").type, "string");
   assertEquals(findToken(js, src, "x").type, "variable");
 });
 
 test("advanced: template with nested object", () => {
   const src = "`${fn({a: 1, b: [2, 3]})}`";
-  const tokens = whitespaceless(js, src);
+  const _tokens = whitespaceless(js, src);
   assertEquals(findToken(js, src, "fn").type, "function");
   assertEquals(findToken(js, src, "a").type, "property");
   assertEquals(findToken(js, src, "b").type, "property");
@@ -1073,7 +1069,7 @@ test("advanced: multiline template literal", () => {
 
 test("advanced: template with multiple interpolations", () => {
   const src = "const msg = `hello ${name}, you have ${count} items`;";
-  const tokens = whitespaceless(js, src);
+  const _tokens = whitespaceless(js, src);
   assertEquals(findToken(js, src, "const").type, "keyword");
   assertEquals(findToken(js, src, "msg").type, "variable");
   assertEquals(findToken(js, src, "name").type, "variable");
@@ -1082,7 +1078,7 @@ test("advanced: template with multiple interpolations", () => {
 
 test("advanced: template with ternary interpolation", () => {
   const src = "`${a ? `${b}` : `${c}`}`";
-  const tokens = whitespaceless(js, src);
+  const _tokens = whitespaceless(js, src);
   assertEquals(findToken(js, src, "a").type, "variable");
   assertEquals(findToken(js, src, "?").type, "operator");
   assertEquals(findToken(js, src, "b").type, "variable");
@@ -1095,7 +1091,8 @@ test("advanced: template with ternary interpolation", () => {
 // ================================================================
 
 test("advanced: nested function declarations", () => {
-  const src = "function outer() { function inner() { function deepest() { return 42; } return deepest(); } return inner(); }";
+  const src =
+    "function outer() { function inner() { function deepest() { return 42; } return deepest(); } return inner(); }";
   assertEquals(findToken(js, src, "outer").type, "function");
   assertEquals(findToken(js, src, "inner").type, "function");
   assertEquals(findToken(js, src, "deepest").type, "function");
@@ -1134,7 +1131,8 @@ test("advanced: try/catch/finally", () => {
 });
 
 test("advanced: nested for loops", () => {
-  const src = "for (let i = 0; i < arr.length; i++) { for (let j = 0; j < arr[i].length; j++) { sum += arr[i][j]; } }";
+  const src =
+    "for (let i = 0; i < arr.length; i++) { for (let j = 0; j < arr[i].length; j++) { sum += arr[i][j]; } }";
   const keywords = whitespaceless(js, src)
     .filter((t) => t.type === "keyword")
     .map((t) => src.slice(t.start, t.end));
@@ -1146,8 +1144,9 @@ test("advanced: nested for loops", () => {
 
 test("advanced: curried arrow functions", () => {
   const src = "const f = (a) => (b) => (c) => a + b + c;";
-  const arrows = whitespaceless(js, src)
-    .filter((t) => t.type === "operator" && src.slice(t.start, t.end) === "=>");
+  const arrows = whitespaceless(js, src).filter(
+    (t) => t.type === "operator" && src.slice(t.start, t.end) === "=>",
+  );
   assertEquals(arrows.length, 3);
   const params = whitespaceless(js, src).filter((t) => t.type === "parameter");
   assertEquals(params.length, 6);
@@ -1159,7 +1158,7 @@ test("advanced: deeply nested array flat", () => {
   assertEquals(findToken(js, src, "2").type, "number");
   assertEquals(findToken(js, src, "3").type, "number");
   assertEquals(findToken(js, src, "4").type, "number");
-  assertEquals(findToken(js, src, "flat").type, "property");
+  assertEquals(findToken(js, src, "flat").type, "method");
   assertEquals(findToken(js, src, "Infinity").type, "constant");
 });
 
@@ -1230,8 +1229,9 @@ test("advanced: regex patterns", () => {
   assertEquals(findToken(js, "/a{2,}/g", "/a{2,}/g").type, "regex");
   assertEquals(findToken(js, "/[\\w-]+/g", "/[\\w-]+/g").type, "regex");
   assertEquals(
-    findToken(js, "/(?<year>\\d{4})-(?<month>\\d{2})/g", "/(?<year>\\d{4})-(?<month>\\d{2})/g").type,
-    "regex"
+    findToken(js, "/(?<year>\\d{4})-(?<month>\\d{2})/g", "/(?<year>\\d{4})-(?<month>\\d{2})/g")
+      .type,
+    "regex",
   );
 });
 
@@ -1437,7 +1437,7 @@ test("advanced: Rust closure", () => {
 });
 
 test("advanced: Rust match expression", () => {
-  const src = "match result { Ok(v) => v, Err(e) => panic!(\"{}\", e) }";
+  const src = 'match result { Ok(v) => v, Err(e) => panic!("{}", e) }';
   assertEquals(findToken(rustTok, src, "match").type, "keyword");
   assertEquals(findToken(rustTok, src, "Ok").type, "function");
   assertEquals(findToken(rustTok, src, "Err").type, "function");
@@ -1454,7 +1454,8 @@ test("advanced: Rust if let", () => {
 });
 
 test("advanced: Rust impl with generics", () => {
-  const src = "impl<T: Display + Debug> fmt::Display for Wrapper<T> { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { Ok(()) } }";
+  const src =
+    "impl<T: Display + Debug> fmt::Display for Wrapper<T> { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { Ok(()) } }";
   assertEquals(findToken(rustTok, src, "impl").type, "keyword");
   assertEquals(findToken(rustTok, src, "T").type, "constant");
   assertEquals(findToken(rustTok, src, "Display").type, "variable");
@@ -1478,7 +1479,7 @@ test("advanced: Rust async fn", () => {
 });
 
 test("advanced: Rust for range", () => {
-  const src = "for i in (0..5).rev() { println!(\"{}\", i); }";
+  const src = 'for i in (0..5).rev() { println!("{}", i); }';
   assertEquals(findToken(rustTok, src, "for").type, "keyword");
   assertEquals(findToken(rustTok, src, "in").type, "keyword");
   assertEquals(findToken(rustTok, src, "rev").type, "function");
@@ -1576,7 +1577,7 @@ test("advanced: 26-level deep function call nesting", () => {
 
 test("advanced: Rust range (0..10)", () => {
   const src = "(0..10)";
-  const tokens = whitespaceless(rustTok, src);
+  const _tokens = whitespaceless(rustTok, src);
   assertEquals(findToken(rustTok, src, "0").type, "number");
   assertEquals(findToken(rustTok, src, "..").type, "operator");
   assertEquals(findToken(rustTok, src, "10").type, "number");
@@ -1584,7 +1585,7 @@ test("advanced: Rust range (0..10)", () => {
 
 test("advanced: Rust range (0..5).rev()", () => {
   const src = "(0..5).rev()";
-  const tokens = whitespaceless(rustTok, src);
+  const _tokens = whitespaceless(rustTok, src);
   assertEquals(findToken(rustTok, src, "0").type, "number");
   assertEquals(findToken(rustTok, src, "..").type, "operator");
   assertEquals(findToken(rustTok, src, "5").type, "number");
