@@ -3,6 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const monokai: AnsiTheme = {
   comment: "#75715e",
   keyword: "#f92672",
+  control: "#f92672",
   string: "#e6db74",
   number: "#ae81ff",
   regex: "#e6db74",

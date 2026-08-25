@@ -61,7 +61,12 @@ function isObjectStart(prev: Token | null, val: string | null): boolean {
     if (ch === "(" || ch === "[" || ch === "{" || ch === "," || ch === ":" || ch === "?")
       return true;
   }
-  if (prev.type === TokenType.KEYWORD && val != null && OBJECT_STARTERS.has(val)) return true;
+  if (
+    (prev.type === TokenType.KEYWORD || prev.type === TokenType.CONTROL) &&
+    val != null &&
+    OBJECT_STARTERS.has(val)
+  )
+    return true;
   return false;
 }
 

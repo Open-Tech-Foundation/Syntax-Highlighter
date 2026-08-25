@@ -16,6 +16,10 @@
 .sh-keyword {
   color: var(--sh-keyword);
 }
+::highlight(sh-control),
+.sh-control {
+  color: var(--sh-control, var(--sh-keyword));
+}
 ::highlight(sh-string),
 .sh-string {
   color: var(--sh-string);

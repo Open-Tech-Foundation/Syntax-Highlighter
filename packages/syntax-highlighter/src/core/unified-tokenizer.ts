@@ -27,6 +27,26 @@ const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
 const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
 
+const CONTROL_KEYWORDS = new Set([
+  "return",
+  "throw",
+  "break",
+  "continue",
+  "if",
+  "else",
+  "switch",
+  "case",
+  "default",
+  "for",
+  "while",
+  "do",
+  "try",
+  "catch",
+  "finally",
+  "yield",
+  "await",
+]);
+
 const TYPE_DECL_KEYWORDS = new Set(["interface", "enum", "type"]);
 
 /**
@@ -300,6 +320,10 @@ export class UnifiedTokenizer {
 
     // ---- Word-list classification (all modes) ----
     if (this.keywords.has(val)) {
+      if (CONTROL_KEYWORDS.has(val)) {
+        if (this.features.contextStack) setKeywordState(val, ctx);
+        return createToken(TokenType.CONTROL, raw.start, raw.end);
+      }
       if (this.features.contextStack) setKeywordState(val, ctx);
       return createToken(TokenType.KEYWORD, raw.start, raw.end);
     }
@@ -332,7 +356,7 @@ export class UnifiedTokenizer {
 
       const prev = ctx.previousToken;
       if (
-        prev?.type === TokenType.KEYWORD &&
+        (prev?.type === TokenType.KEYWORD || prev?.type === TokenType.CONTROL) &&
         ctx.previousValue != null &&
         CLASS_KEYWORDS.has(ctx.previousValue)
       ) {
@@ -432,7 +456,8 @@ export class UnifiedTokenizer {
         const after = closeIdx != null ? this.nextSig(raws, closeIdx) : null;
         const nextIsBrace = after?.type === "punctuation" && src[after.start] === "{";
         const prevIsControl =
-          ctx.previousToken?.type === TokenType.KEYWORD &&
+          (ctx.previousToken?.type === TokenType.KEYWORD ||
+            ctx.previousToken?.type === TokenType.CONTROL) &&
           ctx.previousValue != null &&
           isControl(ctx.previousValue);
         const binds = nextIsBrace && !prevIsControl;

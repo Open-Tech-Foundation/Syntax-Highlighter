@@ -90,7 +90,7 @@ test("JS: function declaration", () => {
   assertEquals(findToken(js, src, "add").type, "function");
   assertEquals(findToken(js, src, "a", 0).type, "parameter");
   assertEquals(findToken(js, src, "b", 0).type, "parameter");
-  assertEquals(findToken(js, src, "return").type, "keyword");
+  assertEquals(findToken(js, src, "return").type, "control");
 });
 
 test("JS: arrow function", () => {
@@ -149,7 +149,7 @@ test("JS: numbers", () => {
 
 test("JS: regex", () => {
   assertEquals(kinds(js, "/^[a-z]+$/gi"), ["regex:/^[a-z]+$/gi"]);
-  assertEquals(kinds(js, "return /test/;"), ["keyword:return", "regex:/test/", "punctuation:;"]);
+  assertEquals(kinds(js, "return /test/;"), ["control:return", "regex:/test/", "punctuation:;"]);
 });
 
 test("JS: operators", () => {
@@ -452,7 +452,7 @@ test("Python: class", () => {
 
 test("Python: list comprehension", () => {
   const src = "squares = [x**2 for x in range(10)]";
-  assertEquals(findToken(py, src, "for").type, "keyword");
+  assertEquals(findToken(py, src, "for").type, "control");
   assertEquals(findToken(py, src, "in").type, "keyword");
 });
 
@@ -480,7 +480,7 @@ test("Python: walrus operator", () => {
 test("Python: match/case", () => {
   const src = "match command:\n    case 'quit': pass";
   assertEquals(findToken(py, src, "match").type, "keyword");
-  assertEquals(findToken(py, src, "case").type, "keyword");
+  assertEquals(findToken(py, src, "case").type, "control");
 });
 
 // ================================================================
@@ -524,7 +524,7 @@ test("Go: error handling", () => {
   const src = 'if err != nil { return fmt.Errorf("failed") }';
   assertEquals(findToken(goTok, src, "err").type, "variable");
   assertEquals(findToken(goTok, src, "nil").type, "null");
-  assertEquals(findToken(goTok, src, "return").type, "keyword");
+  assertEquals(findToken(goTok, src, "return").type, "control");
   assertEquals(findToken(goTok, src, "Errorf").type, "function");
 });
 
@@ -632,7 +632,7 @@ test("C: basics", () => {
   assertEquals(findToken(cTok, src, "int").type, "keyword");
   assertEquals(findToken(cTok, src, "main").type, "function");
   assertEquals(findToken(cTok, src, "void").type, "keyword");
-  assertEquals(findToken(cTok, src, "return").type, "keyword");
+  assertEquals(findToken(cTok, src, "return").type, "control");
   assertEquals(findToken(cTok, src, "0").type, "number");
 });
 
@@ -756,7 +756,7 @@ test("Bash: constants", () => {
 
 test("Bash: keywords", () => {
   assertEquals(kinds(bashTok, "if true; then echo x; fi"), [
-    "keyword:if",
+    "control:if",
     "keyword:true",
     "operator:;",
     "keyword:then",
@@ -901,14 +901,14 @@ test("advanced: <script> with function", () => {
   assertEquals(findToken(htmlTok, src, "function").type, "keyword");
   assertEquals(findToken(htmlTok, src, "greet").type, "function");
   assertEquals(findToken(htmlTok, src, "name").type, "parameter");
-  assertEquals(findToken(htmlTok, src, "return").type, "keyword");
+  assertEquals(findToken(htmlTok, src, "return").type, "control");
 });
 
 test("advanced: <script> with if/else", () => {
   const src = "<script>if (x > 0) { console.log(x); } else { console.log(0); }</script>";
   const _tokens = whitespaceless(htmlTok, src);
-  assertEquals(findToken(htmlTok, src, "if").type, "keyword");
-  assertEquals(findToken(htmlTok, src, "else").type, "keyword");
+  assertEquals(findToken(htmlTok, src, "if").type, "control");
+  assertEquals(findToken(htmlTok, src, "else").type, "control");
   assertEquals(findToken(htmlTok, src, "console").type, "constant");
   assertEquals(findToken(htmlTok, src, "log").type, "method");
 });
@@ -1096,7 +1096,7 @@ test("advanced: nested function declarations", () => {
   assertEquals(findToken(js, src, "outer").type, "function");
   assertEquals(findToken(js, src, "inner").type, "function");
   assertEquals(findToken(js, src, "deepest").type, "function");
-  assertEquals(findToken(js, src, "return").type, "keyword");
+  assertEquals(findToken(js, src, "return").type, "control");
 });
 
 test("advanced: deeply nested objects", () => {
@@ -1115,15 +1115,15 @@ test("advanced: complex boolean logic", () => {
   assertEquals(ops.includes("&&"), true);
   assertEquals(ops.includes("||"), true);
   assertEquals(ops.includes("!"), true);
-  assertEquals(findToken(js, src, "if").type, "keyword");
+  assertEquals(findToken(js, src, "if").type, "control");
   assertEquals(findToken(js, src, "x").type, "function");
 });
 
 test("advanced: try/catch/finally", () => {
   const src = "try { risky(); } catch (e) { recover(); } finally { cleanup(); }";
-  assertEquals(findToken(js, src, "try").type, "keyword");
-  assertEquals(findToken(js, src, "catch").type, "keyword");
-  assertEquals(findToken(js, src, "finally").type, "keyword");
+  assertEquals(findToken(js, src, "try").type, "control");
+  assertEquals(findToken(js, src, "catch").type, "control");
+  assertEquals(findToken(js, src, "finally").type, "control");
   assertEquals(findToken(js, src, "risky").type, "function");
   assertEquals(findToken(js, src, "recover").type, "function");
   assertEquals(findToken(js, src, "cleanup").type, "function");
@@ -1134,7 +1134,7 @@ test("advanced: nested for loops", () => {
   const src =
     "for (let i = 0; i < arr.length; i++) { for (let j = 0; j < arr[i].length; j++) { sum += arr[i][j]; } }";
   const keywords = whitespaceless(js, src)
-    .filter((t) => t.type === "keyword")
+    .filter((t) => t.type === "keyword" || t.type === "control")
     .map((t) => src.slice(t.start, t.end));
   assertEquals(keywords, ["for", "let", "for", "let"]);
   assertEquals(findToken(js, src, "length").type, "property");
@@ -1237,7 +1237,7 @@ test("advanced: regex patterns", () => {
 
 test("advanced: return before regex", () => {
   const src = "return /test/;";
-  assertEquals(findToken(js, src, "return").type, "keyword");
+  assertEquals(findToken(js, src, "return").type, "control");
   assertEquals(findToken(js, src, "/test/").type, "regex");
 });
 
@@ -1318,10 +1318,10 @@ test("advanced: Python class inheritance", () => {
 test("advanced: Python list comprehension", () => {
   const src = "x = [i**2 for i in range(10) if i % 2 == 0]";
   assertEquals(findToken(py, src, "x").type, "variable");
-  assertEquals(findToken(py, src, "for").type, "keyword");
+  assertEquals(findToken(py, src, "for").type, "control");
   assertEquals(findToken(py, src, "in").type, "keyword");
   assertEquals(findToken(py, src, "range").type, "function");
-  assertEquals(findToken(py, src, "if").type, "keyword");
+  assertEquals(findToken(py, src, "if").type, "control");
 });
 
 test("advanced: Python with statement", () => {
@@ -1334,7 +1334,7 @@ test("advanced: Python with statement", () => {
 
 test("advanced: Python yield from", () => {
   const src = "yield from iterable";
-  assertEquals(findToken(py, src, "yield").type, "keyword");
+  assertEquals(findToken(py, src, "yield").type, "control");
   assertEquals(findToken(py, src, "from").type, "keyword");
   assertEquals(findToken(py, src, "iterable").type, "variable");
 });
@@ -1369,7 +1369,7 @@ test("advanced: Go channels", () => {
 
 test("advanced: Go range loop", () => {
   const src = "for i, v := range arr { sum += v }";
-  assertEquals(findToken(goTok, src, "for").type, "keyword");
+  assertEquals(findToken(goTok, src, "for").type, "control");
   assertEquals(findToken(goTok, src, "range").type, "keyword");
   assertEquals(findToken(goTok, src, "arr").type, "variable");
   assertEquals(findToken(goTok, src, "+=").type, "operator");
@@ -1378,7 +1378,7 @@ test("advanced: Go range loop", () => {
 test("advanced: Go select statement", () => {
   const src = "select { case v := <-ch: process(v); }";
   assertEquals(findToken(goTok, src, "select").type, "keyword");
-  assertEquals(findToken(goTok, src, "case").type, "keyword");
+  assertEquals(findToken(goTok, src, "case").type, "control");
   assertEquals(findToken(goTok, src, "<-").type, "operator");
   assertEquals(findToken(goTok, src, "ch").type, "variable");
   assertEquals(findToken(goTok, src, "process").type, "function");
@@ -1447,7 +1447,7 @@ test("advanced: Rust match expression", () => {
 
 test("advanced: Rust if let", () => {
   const src = 'if let Some(x) = option { println!("{}", x); }';
-  assertEquals(findToken(rustTok, src, "if").type, "keyword");
+  assertEquals(findToken(rustTok, src, "if").type, "control");
   assertEquals(findToken(rustTok, src, "let").type, "keyword");
   assertEquals(findToken(rustTok, src, "Some").type, "function");
   assertEquals(findToken(rustTok, src, "println").type, "variable");
@@ -1460,7 +1460,7 @@ test("advanced: Rust impl with generics", () => {
   assertEquals(findToken(rustTok, src, "T").type, "constant");
   assertEquals(findToken(rustTok, src, "Display").type, "variable");
   assertEquals(findToken(rustTok, src, "Debug").type, "variable");
-  assertEquals(findToken(rustTok, src, "for").type, "keyword");
+  assertEquals(findToken(rustTok, src, "for").type, "control");
   assertEquals(findToken(rustTok, src, "fn").type, "keyword");
   assertEquals(findToken(rustTok, src, "self").type, "keyword");
   assertEquals(findToken(rustTok, src, "mut").type, "keyword");
@@ -1480,7 +1480,7 @@ test("advanced: Rust async fn", () => {
 
 test("advanced: Rust for range", () => {
   const src = 'for i in (0..5).rev() { println!("{}", i); }';
-  assertEquals(findToken(rustTok, src, "for").type, "keyword");
+  assertEquals(findToken(rustTok, src, "for").type, "control");
   assertEquals(findToken(rustTok, src, "in").type, "keyword");
   assertEquals(findToken(rustTok, src, "rev").type, "function");
   assertEquals(findToken(rustTok, src, "println").type, "variable");

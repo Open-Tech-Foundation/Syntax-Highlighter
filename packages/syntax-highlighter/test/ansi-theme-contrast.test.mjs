@@ -48,6 +48,7 @@ const SUB_AA_ALLOWLIST = {
   "solarized-light/keyword": 2.97,
   "solarized-light/operator": 2.97,
   "solarized-light/class": 2.97,
+  "solarized-light/control": 2.97,
 };
 
 test("every ANSI theme has a paired background", () => {

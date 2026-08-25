@@ -3,6 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const dracula: AnsiTheme = {
   comment: "#6272a4",
   keyword: "#ff79c6",
+  control: "#ff79c6",
   string: "#f1fa8c",
   number: "#bd93f9",
   regex: "#f1fa8c",

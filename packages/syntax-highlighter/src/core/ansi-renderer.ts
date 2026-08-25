@@ -80,6 +80,7 @@ export function renderANSI(
 
   const rawTheme: AnsiTheme = { ...defaultTheme, ...(options.theme ?? {}) };
   if (rawTheme.method == null && rawTheme.function != null) rawTheme.method = rawTheme.function;
+  if (rawTheme.control == null && rawTheme.keyword != null) rawTheme.control = rawTheme.keyword;
   if (options.theme?.type != null && options.theme?.class == null)
     rawTheme.class = options.theme.type as string;
 

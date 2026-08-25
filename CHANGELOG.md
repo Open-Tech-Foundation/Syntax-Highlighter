@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added `METHOD` semantic token type (`TokenType.METHOD`) for callable property accesses — `a.method()` highlights as `method` distinct from `a.prop` field reads.
 - Added `method` CSS (`::highlight(sh-method)`/`.sh-method`) and ANSI theme (`method: "#61afef"`) support with fallback to `function` color; all 13 ANSI themes and `shared.css` updated.
+- Added `CONTROL` semantic token type (`TokenType.CONTROL`) for flow keywords — `return`/`if`/`for`/`while`/`throw`/`break`/`yield`/`await` etc. highlight as `control` distinct from `keyword`; `sh-control`/`control` themes fallback to `keyword` color.
 
 ### Changed
 

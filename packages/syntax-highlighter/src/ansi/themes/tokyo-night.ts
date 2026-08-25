@@ -3,6 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const tokyoNight: AnsiTheme = {
   comment: "#565f89",
   keyword: "#bb9af7",
+  control: "#bb9af7",
   string: "#9ece6a",
   number: "#ff9e64",
   regex: "#9ece6a",

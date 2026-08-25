@@ -3,6 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const nord: AnsiTheme = {
   comment: "#616e88",
   keyword: "#81a1c1",
+  control: "#81a1c1",
   string: "#a3be8c",
   number: "#b48ead",
   regex: "#a3be8c",
