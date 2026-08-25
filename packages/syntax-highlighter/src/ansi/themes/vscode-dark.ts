@@ -2,7 +2,7 @@ import type { AnsiTheme } from "./types.ts";
 
 export const vscodeDark: AnsiTheme = {
   keyword: "#569CD6",
-  control: "#74addd",
+  control: "#c586c0",
   string: "#CE9178",
   number: "#B5CEA8",
   boolean: "#569CD6",

@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const oneDark: AnsiTheme = {
   comment: "#5c6370",
   keyword: "#c678dd",
-  control: "#d090e3",
+  control: "#e06c75",
   string: "#98c379",
   number: "#d19a66",
   regex: "#56b6c2",

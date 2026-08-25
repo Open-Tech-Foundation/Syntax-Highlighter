@@ -4,7 +4,7 @@
 :root {
   --sh-comment: #586e75;
   --sh-keyword: #859900;
-  --sh-control: #9aab2d;
+  --sh-control: #d33682;
   --sh-string: #2aa198;
   --sh-number: #d33682;
   --sh-regex: #2aa198;

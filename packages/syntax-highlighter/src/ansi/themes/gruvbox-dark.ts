@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const gruvboxDark: AnsiTheme = {
   comment: "#928374",
   keyword: "#fb4934",
-  control: "#fb6958",
+  control: "#83a598",
   string: "#b8bb26",
   number: "#d3869b",
   regex: "#b8bb26",

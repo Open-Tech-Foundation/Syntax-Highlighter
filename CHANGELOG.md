@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **style(themes):** theme-specific `control`/`method` colors per palette — light themes use Shiki/VS Code purple `#af00db` for `control` (vs `keyword` red/blue), dark themes use palette-native distinct hues (`#e06c75`, `#bd93f9`, `#c586c0`, etc.); `method` is per-theme lightened `function` (e.g. `#9165e2` vs `#8250df`) replacing the previous universal vivid `#ff3b30`/`#2ee5a6` for Shiki visual parity.
 - Extracted `retroactive-params.ts`, `binding-analyzer.ts`, `context-helpers.ts` from `unified-tokenizer.ts` (982→~530 LOC). Moved `pushCtx`/`popCtx` to `state.ts`.
 - Added `..=` (inclusive range) operator to Rust language definition.
 - Added `lex.scanString` hook to `LexDefinition` interface and Lexer class for language-specific string scanning.

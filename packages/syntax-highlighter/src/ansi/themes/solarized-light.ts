@@ -3,7 +3,7 @@ import type { AnsiTheme } from "./types.ts";
 export const solarizedLight: AnsiTheme = {
   comment: "#93a1a1",
   keyword: "#859900",
-  control: "#9aab2d",
+  control: "#d33682",
   string: "#2aa198",
   number: "#d33682",
   regex: "#2aa198",
