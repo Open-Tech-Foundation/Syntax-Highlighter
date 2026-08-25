@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-25
+
 ### Changed
 
 - **Breaking:** replaced old `Tokenizer` with `UnifiedTokenizer` as the primary tokenizer. Removed `Tokenizer` class, `TokenizerLike` interface export, and `src/core/tokenizer.ts`. `Highlighter` now uses `UnifiedTokenizer` internally. `UnifiedLexer` (extends `Lexer` with markup-aware tokenization) and `UnifiedTokenizer` (single-pipeline classifier with opt-in JS features) are the only exported tokenizer classes.

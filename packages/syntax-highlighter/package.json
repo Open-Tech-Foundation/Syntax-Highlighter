@@ -1,6 +1,6 @@
 {
   "name": "@opentf/syntax-highlighter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Modern, renderer-agnostic syntax highlighting with one tokenizer powering browser, HTML/SSR, JSON, and ANSI output.",
   "type": "module",
   "types": "./dist/index.d.ts",
