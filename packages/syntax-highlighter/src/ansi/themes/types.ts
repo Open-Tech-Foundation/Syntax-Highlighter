@@ -21,4 +21,6 @@ export type AnsiThemeName =
   | "solarized"
   | "solarized-dark"
   | "solarized-light"
-  | "tokyo-night";
+  | "tokyo-night"
+  | "vscode-dark"
+  | "vscode-light";

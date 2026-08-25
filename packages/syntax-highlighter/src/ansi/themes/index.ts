@@ -11,6 +11,8 @@ export { oneDark } from "./one-dark.ts";
 export { solarizedDark, solarizedDark as solarized } from "./solarized-dark.ts";
 export { solarizedLight } from "./solarized-light.ts";
 export { tokyoNight } from "./tokyo-night.ts";
+export { vscodeDark } from "./vscode-dark.ts";
+export { vscodeLight } from "./vscode-light.ts";
 export type { AnsiTheme, AnsiThemeName } from "./types.ts";
 
 import { defaultTheme } from "./default.ts";
@@ -25,6 +27,8 @@ import { oneDark } from "./one-dark.ts";
 import { solarizedDark } from "./solarized-dark.ts";
 import { solarizedLight } from "./solarized-light.ts";
 import { tokyoNight } from "./tokyo-night.ts";
+import { vscodeDark } from "./vscode-dark.ts";
+import { vscodeLight } from "./vscode-light.ts";
 import type { AnsiTheme } from "./types.ts";
 
 /**
@@ -44,6 +48,8 @@ export const ANSI_THEMES: Record<string, AnsiTheme> = {
   "solarized-dark": solarizedDark,
   "solarized-light": solarizedLight,
   "tokyo-night": tokyoNight,
+  "vscode-dark": vscodeDark,
+  "vscode-light": vscodeLight,
   // aliases
   github: githubDark,
   solarized: solarizedDark,

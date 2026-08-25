@@ -1,0 +1,22 @@
+/* VS Code Default Light+ — VS Code's built-in light theme colors. */
+@import "./shared.css";
+
+:root {
+  --sh-keyword: #0000FF;
+  --sh-string: #A31515;
+  --sh-number: #098658;
+  --sh-boolean: #0000FF;
+  --sh-null: #0000FF;
+  --sh-constant: #0070C1;
+  --sh-comment: #008000;
+  --sh-function: #795E26;
+  --sh-class: #267F99;
+  --sh-variable: #001080;
+  --sh-identifier: #000000;
+  --sh-property: #001080;
+  --sh-parameter: #001080;
+  --sh-operator: #000000;
+  --sh-punctuation: #000000;
+  --sh-decorator: #795E26;
+  --sh-regex: #811F3F;
+}

@@ -1,0 +1,22 @@
+/* VS Code Default Dark+ — VS Code's built-in dark theme colors. */
+@import "./shared.css";
+
+:root {
+  --sh-keyword: #569CD6;
+  --sh-string: #CE9178;
+  --sh-number: #B5CEA8;
+  --sh-boolean: #569CD6;
+  --sh-null: #569CD6;
+  --sh-constant: #4FC1FF;
+  --sh-comment: #6A9955;
+  --sh-function: #DCDCAA;
+  --sh-class: #4EC9B0;
+  --sh-variable: #9CDCFE;
+  --sh-identifier: #D4D4D4;
+  --sh-property: #9CDCFE;
+  --sh-parameter: #9CDCFE;
+  --sh-operator: #D4D4D4;
+  --sh-punctuation: #D4D4D4;
+  --sh-decorator: #DCDCAA;
+  --sh-regex: #D16969;
+}

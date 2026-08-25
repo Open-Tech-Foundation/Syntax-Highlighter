@@ -33,6 +33,8 @@ const THEME_BACKGROUND = {
   "solarized-dark": "#002b36",
   "solarized-light": "#fdf6e3",
   "tokyo-night": "#1a1b26",
+  "vscode-dark": "#1e1e1e",
+  "vscode-light": "#ffffff",
 };
 
 /**

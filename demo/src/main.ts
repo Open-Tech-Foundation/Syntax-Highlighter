@@ -66,6 +66,8 @@ const SYNTAX_THEMES = [
   "one-dark",
   "gruvbox-dark",
   "tokyo-night",
+  "vscode-dark",
+  "vscode-light",
 ] as const;
 type ThemeMode = (typeof THEME_MODES)[number];
 const THEME_ICONS: Record<ThemeMode, string> = {
