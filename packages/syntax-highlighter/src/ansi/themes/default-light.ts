@@ -12,6 +12,7 @@ export const defaultLight: AnsiTheme = {
   identifier: "#24292f",
   constant: "#0550ae",
   property: "#116329",
+  method: "#8250df",
   key: "#0550ae",
   parameter: "#953800",
   operator: "#0550ae",

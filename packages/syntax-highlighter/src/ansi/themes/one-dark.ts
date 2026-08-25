@@ -12,6 +12,7 @@ export const oneDark: AnsiTheme = {
   identifier: "#abb2bf",
   constant: "#d19a66",
   property: "#e06c75",
+  method: "#61afef",
   key: "#61afef",
   parameter: "#e06c75",
   operator: "#56b6c2",

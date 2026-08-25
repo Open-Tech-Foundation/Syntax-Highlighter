@@ -13,6 +13,7 @@ export const vscodeLight: AnsiTheme = {
   variable: "#001080",
   identifier: "#000000",
   property: "#001080",
+  method: "#795E26",
   key: "#267F99",
   parameter: "#001080",
   operator: "#000000",

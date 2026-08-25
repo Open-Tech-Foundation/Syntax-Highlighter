@@ -1,32 +1,27 @@
-import type { LanguageDefinition, RawToken, TokenizerFeatures } from "./lexer.ts";
+import { analyzeBindings, isTypeAliasName } from "./binding-analyzer.ts";
 import {
-  type Context,
+  braceKind,
+  isControl,
+  isParam,
+  nearestParameterContext,
+  popBrace,
+  popLang,
+  setKeywordState,
+  topCtx,
+} from "./context-helpers.ts";
+import type { LanguageDefinition, RawToken, TokenizerFeatures } from "./lexer.ts";
+import { retroParams } from "./retroactive-params.ts";
+import {
   ContextKind,
   createContext,
   createState,
   Expectation,
   type HighlightState,
-  pushCtx,
   popCtx,
+  pushCtx,
 } from "./state.ts";
 import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 import { UnifiedLexer } from "./unified-lexer.ts";
-import { retroParams } from "./retroactive-params.ts";
-import {
-  analyzeBindings,
-  skipTypeAnnotation,
-  isTypeAliasName,
-} from "./binding-analyzer.ts";
-import {
-  setKeywordState,
-  braceKind,
-  popBrace,
-  popLang,
-  isControl,
-  topCtx,
-  isParam,
-  nearestParameterContext,
-} from "./context-helpers.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
@@ -267,9 +262,9 @@ export class UnifiedTokenizer {
     idx: number,
     raws: RawToken[],
     ctx: HighlightState,
-    out: Token[],
+    _out: Token[],
     src: string,
-    parens: Map<number, number>,
+    _parens: Map<number, number>,
     parameterBindings: Set<number>,
   ): Token {
     const val = this.language.caseInsensitive ? raw.value.toLowerCase() : raw.value;
@@ -285,6 +280,10 @@ export class UnifiedTokenizer {
     // ---- JS features: expectation-driven classification ----
     if (ctx.expectation === Expectation.PROPERTY) {
       ctx.expectation = Expectation.NONE;
+      const nxt = this.nextSig(raws, idx);
+      if (nxt?.type === "punctuation" && src[nxt.start] === "(") {
+        return createToken(TokenType.METHOD, raw.start, raw.end);
+      }
       return createToken(TokenType.PROPERTY, raw.start, raw.end);
     }
     if (ctx.expectation === Expectation.FUNCTION_NAME) {
@@ -368,7 +367,12 @@ export class UnifiedTokenizer {
     }
 
     // JS: identifier before `:` inside an object → property key
-    if (this.features.contextStack && nxt?.type === "punctuation" && src[nxt.start] === ":" && topCtx(ctx)?.kind === ContextKind.OBJECT) {
+    if (
+      this.features.contextStack &&
+      nxt?.type === "punctuation" &&
+      src[nxt.start] === ":" &&
+      topCtx(ctx)?.kind === ContextKind.OBJECT
+    ) {
       return createToken(TokenType.PROPERTY, raw.start, raw.end);
     }
 
@@ -384,12 +388,7 @@ export class UnifiedTokenizer {
   // Operator classification
   // ----------------------------------------------------------------
 
-  private classifyOperator(
-    raw: RawToken,
-    ctx: HighlightState,
-    out: Token[],
-    src: string,
-  ): Token {
+  private classifyOperator(raw: RawToken, ctx: HighlightState, out: Token[], src: string): Token {
     const op = raw.value;
 
     if (op === "=>") {
@@ -471,8 +470,11 @@ export class UnifiedTokenizer {
         const kind = braceKind(ctx, ctx.previousToken, ctx.previousValue);
         pushCtx(ctx, createContext(kind));
         if (ctx.pendingParams) {
-          const set = (topCtx(ctx)!.params ??= new Set());
-          for (const n of ctx.pendingParams) set.add(n);
+          const top = topCtx(ctx);
+          if (top) {
+            const set = (top.params ??= new Set());
+            for (const n of ctx.pendingParams) set.add(n);
+          }
           ctx.pendingParams = null;
         }
         ctx.lastClosedParams = false;
@@ -481,10 +483,7 @@ export class UnifiedTokenizer {
       }
       case "}":
         if (raw.detail?.templateClose) {
-          while (
-            ctx.contexts.length &&
-            topCtx(ctx)?.kind !== ContextKind.TEMPLATE_EXPRESSION
-          ) {
+          while (ctx.contexts.length && topCtx(ctx)?.kind !== ContextKind.TEMPLATE_EXPRESSION) {
             ctx.contexts.pop();
           }
           if (ctx.contexts.length) ctx.contexts.pop();
@@ -533,7 +532,7 @@ export class UnifiedTokenizer {
     next[raws.length] = raws.length;
     for (let i = raws.length - 1; i >= 0; i--) {
       const type = raws[i].type;
-      next[i] = type === "whitespace" || type === "comment" ? next[i + 1]! : i;
+      next[i] = type === "whitespace" || type === "comment" ? (next[i + 1] ?? raws.length) : i;
     }
     this.sigIndex = next;
   }

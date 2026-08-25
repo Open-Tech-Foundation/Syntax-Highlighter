@@ -13,6 +13,7 @@ export const vscodeDark: AnsiTheme = {
   variable: "#9CDCFE",
   identifier: "#D4D4D4",
   property: "#9CDCFE",
+  method: "#DCDCAA",
   key: "#4EC9B0",
   parameter: "#9CDCFE",
   operator: "#D4D4D4",

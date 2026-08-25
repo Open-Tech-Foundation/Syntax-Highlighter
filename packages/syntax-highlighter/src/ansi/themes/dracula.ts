@@ -12,6 +12,7 @@ export const dracula: AnsiTheme = {
   identifier: "#f8f8f2",
   constant: "#bd93f9",
   property: "#50fa7b",
+  method: "#50fa7b",
   key: "#8be9fd",
   parameter: "#ffb86c",
   operator: "#ff79c6",

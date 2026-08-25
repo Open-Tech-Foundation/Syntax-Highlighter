@@ -12,6 +12,7 @@ export const githubDark: AnsiTheme = {
   identifier: "#c9d1d9",
   constant: "#79c0ff",
   property: "#7ee787",
+  method: "#d2a8ff",
   key: "#79c0ff",
   parameter: "#ffa657",
   operator: "#ff7b72",

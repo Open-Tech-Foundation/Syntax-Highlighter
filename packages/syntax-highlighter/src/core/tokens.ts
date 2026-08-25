@@ -5,6 +5,7 @@ export interface TokenTypeConst {
   readonly CLASS: "class";
   readonly PARAMETER: "parameter";
   readonly PROPERTY: "property";
+  readonly METHOD: "method";
   readonly KEY: "key";
   readonly VARIABLE: "variable";
   readonly CONSTANT: "constant";
@@ -29,6 +30,7 @@ export const TokenType: TokenTypeConst = Object.freeze({
   CLASS: "class",
   PARAMETER: "parameter",
   PROPERTY: "property",
+  METHOD: "method",
   KEY: "key",
   VARIABLE: "variable",
   CONSTANT: "constant",

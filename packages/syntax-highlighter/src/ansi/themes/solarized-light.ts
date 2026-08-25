@@ -12,6 +12,7 @@ export const solarizedLight: AnsiTheme = {
   identifier: "#657b83",
   constant: "#d33682",
   property: "#268bd2",
+  method: "#268bd2",
   key: "#1a8a7a",
   parameter: "#cb4b16",
   operator: "#859900",
