@@ -367,8 +367,15 @@ const SHIKI_LANGS = [
 
 async function getShikiHighlighter() {
   if (!shikiHighlighterPromise) {
-    shikiHighlighterPromise = import("shiki").then((m) =>
-      m.createHighlighter({ themes: ["dark-plus"], langs: SHIKI_LANGS }),
+    shikiHighlighterPromise = Promise.all([
+      import("shiki"),
+      import("shiki/engine/javascript"),
+    ]).then(([shiki, engine]) =>
+      shiki.createHighlighter({
+        themes: ["dark-plus"],
+        langs: SHIKI_LANGS,
+        engine: engine.createJavaScriptRegexEngine(),
+      }),
     );
   }
   return shikiHighlighterPromise;
@@ -448,8 +455,9 @@ function renderNow(source: string): void {
       .then((html) => {
         shikiPane.innerHTML = html;
       })
-      .catch(() => {
-        shikiPane.textContent = `Shiki: unsupported language "${shikiLang}"`;
+      .catch((err) => {
+        console.error("Shiki error:", err);
+        shikiPane.textContent = `Shiki error: ${err?.message ?? err}`;
       });
     statusTokens.textContent = `${significant.length} tokens`;
     syncScroll();
