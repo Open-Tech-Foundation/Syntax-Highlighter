@@ -230,7 +230,7 @@ export class UnifiedTokenizer {
         if (this.features.propertyKeys) {
           const nxt = this.nextSig(raws, idx);
           if (nxt?.value === ":") {
-            tok = createToken(TokenType.PROPERTY, raw.start, raw.end);
+            tok = createToken(TokenType.KEY, raw.start, raw.end);
             break;
           }
         }

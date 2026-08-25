@@ -12,6 +12,7 @@ export const tokyoNight: AnsiTheme = {
   identifier: "#c0caf5",
   constant: "#ff9e64",
   property: "#7dcfff",
+  key: "#7aa2f7",
   parameter: "#e0af68",
   operator: "#bb9af7",
   punctuation: "#c0caf5",

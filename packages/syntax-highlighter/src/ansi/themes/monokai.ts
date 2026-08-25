@@ -12,6 +12,7 @@ export const monokai: AnsiTheme = {
   identifier: "#f8f8f2",
   constant: "#ae81ff",
   property: "#a6e22e",
+  key: "#66d9ef",
   parameter: "#fd971f",
   operator: "#f92672",
   punctuation: "#f8f8f2",

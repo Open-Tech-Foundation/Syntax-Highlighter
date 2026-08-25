@@ -52,6 +52,10 @@
 .sh-property {
   color: var(--sh-property);
 }
+::highlight(sh-key),
+.sh-key {
+  color: var(--sh-key, var(--sh-property));
+}
 ::highlight(sh-parameter),
 .sh-parameter {
   color: var(--sh-parameter);

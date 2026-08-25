@@ -12,6 +12,7 @@ export const githubLight: AnsiTheme = {
   identifier: "#24292f",
   constant: "#0550ae",
   property: "#116329",
+  key: "#953800",
   parameter: "#953800",
   operator: "#0550ae",
   punctuation: "#24292f",

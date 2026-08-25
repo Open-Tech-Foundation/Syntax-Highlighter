@@ -158,9 +158,9 @@ const SHIKI_SCOPE_TO_SEMANTIC = {
   "variable.language.super.ts": "variable",
 
   // JSON scopes
-  "support.type.property-name.json": "property",
-  "punctuation.support.type.property-name.begin.json": "property",
-  "punctuation.support.type.property-name.end.json": "property",
+  "support.type.property-name.json": "key",
+  "punctuation.support.type.property-name.begin.json": "key",
+  "punctuation.support.type.property-name.end.json": "key",
   "string.quoted.double.json": "string",
   "punctuation.definition.string.begin.json": "string",
   "punctuation.definition.string.end.json": "string",

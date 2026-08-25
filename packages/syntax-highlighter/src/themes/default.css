@@ -26,6 +26,7 @@
   --sh-identifier: #24292f;
   --sh-constant: #0550ae;
   --sh-property: #116329;
+  --sh-key: #0550ae;
   --sh-parameter: #953800;
   --sh-operator: #0550ae;
   --sh-punctuation: #24292f;
@@ -47,6 +48,7 @@
     --sh-identifier: #abb2bf;
     --sh-constant: #d19a66;
     --sh-property: #e06c75;
+    --sh-key: #79c0ff;
     --sh-parameter: #d19a66;
     --sh-operator: #56b6c2;
     --sh-punctuation: #abb2bf;
@@ -68,6 +70,7 @@
   --sh-identifier: #abb2bf;
   --sh-constant: #d19a66;
   --sh-property: #e06c75;
+  --sh-key: #79c0ff;
   --sh-parameter: #d19a66;
   --sh-operator: #56b6c2;
   --sh-punctuation: #abb2bf;

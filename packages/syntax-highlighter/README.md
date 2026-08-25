@@ -217,7 +217,7 @@ Base lexer that scans source into raw tokens (identifiers, strings, numbers, com
 | Export | Description |
 |--------|-------------|
 | `Token` | `{ type: TokenType \| "whitespace"; start: number; end: number }` — a semantic token with UTF-16 offsets. |
-| `TokenType` | Union of all token type strings: `"keyword" \| "identifier" \| "function" \| "class" \| "parameter" \| "property" \| "variable" \| "constant" \| "number" \| "string" \| "comment" \| "regex" \| "operator" \| "punctuation" \| "decorator" \| "boolean" \| "null" \| "tag" \| "attribute" \| "text"`. |
+| `TokenType` | Union of all token type strings: `"keyword" \| "identifier" \| "function" \| "class" \| "parameter" \| "property" \| "key" \| "variable" \| "constant" \| "number" \| "string" \| "comment" \| "regex" \| "operator" \| "punctuation" \| "decorator" \| "boolean" \| "null" \| "tag" \| "attribute" \| "text"`. |
 | `LanguageDefinition` | Language configuration object. See below. |
 | `TokenizerFeatures` | Opt-in tokenizer features. See below. |
 | `AnsiTheme` | ANSI theme object mapping token types to hex colors. |

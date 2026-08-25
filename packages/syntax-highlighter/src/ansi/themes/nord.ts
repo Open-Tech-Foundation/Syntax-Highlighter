@@ -12,6 +12,7 @@ export const nord: AnsiTheme = {
   identifier: "#eceff4",
   constant: "#b48ead",
   property: "#88c0d0",
+  key: "#81a1c1",
   parameter: "#d08770",
   operator: "#81a1c1",
   punctuation: "#eceff4",

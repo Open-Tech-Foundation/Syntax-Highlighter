@@ -12,6 +12,7 @@ export const gruvboxDark: AnsiTheme = {
   identifier: "#ebdbb2",
   constant: "#d3869b",
   property: "#83a598",
+  key: "#83a598",
   parameter: "#fe8019",
   operator: "#fb4934",
   punctuation: "#ebdbb2",

@@ -12,6 +12,7 @@ export const defaultTheme: AnsiTheme = {
   identifier: "#abb2bf",
   constant: "#d19a66",
   property: "#e06c75",
+  key: "#79c0ff",
   parameter: "#d19a66",
   operator: "#56b6c2",
   punctuation: "#abb2bf",

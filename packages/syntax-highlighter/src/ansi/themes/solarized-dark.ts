@@ -12,6 +12,7 @@ export const solarizedDark: AnsiTheme = {
   identifier: "#93a1a1",
   constant: "#d33682",
   property: "#268bd2",
+  key: "#2aa198",
   parameter: "#cb4b16",
   operator: "#859900",
   punctuation: "#93a1a1",
