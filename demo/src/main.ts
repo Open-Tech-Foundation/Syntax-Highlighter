@@ -374,7 +374,7 @@ async function getShikiHighlighter() {
       import("shiki/engine/javascript"),
     ]).then(([shiki, engine]) =>
       shiki.createHighlighter({
-        themes: ["dark-plus"],
+        themes: ["dark-plus", "light-plus"],
         langs: SHIKI_LANGS,
         engine: engine.createJavaScriptRegexEngine(),
       }),
@@ -452,8 +452,9 @@ function renderNow(source: string): void {
     }
     // Shiki comparison
     const shikiLang = SHIKI_LANG_MAP[languageSelect.value] ?? languageSelect.value;
+    const shikiTheme = getEffectiveMode() === "light" ? "light-plus" : "dark-plus";
     getShikiHighlighter()
-      .then((h) => h.codeToHtml(source, { lang: shikiLang, theme: "dark-plus" }))
+      .then((h) => h.codeToHtml(source, { lang: shikiLang, theme: shikiTheme }))
       .then((html) => {
         shikiPane.innerHTML = html;
       })
