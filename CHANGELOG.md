@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added VS Code Default Dark+ and Light+ themes (`vscode-dark`, `vscode-light`) — CSS themes, ANSI themes, and demo picker support. Colors mapped from Shiki's TextMate scopes.
 - Added Shiki comparison tab to the demo site — dynamically loads shiki with JS regex engine, renders side-by-side with our tokenizer output, respects light/dark theme mode.
+- Added `propertyKeys` feature to `TokenizerFeatures` — detects strings before `:` and classifies as `property` instead of `string`. Enabled by default in JSON language definition.
 
 ### Fixed
 

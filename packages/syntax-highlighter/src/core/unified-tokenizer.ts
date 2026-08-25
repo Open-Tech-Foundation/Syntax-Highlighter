@@ -49,6 +49,7 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
     declarations: f.declarations ?? isJS,
     retroactiveRewrite: f.retroactiveRewrite ?? isJS,
     typeAnnotationAware: f.typeAnnotationAware ?? isJS,
+    propertyKeys: f.propertyKeys ?? false,
   };
 }
 
@@ -224,10 +225,18 @@ export class UnifiedTokenizer {
         ctx.expectation = Expectation.NONE;
         tok = createToken(TokenType.NUMBER, raw.start, raw.end);
         break;
-      case "string":
+      case "string": {
         ctx.expectation = Expectation.NONE;
+        if (this.features.propertyKeys) {
+          const nxt = this.nextSig(raws, idx);
+          if (nxt?.value === ":") {
+            tok = createToken(TokenType.PROPERTY, raw.start, raw.end);
+            break;
+          }
+        }
         tok = createToken(TokenType.STRING, raw.start, raw.end);
         break;
+      }
       case "regex":
         ctx.expectation = Expectation.NONE;
         tok = createToken(TokenType.REGEX, raw.start, raw.end);

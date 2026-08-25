@@ -72,6 +72,8 @@ export interface TokenizerFeatures {
   retroactiveRewrite?: boolean;
   /** Skip type annotations in parameter binding analysis. */
   typeAnnotationAware?: boolean;
+  /** Detect string keys before `:` and classify as `property` instead of `string`. */
+  propertyKeys?: boolean;
 }
 
 export interface MarkupConfig {

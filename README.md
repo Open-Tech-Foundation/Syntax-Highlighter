@@ -263,6 +263,7 @@ interface TokenizerFeatures {
   declarations?: boolean;        // Register declarations for hoisted lookup
   retroactiveRewrite?: boolean;  // Retroactive token rewriting for arrows
   typeAnnotationAware?: boolean; // Skip type annotations in parameter analysis
+  propertyKeys?: boolean;        // Detect string keys before `:` as `property`
 }
 ```
 

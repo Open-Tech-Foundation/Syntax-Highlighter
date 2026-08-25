@@ -9,6 +9,9 @@ const json: LanguageDefinition = {
   nulls: ["null"],
   operators: [":"],
   punctuation: ["{", "}", "[", "]", ","],
+  features: {
+    propertyKeys: true,
+  },
   lex: {
     strings: [{ open: '"', close: '"', escape: "\\", multiline: false }],
     comments: [

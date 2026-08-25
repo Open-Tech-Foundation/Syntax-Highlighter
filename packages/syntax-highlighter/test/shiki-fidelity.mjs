@@ -4,16 +4,18 @@ import jsLang from "shiki/langs/javascript.mjs";
 import tsLang from "shiki/langs/typescript.mjs";
 import htmlLang from "shiki/langs/html.mjs";
 import cssLang from "shiki/langs/css.mjs";
+import jsonLang from "shiki/langs/json.mjs";
 import theme from "shiki/themes/github-dark.mjs";
 
 import { UnifiedTokenizer } from "../dist/index.js";
 import jsDef from "../dist/languages/javascript.js";
 import tsDef from "../dist/languages/typescript.js";
 import htmlDef from "../dist/languages/html.js";
+import jsonDef from "../dist/languages/json.js";
 
 const shiki = createHighlighterCoreSync({
   themes: [theme],
-  langs: [jsLang, tsLang, htmlLang, cssLang],
+  langs: [jsLang, tsLang, htmlLang, cssLang, jsonLang],
   engine: createJavaScriptRegexEngine(),
 });
 
@@ -21,6 +23,7 @@ const UNIFIED_MAP = {
   javascript: new UnifiedTokenizer(jsDef),
   typescript: new UnifiedTokenizer(tsDef),
   html: new UnifiedTokenizer(htmlDef),
+  json: new UnifiedTokenizer(jsonDef),
 };
 
 function shikiTokens(src, lang) {
@@ -153,6 +156,25 @@ const SHIKI_SCOPE_TO_SEMANTIC = {
   "punctuation.definition.block.end.ts": "punctuation",
   "variable.language.this.ts": "variable",
   "variable.language.super.ts": "variable",
+
+  // JSON scopes
+  "support.type.property-name.json": "property",
+  "punctuation.support.type.property-name.begin.json": "property",
+  "punctuation.support.type.property-name.end.json": "property",
+  "string.quoted.double.json": "string",
+  "punctuation.definition.string.begin.json": "string",
+  "punctuation.definition.string.end.json": "string",
+  "constant.numeric.json": "number",
+  "constant.language.json": "boolean",
+  "punctuation.definition.dictionary.begin.json": "punctuation",
+  "punctuation.definition.dictionary.end.json": "punctuation",
+  "punctuation.definition.array.begin.json": "punctuation",
+  "punctuation.definition.array.end.json": "punctuation",
+  "punctuation.separator.dictionary.pair.json": "punctuation",
+  "punctuation.separator.array.json": "punctuation",
+  "meta.structure.dictionary.json": "other",
+  "meta.structure.dictionary.value.json": "other",
+  "meta.structure.array.json": "other",
 };
 
 function mapShikiToSemantic(scopes) {
@@ -309,6 +331,17 @@ const HTML_SAMPLES = [
   { name: "nested elements", src: '<div><span><a href="#">link</a></span></div>' },
 ];
 
+const JSON_SAMPLES = [
+  { name: "simple object", src: '{"name": "John", "age": 30}' },
+  { name: "nested object", src: '{"user": {"name": "John", "address": {"city": "NYC"}}}' },
+  { name: "array of strings", src: '{"tags": ["admin", "user"]}' },
+  { name: "boolean and null", src: '{"active": true, "deleted": false, "data": null}' },
+  { name: "number formats", src: '{"int": 42, "float": 3.14, "neg": -1}' },
+  { name: "empty structures", src: '{"empty_obj": {}, "empty_arr": []}' },
+  { name: "deeply nested", src: '{"a": {"b": {"c": {"d": "deep"}}}}' },
+  { name: "mixed array", src: '{"data": [1, "two", true, null, {"key": "val"}]}' },
+];
+
 // ======================================================================
 // Run comparison
 // ======================================================================
@@ -366,17 +399,19 @@ function runComparison(name, samples, shikiLang, unifiedLang) {
 const jsResults = runComparison("JavaScript", JS_SAMPLES, "javascript", "javascript");
 const tsResults = runComparison("TypeScript", TS_SAMPLES, "typescript", "typescript");
 const htmlResults = runComparison("HTML", HTML_SAMPLES, "html", "html");
+const jsonResults = runComparison("JSON", JSON_SAMPLES, "json", "json");
 
 console.log(`\n${"=".repeat(60)}`);
 console.log(`  OVERALL SUMMARY`);
 console.log(`${"=".repeat(60)}`);
-const grandMatch = jsResults.totalMatch + tsResults.totalMatch + htmlResults.totalMatch;
-const grandMismatch = jsResults.totalMismatch + tsResults.totalMismatch + htmlResults.totalMismatch;
+const grandMatch = jsResults.totalMatch + tsResults.totalMatch + htmlResults.totalMatch + jsonResults.totalMatch;
+const grandMismatch = jsResults.totalMismatch + tsResults.totalMismatch + htmlResults.totalMismatch + jsonResults.totalMismatch;
 const grandTotal = grandMatch + grandMismatch;
 const grandPct = grandTotal > 0 ? ((grandMatch / grandTotal) * 100).toFixed(1) : "N/A";
 console.log(`  JS:   ${jsResults.totalMatch}/${jsResults.totalMatch + jsResults.totalMismatch} (${((jsResults.totalMatch / (jsResults.totalMatch + jsResults.totalMismatch)) * 100).toFixed(1)}%)`);
 console.log(`  TS:   ${tsResults.totalMatch}/${tsResults.totalMatch + tsResults.totalMismatch} (${((tsResults.totalMatch / (tsResults.totalMatch + tsResults.totalMismatch)) * 100).toFixed(1)}%)`);
 console.log(`  HTML: ${htmlResults.totalMatch}/${htmlResults.totalMatch + htmlResults.totalMismatch} (${((htmlResults.totalMatch / (htmlResults.totalMatch + htmlResults.totalMismatch)) * 100).toFixed(1)}%)`);
+console.log(`  JSON: ${jsonResults.totalMatch}/${jsonResults.totalMatch + jsonResults.totalMismatch} (${((jsonResults.totalMatch / (jsonResults.totalMatch + jsonResults.totalMismatch)) * 100).toFixed(1)}%)`);
 console.log(`  ────────────────────────────`);
 console.log(`  Grand Total: ${grandMatch}/${grandTotal} (${grandPct}%)`);
 
