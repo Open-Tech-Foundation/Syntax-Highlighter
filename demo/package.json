@@ -10,6 +10,7 @@
   "dependencies": {
     "@opentf/syntax-highlighter": "workspace:*",
     "@xterm/addon-fit": "0.10.0",
-    "@xterm/xterm": "5.5.0"
+    "@xterm/xterm": "5.5.0",
+    "shiki": "^4.4.3"
   }
 }

@@ -660,3 +660,18 @@ select:focus {
   height: 100%;
   min-height: 240px;
 }
+
+.shiki-pane {
+  padding: 0.75rem;
+  font: 13px / 1.55 var(--mono);
+  background: var(--bg-editor);
+  color: var(--fg);
+  overflow: auto;
+  min-height: 0;
+}
+
+.shiki-pane pre {
+  margin: 0;
+  font: inherit;
+  background: transparent;
+}

@@ -217,6 +217,7 @@ root.replaceChildren(
             panelTab("html", "HTML", ICONS.file),
             panelTab("preview", "Preview", ICONS.sun),
             panelTab("ansi", "Terminal", ICONS.code),
+            panelTab("shiki", "Shiki", ICONS.code),
             element("span", { className: "spacer" }),
             element("button", {
               id: "preview-copy",
@@ -251,6 +252,11 @@ root.replaceChildren(
               } as unknown as Record<string, unknown>,
               [element("div", { id: "terminal" })],
             ),
+            element("div", {
+              id: "shiki-pane",
+              className: "shiki-pane",
+              hidden: true,
+            } as unknown as Record<string, unknown>),
           ]),
         ]),
       ]),
@@ -317,6 +323,7 @@ const htmlPane = byId<HTMLPreElement>("html-pane");
 const htmlPreviewPane = byId<HTMLDivElement>("html-preview-pane");
 const ansiPane = byId<HTMLElement>("ansi-pane");
 const terminalEl = byId<HTMLDivElement>("terminal");
+const shikiPane = byId<HTMLDivElement>("shiki-pane");
 const languageSelect = byId<HTMLSelectElement>("select-language");
 const syntaxThemeSelect = byId<HTMLSelectElement>("select-syntax-theme");
 const sampleSelect = byId<HTMLSelectElement>("select-sample");
@@ -339,12 +346,22 @@ const previewTabs = [...document.querySelectorAll<HTMLButtonElement>(".preview .
 /* ------------------------------------------------------- highlight pipeline */
 
 let renderer: CSSHighlightRenderer | null = null;
-let activePreview: "tokens" | "json" | "html" | "preview" | "ansi" = "tokens";
+let activePreview: "tokens" | "json" | "html" | "preview" | "ansi" | "shiki" = "tokens";
 let currentSource = "";
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let renderSeq = 0;
 let activePanel: "editor" | "tokens" | "custom" = "editor";
 const highlighters = new Map<string, Promise<Highlighter>>();
+let shikiHighlighterPromise: Promise<any> | null = null;
+
+async function getShikiHighlighter() {
+  if (!shikiHighlighterPromise) {
+    shikiHighlighterPromise = import("shiki").then((m) =>
+      m.createHighlighter({ themes: ["dark-plus"], langs: [] }),
+    );
+  }
+  return shikiHighlighterPromise;
+}
 
 /** Drop the memoized highlighter for a language so the next use rebuilds it. */
 function invalidateHighlighter(language: string): void {
@@ -413,6 +430,16 @@ function renderNow(source: string): void {
     } catch {
       setAnsiContent("Invalid tokens");
     }
+    // Shiki comparison
+    const shikiLang = languageSelect.value;
+    getShikiHighlighter()
+      .then((h) => h.codeToHtml(source, { lang: shikiLang, theme: "dark-plus" }))
+      .then((html) => {
+        shikiPane.innerHTML = html;
+      })
+      .catch(() => {
+        shikiPane.textContent = `Shiki: unsupported language "${shikiLang}"`;
+      });
     statusTokens.textContent = `${significant.length} tokens`;
     syncScroll();
   });
@@ -509,7 +536,9 @@ function activatePanel(tab: "editor" | "custom"): void {
             ? htmlPreviewPane
             : activePreview === "ansi"
               ? ansiPane
-              : tokenList;
+              : activePreview === "shiki"
+                ? shikiPane
+                : tokenList;
     let text: string;
     if (activePreview === "ansi") {
       text = currentAnsi || (ansiPane.textContent ?? "");
@@ -539,7 +568,8 @@ let currentAnsi = "";
 
 function flushTerminal(): void {
   if (!terminal) return;
-  terminal.clear();
+  // Use explicit escape sequences: clear scrollback (2J), clear viewport (3J), home cursor (H)
+  terminal.write("\x1b[2J\x1b[3J\x1b[H");
   if (!currentAnsi) return;
   terminal.write(currentAnsi);
 }
@@ -606,7 +636,7 @@ function ensureTerminal(): void {
   } catch {}
 }
 
-function activatePreview(tab: "tokens" | "json" | "html" | "preview" | "ansi"): void {
+function activatePreview(tab: "tokens" | "json" | "html" | "preview" | "ansi" | "shiki"): void {
   activePreview = tab;
   for (const btn of previewTabs) btn.classList.toggle("active", btn.dataset.tab === tab);
   tokenList.hidden = tab !== "tokens";
@@ -614,6 +644,7 @@ function activatePreview(tab: "tokens" | "json" | "html" | "preview" | "ansi"): 
   htmlPane.hidden = tab !== "html";
   htmlPreviewPane.hidden = tab !== "preview";
   ansiPane.hidden = tab !== "ansi";
+  shikiPane.hidden = tab !== "shiki";
   if (tab === "ansi") {
     ensureTerminal();
     requestAnimationFrame(() => {
@@ -634,15 +665,17 @@ for (const btn of activityButtons) {
       | "html"
       | "preview"
       | "ansi"
+      | "shiki"
       | "custom";
     if (
       target === "tokens" ||
       target === "json" ||
       target === "html" ||
       target === "preview" ||
-      target === "ansi"
+      target === "ansi" ||
+      target === "shiki"
     ) {
-      activatePreview(target as "tokens" | "json" | "html" | "preview" | "ansi");
+      activatePreview(target as "tokens" | "json" | "html" | "preview" | "ansi" | "shiki");
       return;
     }
     if (target === "custom" || target === "editor") {
