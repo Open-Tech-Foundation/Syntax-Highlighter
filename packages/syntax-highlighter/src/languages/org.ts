@@ -64,10 +64,7 @@ const org: LanguageDefinition = {
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
-    comments: [
-      { open: "//", close: "\n", line: true },
-      { open: "/*", close: "*/" },
-    ],
+    comments: [],
     regex: false,
   },
 };

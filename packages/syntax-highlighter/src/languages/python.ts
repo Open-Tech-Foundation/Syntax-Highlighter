@@ -42,7 +42,6 @@ const python: LanguageDefinition = {
   ],
   booleans: ["True", "False"],
   nulls: ["None"],
-  constants: [],
   operators: [
     "**=",
     "//=",

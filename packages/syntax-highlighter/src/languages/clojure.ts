@@ -50,7 +50,6 @@ const clojure: LanguageDefinition = {
     "for",
     "if-let",
     "if-not",
-    "when-let",
     "nil",
     "true",
     "false",
@@ -119,7 +118,6 @@ const clojure: LanguageDefinition = {
     strings: [{ open: '"', close: '"', escape: "\\", multiline: false }],
     comments: [
       { open: ";", close: "\n", line: true },
-      { open: "(comment", close: ")" },
     ],
     regex: false,
   },

@@ -1,7 +1,6 @@
 import { assert, assertEquals, test } from "runtime:test";
-import { GenericTokenizer } from "../src/core/generic-tokenizer.ts";
+import { UnifiedTokenizer as Tokenizer } from "../src/core/unified-tokenizer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
-import { Tokenizer } from "../src/core/tokenizer.ts";
 import csharp from "../src/languages/csharp.ts";
 import javascript from "../src/languages/javascript.ts";
 import rust from "../src/languages/rust.ts";
@@ -27,7 +26,7 @@ const minilang = {
   },
 };
 
-const tokenizer = new GenericTokenizer(minilang);
+const tokenizer = new Tokenizer(minilang);
 
 function tokens(source) {
   return tokenizer.tokenize(source).filter((t) => t.type !== "whitespace");
@@ -107,17 +106,23 @@ test("tokens cover the whole source contiguously", () => {
   assertEquals(pos, source.length);
 });
 
-test("Highlighter dispatches on the semantic field", () => {
+test("one tokenizer class handles every definition", () => {
+  // single class — dispatch is internal, driven by the definition's data
   assert(new Highlighter(javascript).tokenizer instanceof Tokenizer);
-  assert(new Highlighter(minilang).tokenizer instanceof GenericTokenizer);
+  assert(new Highlighter(minilang).tokenizer instanceof Tokenizer);
   assert(
-    new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof GenericTokenizer,
+    new Highlighter({ ...minilang, semantic: "generic" }).tokenizer instanceof Tokenizer,
   );
+  const k = new Highlighter(minilang)
+    .highlight("fn call()")
+    .map((t) => `${t.type}`)
+    .join(" ");
+  assert(k.includes("function"), k);
 });
 
 test("caseInsensitive languages match keywords in any case (SQL)", () => {
   const src = "SELECT id FROM users WHERE active = TRUE AND name IS NOT NULL";
-  const toks = new GenericTokenizer(sql).tokenize(src);
+  const toks = new Tokenizer(sql).tokenize(src);
   const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
   for (const word of ["SELECT", "FROM", "WHERE", "AND", "IS", "NOT"]) {
     assert(
@@ -131,7 +136,7 @@ test("caseInsensitive languages match keywords in any case (SQL)", () => {
 
 test("case-sensitive languages keep exact matching (minilang)", () => {
   const src = "let If = 1;";
-  const toks = new GenericTokenizer(minilang).tokenize(src);
+  const toks = new Tokenizer(minilang).tokenize(src);
   const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
   assert(
     !kinds.some((k) => k.startsWith("keyword:If")),
@@ -141,7 +146,7 @@ test("case-sensitive languages keep exact matching (minilang)", () => {
 
 test("typescript classifies satisfies as a keyword", () => {
   const src = "const config = { port: 8080 } satisfies Options;";
-  const toks = new GenericTokenizer(typescript).tokenize(src);
+  const toks = new Tokenizer(typescript).tokenize(src);
   const kinds = toks.map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
   assert(
     kinds.includes("keyword:satisfies"),
@@ -150,7 +155,7 @@ test("typescript classifies satisfies as a keyword", () => {
 });
 
 function kindsFor(def, src) {
-  return new GenericTokenizer(def)
+  return new Tokenizer(def)
     .tokenize(src)
     .map((t) => `${t.type}:${src.slice(t.start, t.end)}`);
 }

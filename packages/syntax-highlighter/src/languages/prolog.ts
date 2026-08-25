@@ -65,8 +65,7 @@ const prolog: LanguageDefinition = {
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     comments: [
-      { open: "//", close: "\n", line: true },
-      { open: "/*", close: "*/" },
+      { open: "%", close: "\n", line: true },
     ],
     regex: false,
   },

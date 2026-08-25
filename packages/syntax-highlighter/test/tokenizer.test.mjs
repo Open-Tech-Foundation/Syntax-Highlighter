@@ -1,6 +1,6 @@
 import { assert, assertEquals, test } from "runtime:test";
 import { Lexer } from "../src/core/lexer.ts";
-import { Tokenizer } from "../src/core/tokenizer.ts";
+import { UnifiedTokenizer as Tokenizer } from "../src/core/unified-tokenizer.ts";
 import javascript from "../src/languages/javascript.ts";
 
 const tokenizer = new Tokenizer(javascript);

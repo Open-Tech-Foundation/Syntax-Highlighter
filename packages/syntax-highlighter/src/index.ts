@@ -14,12 +14,9 @@ export {
   renderANSI,
 } from "./core/ansi-renderer.ts";
 export { CSSHighlightRenderer } from "./core/css-renderer.ts";
-export {
-  type EmbedTokenizerFactory,
-  GenericTokenizer,
-  type TokenizerLike,
-} from "./core/generic-tokenizer.ts";
-export { createTokenizer, Highlighter } from "./core/highlighter.ts";
+export { Highlighter } from "./core/highlighter.ts";
+export { UnifiedLexer } from "./core/unified-lexer.ts";
+export { UnifiedTokenizer } from "./core/unified-tokenizer.ts";
 export { renderHTML } from "./core/html-renderer.ts";
 export type { HtmlRenderOptions } from "./core/html-renderer.ts";
 export { renderJSON, validateTokens } from "./core/json-renderer.ts";
@@ -29,6 +26,7 @@ export type {
   LexDefinition,
   RawToken,
   StringDef,
+  TokenizerFeatures,
 } from "./core/lexer.ts";
 export { Lexer } from "./core/lexer.ts";
 export {
@@ -36,7 +34,6 @@ export {
   loadLanguage,
   registerLanguage,
 } from "./core/registry.ts";
-export { Tokenizer } from "./core/tokenizer.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
 

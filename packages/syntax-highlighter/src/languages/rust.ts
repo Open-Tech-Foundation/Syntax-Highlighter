@@ -59,7 +59,6 @@ const rust: LanguageDefinition = {
     "union",
   ],
   booleans: ["true", "false"],
-  nulls: [],
   operators: [
     "=>",
     "->",

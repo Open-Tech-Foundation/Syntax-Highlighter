@@ -88,8 +88,8 @@ const pascal: LanguageDefinition = {
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     comments: [
-      { open: "//", close: "\n", line: true },
-      { open: "/*", close: "*/" },
+      { open: "{", close: "}" },
+      { open: "(*", close: "*)" },
     ],
     regex: false,
   },

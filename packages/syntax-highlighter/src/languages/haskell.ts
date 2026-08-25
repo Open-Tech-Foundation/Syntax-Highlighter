@@ -38,7 +38,6 @@ const haskell: LanguageDefinition = {
     "exists",
   ],
   booleans: ["True", "False"],
-  nulls: [],
   operators: [
     "::",
     "=>",

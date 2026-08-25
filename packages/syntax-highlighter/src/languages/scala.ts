@@ -54,7 +54,6 @@ const scala: LanguageDefinition = {
   operators: [
     "=>",
     "<-",
-    "=>",
     "==",
     "!=",
     "<=",

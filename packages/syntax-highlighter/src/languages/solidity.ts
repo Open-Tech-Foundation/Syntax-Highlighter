@@ -35,7 +35,6 @@ const solidity: LanguageDefinition = {
     "return",
     "if",
     "else",
-    "for",
     "while",
     "do",
     "break",
@@ -63,7 +62,6 @@ const solidity: LanguageDefinition = {
     "bytes32",
   ],
   booleans: ["true", "false"],
-  nulls: [],
   operators: [
     "=>",
     "==",

@@ -34,7 +34,6 @@ const erlang: LanguageDefinition = {
     "xor",
     "maybe",
     "else",
-    "maybe",
     "true",
     "false",
     "nil",
@@ -68,9 +67,6 @@ const erlang: LanguageDefinition = {
     "|",
     "||",
     "&&",
-    "!",
-    "?",
-    ".",
     ",",
   ],
   punctuation: [

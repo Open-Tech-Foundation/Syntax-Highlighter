@@ -19,13 +19,10 @@ const graphql: LanguageDefinition = {
     "extend",
     "directive",
     "schema",
-    "query",
-    "mutation",
-    "subscription",
   ],
   booleans: ["true", "false", "null"],
   nulls: ["null"],
-  operators: ["=", "!", "?", "&", "|", "=", ":", "@", "$", "...", "="],
+  operators: ["=", "!", "?", "&", "|", ":", "@", "$", "..."],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "!", "?", "@", "$", "&", "|", ".", ":"],
   lex: {
     strings: [

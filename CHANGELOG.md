@@ -6,7 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** replaced old `Tokenizer` with `UnifiedTokenizer` as the primary tokenizer. Removed `Tokenizer` class, `TokenizerLike` interface export, and `src/core/tokenizer.ts`. `Highlighter` now uses `UnifiedTokenizer` internally. `UnifiedLexer` (extends `Lexer` with markup-aware tokenization) and `UnifiedTokenizer` (single-pipeline classifier with opt-in JS features) are the only exported tokenizer classes.
+
+### Fixed
+
+- Fixed `?.` operator not setting `Expectation.PROPERTY` for generic languages — always create a `HighlightState` context instead of gating on `features.contextStack`, so member-access property detection works for all languages.
+- Gated JS-specific context features (class/type detection, parameter bindings, declarations, retroactive rewriting) behind `this.features.contextStack` so generic languages don't pick up unintended JavaScript semantics.
+- Updated `html-tokenizer.test.mjs` — DOCTYPE name is now classified as `tag` (not `keyword`) in the unified tokenizer, matching its treatment as a tag-like construct.
+
 ### Added
+
+- Added `UnifiedTokenizer` and `UnifiedLexer` as a separate, parallel implementation for comparison. `UnifiedLexer` extends `Lexer` with markup-aware tokenization (tag/attribute/text/comment raw tokens via `markup: { tags: true }`). `UnifiedTokenizer` uses a single `tokenize()` pipeline — one classifier, no mode-specific scan methods. JS-specific features (parameter bindings, context tracking, declarations, retroactive rewriting) are opt-in via `LanguageDefinition.features` flags, defaulting to `true` when `semantic: "javascript"` and `false` otherwise. Added `TokenizerFeatures` interface to `LanguageDefinition`. Both classes are exported alongside existing `Tokenizer`/`Lexer` for side-by-side comparison. Covered by `test/unified-tokenizer.test.mjs` with parity and performance tests.
+
+### Fixed
+
+- Fixed embedded language delegation in `UnifiedTokenizer` — `<script>` and `<style>` bodies now use a full `UnifiedTokenizer` sub-instance (not a bare `Lexer`), so JavaScript inside `<script>` correctly classifies `const`/`let`/`function` as keywords, not variables. Fixed `embedRegions` accumulation bug where regions leaked across multiple `tokenize()` calls on the same `UnifiedLexer` instance.
+
+- Fixed wrong comment syntax in 18 language definitions (ada, apache, clojure, fish, fortran, ini, lisp, ocaml, org, pascal, prolog, properties, raku, scheme, smalltalk, systemd, tcl, vb) — these had generic `//` / `/* */` comments copy-pasted from a template instead of their actual comment delimiters.
+
+- Removed duplicate entries from keyword/operator arrays in 16 languages (julia, handlebars, swift, graphql, fsharp, dockerfile, clojure, crystal, erlang, nim, nix, scala, solidity, jinja, elixir, liquid).
+
+- Removed empty `nulls`/`constants` arrays from cmake, rust, solidity, python, haskell.
 
 - Added HTML semantic tokenization — config-driven, no new tokenizer class: `markup: { tags: true }` in a language definition switches `GenericTokenizer` to structural scanning (tag names emit the new `tag` type, attribute names `attribute`, text content plain `text`; closing tags parse as one unit; doctype/XML-prolog names are `keyword`; CDATA handled), and `markup.embed` maps raw-text elements to another definition — html embeds `{ script: javascript, style: css }` so `<script>` bodies tokenize as JavaScript and `<style>` bodies as CSS. Wired for `html` and `xml`. Three new semantic token types (`tag`, `attribute`, `text`) added to the token set; `shared.css` gains `sh-tag`/`sh-attribute` selectors falling back to `--sh-tag`→`--sh-keyword` / `--sh-attribute`→`--sh-property` (themes need no changes; `text` renders unstyled by design). Token streams keep full-source coverage so the JSON contract holds. Covered by new `test/html-tokenizer.test.mjs`.
 - Unified the tokenizer stack — `Tokenizer` (JavaScript semantics) now subclasses `GenericTokenizer`, inheriting the lexer, word lists, and significant-token lookahead instead of duplicating them; `createTokenizer(def)` is the single dispatch point (also resolving `markup.embed` bodies recursively) and is exported alongside `TokenizerLike`/`EmbedTokenizerFactory`.

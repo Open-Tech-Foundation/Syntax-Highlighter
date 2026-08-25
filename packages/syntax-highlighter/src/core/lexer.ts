@@ -53,6 +53,25 @@ export interface LanguageDefinition {
    * the identifier-based path.
    */
   markup?: MarkupConfig;
+  /**
+   * Opt-in semantic features for the unified tokenizer. When `semantic` is
+   * `"javascript"`, all features default to `true`. Otherwise all default
+   * to `false`.
+   */
+  features?: TokenizerFeatures;
+}
+
+export interface TokenizerFeatures {
+  /** Track parameter bindings (arrows, destructuring, rest params). */
+  parameterBindings?: boolean;
+  /** Track scopes (blocks, functions, classes, objects, imports, exports). */
+  contextStack?: boolean;
+  /** Register declarations (function/class names) for hoisted lookup. */
+  declarations?: boolean;
+  /** Retroactive token rewriting for arrow function parameters. */
+  retroactiveRewrite?: boolean;
+  /** Skip type annotations in parameter binding analysis. */
+  typeAnnotationAware?: boolean;
 }
 
 export interface MarkupConfig {
@@ -224,11 +243,11 @@ export class Lexer {
   private punctuationByChar: Map<string, string[]>;
   private identifierRe: RegExp;
 
-  private source = "";
-  private length = 0;
+  protected source = "";
+  protected length = 0;
   private tokens: RawToken[] = [];
   private prev: RawToken | null = null;
-  private pos = 0;
+  protected pos = 0;
   private parenControls: boolean[] = [];
   private lastClosedControlParen = false;
 

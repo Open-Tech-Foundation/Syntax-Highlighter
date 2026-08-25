@@ -63,7 +63,6 @@ const jinja: LanguageDefinition = {
     "not",
     "in",
     "is",
-    "|",
     "&",
     "#",
     "!",

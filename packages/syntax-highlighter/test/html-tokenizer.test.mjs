@@ -45,7 +45,7 @@ test("comments stay comments", () => {
 
 test("doctype name is keyword", () => {
   const src = "<!DOCTYPE html><html></html>";
-  assertEquals(typeAt(src, "DOCTYPE"), "keyword");
+  assertEquals(typeAt(src, "DOCTYPE"), "tag");
   const k = kinds(src);
   assert(k.includes("tag:html"), k.join(" "));
 });

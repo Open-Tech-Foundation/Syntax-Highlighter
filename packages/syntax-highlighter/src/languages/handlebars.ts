@@ -12,10 +12,6 @@ const handlebars: LanguageDefinition = {
     "with",
     "lookup",
     "log",
-    "if",
-    "unless",
-    "each",
-    "with",
   ],
   operators: [
     "{{",
@@ -32,11 +28,6 @@ const handlebars: LanguageDefinition = {
     "}",
     "{",
     "=",
-    "!",
-    "#",
-    "/",
-    "}",
-    "{",
   ],
   punctuation: [
     "{",

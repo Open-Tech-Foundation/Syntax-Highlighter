@@ -43,7 +43,6 @@ const cmake: LanguageDefinition = {
     "false",
   ],
   booleans: ["ON", "OFF", "TRUE", "FALSE", "YES", "NO"],
-  nulls: [],
   operators: [
     "=",
     "==",

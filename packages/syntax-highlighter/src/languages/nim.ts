@@ -72,7 +72,6 @@ const nim: LanguageDefinition = {
     "xor",
     "true",
     "false",
-    "nil",
   ],
   booleans: ["true", "false"],
   nulls: ["nil"],
@@ -105,9 +104,6 @@ const nim: LanguageDefinition = {
     "$",
     "#",
     "`",
-    "~",
-    "|",
-    "&",
   ],
   punctuation: [
     "(",

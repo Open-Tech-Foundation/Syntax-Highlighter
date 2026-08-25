@@ -24,7 +24,6 @@ const dockerfile: LanguageDefinition = {
     "HEALTHCHECK",
     "SHELL",
     "AS",
-    "FROM",
   ],
   operators: ["=", "==", "!="],
   punctuation: [
