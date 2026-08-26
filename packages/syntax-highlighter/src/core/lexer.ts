@@ -658,12 +658,10 @@ export class Lexer {
           // Check for multi-char prefixes first (longest match)
           for (const [prefix, type] of this.linePrefixes) {
             if (s.startsWith(prefix, this.pos)) {
-              // Consume the prefix plus any following chars of the same kind
+              // Consume the entire line (prefix + content) as one token
               let end = this.pos + prefix.length;
-              if (prefix.length === 1) {
-                const ch0 = prefix[0];
-                while (end < this.length && s[end] === ch0) end += 1;
-              }
+              const lineEnd = s.indexOf("\n", end);
+              end = lineEnd === -1 ? this.length : lineEnd;
               this.emit(type as RawTokenType, start, end);
               this.pos = end;
               break;
