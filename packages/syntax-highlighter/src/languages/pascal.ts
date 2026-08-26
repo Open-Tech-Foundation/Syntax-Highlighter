@@ -4,6 +4,11 @@ const pascal: LanguageDefinition = {
   name: "pascal",
   aliases: ["pas"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: { function: "EXPECT_FUNCTION_NAME", procedure: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "program",
     "begin",

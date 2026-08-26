@@ -110,6 +110,17 @@ const swift: LanguageDefinition = {
     "$",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ":", ".", "@", "#"],
+  classKeywords: ["class", "struct", "enum", "protocol"],
+  typeDeclKeywords: ["typealias"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    func: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+    struct: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+    protocol: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

@@ -126,6 +126,17 @@ const crystal: LanguageDefinition = {
     "/",
     "-",
   ],
+  classKeywords: ["class", "struct", "enum"],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    def: "EXPECT_FUNCTION_NAME",
+    fun: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+    struct: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

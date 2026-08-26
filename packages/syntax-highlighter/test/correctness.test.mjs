@@ -444,7 +444,7 @@ test("Python: decorators", () => {
 
 test("Python: class", () => {
   const src = "class Dog:\n    def __init__(self, name):\n        self.name = name";
-  assertEquals(findToken(py, src, "Dog").type, "variable");
+  assertEquals(findToken(py, src, "Dog").type, "class");
   assertEquals(findToken(py, src, "__init__").type, "function");
   assertEquals(findToken(py, src, "self", 0).type, "variable");
   assertEquals(findToken(py, src, "name", 0).type, "variable");
@@ -547,7 +547,7 @@ test("Rust: basics", () => {
 test("Rust: struct", () => {
   const src = "struct Point { x: f64, y: f64 }";
   assertEquals(findToken(rustTok, src, "struct").type, "keyword");
-  assertEquals(findToken(rustTok, src, "Point").type, "variable");
+  assertEquals(findToken(rustTok, src, "Point").type, "class");
 });
 
 test("Rust: impl", () => {
@@ -560,7 +560,7 @@ test("Rust: impl", () => {
 test("Rust: enum", () => {
   const src = "enum Shape { Circle(f64), Rectangle(f64, f64) }";
   assertEquals(findToken(rustTok, src, "enum").type, "keyword");
-  assertEquals(findToken(rustTok, src, "Shape").type, "variable");
+  assertEquals(findToken(rustTok, src, "Shape").type, "class");
   assertEquals(findToken(rustTok, src, "Circle").type, "function");
   assertEquals(findToken(rustTok, src, "Rectangle").type, "function");
 });
@@ -568,7 +568,7 @@ test("Rust: enum", () => {
 test("Rust: trait", () => {
   const src = "trait Drawable { fn draw(&self); }";
   assertEquals(findToken(rustTok, src, "trait").type, "keyword");
-  assertEquals(findToken(rustTok, src, "Drawable").type, "variable");
+  assertEquals(findToken(rustTok, src, "Drawable").type, "class");
   assertEquals(findToken(rustTok, src, "draw").type, "function");
 });
 
@@ -598,14 +598,14 @@ test("Java: class", () => {
   const src = "public class App { private String name; }";
   assertEquals(findToken(javaTok, src, "public").type, "keyword");
   assertEquals(findToken(javaTok, src, "class").type, "keyword");
-  assertEquals(findToken(javaTok, src, "App").type, "variable");
+  assertEquals(findToken(javaTok, src, "App").type, "class");
   assertEquals(findToken(javaTok, src, "private").type, "keyword");
 });
 
 test("Java: interface", () => {
   const src = "interface Serializable {}";
   assertEquals(findToken(javaTok, src, "interface").type, "keyword");
-  assertEquals(findToken(javaTok, src, "Serializable").type, "variable");
+  assertEquals(findToken(javaTok, src, "Serializable").type, "class");
 });
 
 test("Java: enum", () => {
@@ -648,7 +648,7 @@ test("C: preprocessor", () => {
 test("C: struct", () => {
   const src = "struct Point { int x; int y; };";
   assertEquals(findToken(cTok, src, "struct").type, "keyword");
-  assertEquals(findToken(cTok, src, "Point").type, "variable");
+  assertEquals(findToken(cTok, src, "Point").type, "class");
 });
 
 test("C: pointers", () => {
@@ -715,7 +715,7 @@ test("literal lists win over keywords (no double-classification)", () => {
 test("Ruby: class", () => {
   const src = "class Dog\n  def initialize(name)\n  end\nend";
   assertEquals(findToken(rubyTok, src, "class").type, "keyword");
-  assertEquals(findToken(rubyTok, src, "Dog").type, "variable");
+  assertEquals(findToken(rubyTok, src, "Dog").type, "class");
   assertEquals(findToken(rubyTok, src, "def").type, "keyword");
   assertEquals(findToken(rubyTok, src, "initialize").type, "function");
   assertEquals(findToken(rubyTok, src, "end", 0).type, "keyword");
@@ -742,7 +742,7 @@ test("PHP: variables", () => {
 test("PHP: class", () => {
   const src = "class App { public function __construct() {} }";
   assertEquals(findToken(phpTok, src, "class").type, "keyword");
-  assertEquals(findToken(phpTok, src, "App").type, "variable");
+  assertEquals(findToken(phpTok, src, "App").type, "class");
   assertEquals(findToken(phpTok, src, "public").type, "keyword");
   assertEquals(findToken(phpTok, src, "function").type, "keyword");
   assertEquals(findToken(phpTok, src, "__construct").type, "function");
@@ -1321,7 +1321,7 @@ test("advanced: Python *args **kwargs", () => {
 test("advanced: Python class inheritance", () => {
   const src = "class A(B, C, metaclass=D): pass";
   assertEquals(findToken(py, src, "class").type, "keyword");
-  assertEquals(findToken(py, src, "A").type, "function");
+  assertEquals(findToken(py, src, "A").type, "class");
   assertEquals(findToken(py, src, "B").type, "constant");
   assertEquals(findToken(py, src, "C").type, "constant");
   assertEquals(findToken(py, src, "metaclass").type, "variable");

@@ -4,6 +4,16 @@ const haskell: LanguageDefinition = {
   name: "haskell",
   aliases: ["hs"],
   semantic: "generic",
+  classKeywords: ["class"],
+  typeDeclKeywords: ["type", "data", "newtype"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    class: "EXPECT_CLASS_NAME",
+    type: "EXPECT_CLASS_NAME",
+    data: "EXPECT_CLASS_NAME",
+    newtype: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "case",
     "class",

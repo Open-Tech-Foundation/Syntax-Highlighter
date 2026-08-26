@@ -144,6 +144,11 @@ const cpp: LanguageDefinition = {
     "...",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "\\"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["enum"],
+  classUsageKeywords: ["new"],
+  declarationKeywords: { class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

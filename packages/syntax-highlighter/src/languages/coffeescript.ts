@@ -75,6 +75,11 @@ const coffeescript: LanguageDefinition = {
     "!",
     "^",
   ],
+  classKeywords: ["class"],
+  typeDeclKeywords: [],
+  classUsageKeywords: ["extends"],
+  declarationKeywords: { class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

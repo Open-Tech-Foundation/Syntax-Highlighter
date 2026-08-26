@@ -89,6 +89,11 @@ const perl: LanguageDefinition = {
     "...",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "$", "%", "#"],
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { sub: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

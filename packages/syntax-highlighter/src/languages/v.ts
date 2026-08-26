@@ -76,6 +76,15 @@ const v: LanguageDefinition = {
     "!",
     "^",
   ],
+  classKeywords: ["struct", "enum"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    fn: "EXPECT_FUNCTION_NAME",
+    struct: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

@@ -4,6 +4,11 @@ const fortran: LanguageDefinition = {
   name: "fortran",
   aliases: [],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { function: "EXPECT_FUNCTION_NAME", subroutine: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "program",
     "end",

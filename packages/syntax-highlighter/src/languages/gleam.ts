@@ -4,6 +4,11 @@ const gleam: LanguageDefinition = {
   name: "gleam",
   aliases: [],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: { fn: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "import",
     "pub",

@@ -4,6 +4,11 @@ const erlang: LanguageDefinition = {
   name: "erlang",
   aliases: ["erl", "hrl"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { fun: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "after",
     "and",

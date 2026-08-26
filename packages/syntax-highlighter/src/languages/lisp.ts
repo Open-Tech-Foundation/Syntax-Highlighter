@@ -4,6 +4,11 @@ const lisp: LanguageDefinition = {
   name: "lisp",
   aliases: ["cl", "common-lisp"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { defun: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "defun",
     "defvar",

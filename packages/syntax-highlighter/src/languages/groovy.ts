@@ -118,6 +118,11 @@ const groovy: LanguageDefinition = {
     "?",
     "!",
   ],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "trait", "record"],
+  classUsageKeywords: ["new", "extends", "implements", "instanceof"],
+  declarationKeywords: { def: "EXPECT_FUNCTION_NAME", class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

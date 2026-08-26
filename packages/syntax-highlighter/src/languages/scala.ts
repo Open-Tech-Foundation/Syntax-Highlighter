@@ -85,6 +85,11 @@ const scala: LanguageDefinition = {
     ":::",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "#", "_"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["trait", "enum"],
+  classUsageKeywords: ["new", "extends", "with"],
+  declarationKeywords: { def: "EXPECT_FUNCTION_NAME", class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

@@ -64,6 +64,11 @@ const matlab: LanguageDefinition = {
     ",",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "#", "$", "%", "_", "."],
+  classKeywords: ["classdef"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { function: "EXPECT_FUNCTION_NAME", classdef: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: "'", close: "'", escape: "''", multiline: false },

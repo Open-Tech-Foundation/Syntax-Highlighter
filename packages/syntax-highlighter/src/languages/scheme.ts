@@ -4,6 +4,11 @@ const scheme: LanguageDefinition = {
   name: "scheme",
   aliases: ["scm"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { define: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "define",
     "lambda",

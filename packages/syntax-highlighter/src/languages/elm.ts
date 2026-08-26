@@ -4,6 +4,11 @@ const elm: LanguageDefinition = {
   name: "elm",
   aliases: [],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: {},
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "case",
     "of",

@@ -125,6 +125,15 @@ const php: LanguageDefinition = {
     "$",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "#", "\\"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "trait"],
+  classUsageKeywords: ["new", "extends", "implements", "instanceof"],
+  declarationKeywords: {
+    function: "EXPECT_FUNCTION_NAME",
+    fn: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

@@ -106,6 +106,11 @@ const dart: LanguageDefinition = {
     ".",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "#"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "mixin", "extension"],
+  classUsageKeywords: ["new", "extends", "implements", "with"],
+  declarationKeywords: { class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

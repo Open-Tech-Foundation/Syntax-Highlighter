@@ -103,6 +103,11 @@ const java: LanguageDefinition = {
     ".",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "record"],
+  classUsageKeywords: ["new", "extends", "implements", "instanceof"],
+  declarationKeywords: { class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

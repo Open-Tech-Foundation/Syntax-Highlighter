@@ -80,6 +80,11 @@ const powershell: LanguageDefinition = {
     ">",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "@", "$", "#", ".", ":"],
+  classKeywords: ["class"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { function: "EXPECT_FUNCTION_NAME", class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "`", multiline: false },

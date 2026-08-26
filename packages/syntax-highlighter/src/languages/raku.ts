@@ -77,6 +77,15 @@ const raku: LanguageDefinition = {
     "!",
     "^",
   ],
+  classKeywords: ["class"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    sub: "EXPECT_FUNCTION_NAME",
+    method: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

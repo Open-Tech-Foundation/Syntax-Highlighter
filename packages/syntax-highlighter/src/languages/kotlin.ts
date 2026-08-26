@@ -129,6 +129,11 @@ const kotlin: LanguageDefinition = {
     "...",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ":", ".", "@", "#", "$"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "object"],
+  classUsageKeywords: [],
+  declarationKeywords: { fun: "EXPECT_FUNCTION_NAME", class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

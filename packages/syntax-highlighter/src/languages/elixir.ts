@@ -4,6 +4,11 @@ const elixir: LanguageDefinition = {
   name: "elixir",
   aliases: ["ex", "exs"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { def: "EXPECT_FUNCTION_NAME", defmodule: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "after",
     "and",

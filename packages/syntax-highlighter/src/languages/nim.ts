@@ -140,6 +140,16 @@ const nim: LanguageDefinition = {
     "/",
     "-",
   ],
+  classKeywords: ["enum"],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    func: "EXPECT_FUNCTION_NAME",
+    proc: "EXPECT_FUNCTION_NAME",
+    method: "EXPECT_FUNCTION_NAME",
+    enum: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

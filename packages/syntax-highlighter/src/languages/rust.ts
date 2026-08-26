@@ -139,6 +139,16 @@ const rust: LanguageDefinition = {
     "...",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "@"],
+  classKeywords: ["struct", "enum", "trait"],
+  typeDeclKeywords: ["type"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    fn: "EXPECT_FUNCTION_NAME",
+    struct: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+    trait: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       // Prefixed forms first — openers match longest-first.

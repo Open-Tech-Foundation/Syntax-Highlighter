@@ -137,6 +137,11 @@ const csharp: LanguageDefinition = {
     "..",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ".", ":", "::", "@", "#", "$"],
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "struct", "record"],
+  classUsageKeywords: ["new"],
+  declarationKeywords: { class: "EXPECT_CLASS_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       // Prefixed forms first — openers match longest-first.

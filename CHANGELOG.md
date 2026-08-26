@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **HIGH:** Refactored core to be fully language-agnostic — removed all JS-specific constants (`CLASS_KEYWORDS`, `TYPE_DECL_KEYWORDS`) and hardcoded keyword checks from the core. Added `classKeywords`, `typeDeclKeywords`, `classUsageKeywords`, `declarationKeywords` fields to `LanguageDefinition` so each language defines its own keyword semantics. Generalized `semantic` field to accept any string.
 
+- **HIGH:** Populated semantic declaration data for ~50 languages — Java, PHP, Dart, Groovy, Kotlin, Scala, C#, Swift, CoffeeScript, Crystal, D, PowerShell, Raku, MATLAB, C++, Rust, Go, Zig, Odin, V, C, Objective-C, Nim, Julia, F#, Solidity, Elixir, Erlang, Gleam, Clojure, Scheme, Lisp, OCaml, Haskell, Elm, Pascal, Ada, Fortran, Python, Ruby, Lua, Bash, Fish, Perl, Tcl, R, CMake, Svelte, Vue, Astro. Each language now gets class/function/parameter highlighting via its own keyword semantics.
+
 - **HIGH:** Added `spec.md` — core specification documenting the language-agnostic architecture and all feature flags.
 
 - **MEDIUM:** Fixed demo typecheck error — null-safe access on Shiki highlighter promise resolves TS18047.

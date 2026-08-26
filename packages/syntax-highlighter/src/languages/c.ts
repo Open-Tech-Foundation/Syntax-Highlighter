@@ -91,6 +91,14 @@ const c: LanguageDefinition = {
     ".",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "#", "\\"],
+  classKeywords: ["struct", "enum"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    struct: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+  },
+  features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },

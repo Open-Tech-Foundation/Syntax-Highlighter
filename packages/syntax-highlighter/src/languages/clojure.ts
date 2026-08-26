@@ -4,6 +4,11 @@ const clojure: LanguageDefinition = {
   name: "clojure",
   aliases: ["clj", "cljs", "cljc", "edn"],
   semantic: "generic",
+  classKeywords: [],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: { defn: "EXPECT_FUNCTION_NAME", fn: "EXPECT_FUNCTION_NAME" },
+  features: { declarations: true, contextStack: true, classDetection: true },
   keywords: [
     "def",
     "defn",
