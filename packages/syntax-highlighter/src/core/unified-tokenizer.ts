@@ -202,10 +202,9 @@ export class UnifiedTokenizer {
     parameterBindings: Set<number>,
   ): Token {
     // ---- Markup types: pass through directly (produced by UnifiedLexer) ----
-    const rawType = raw.type as string;
-    if (rawType === "tag") return createToken(TokenType.TAG, raw.start, raw.end);
-    if (rawType === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end);
-    if (rawType === "text") return createToken(TokenType.TEXT, raw.start, raw.end);
+    if (raw.type === "tag") return createToken(TokenType.TAG, raw.start, raw.end);
+    if (raw.type === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end);
+    if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end);
 
     // ---- Whitespace: always the same ----
     if (raw.type === "whitespace") {

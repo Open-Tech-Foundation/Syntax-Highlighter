@@ -1,16 +1,9 @@
-import type { LanguageDefinition, RawToken, StringDef } from "./lexer.ts";
+import type { LanguageDefinition, RawToken, RawTokenType, StringDef } from "./lexer.ts";
 import { Lexer } from "./lexer.ts";
 
 const NAME_RE = /[a-zA-Z][a-zA-Z0-9-]*/y;
 const ATTR_NAME_RE = /[a-zA-Z_:][a-zA-Z0-9_:.-]*/y;
 const WS_RE = /\s+/y;
-
-/**
- * Extended raw token types emitted by the UnifiedLexer when markup scanning
- * is active. These do not exist on the base `RawTokenType` — the unified
- * tokenizer interprets them directly.
- */
-export type MarkupTokenType = "tag" | "attribute" | "text";
 
 /**
  * Lexer subclass that adds markup-aware tokenization. When
@@ -53,10 +46,10 @@ export class UnifiedLexer extends Lexer {
     this.pos = 0;
 
     const tokens: RawToken[] = [];
-    const push = (type: string, start: number, end: number): void => {
+    const push = (type: RawTokenType, start: number, end: number): void => {
       if (end > start)
         tokens.push({
-          type: type as RawToken["type"],
+          type,
           start,
           end,
           value: source.slice(start, end),
@@ -211,7 +204,7 @@ export class UnifiedLexer extends Lexer {
   #scanBang(
     source: string,
     start: number,
-    push: (type: string, s: number, e: number) => void,
+    push: (type: RawTokenType, s: number, e: number) => void,
     terminator: ">" | "?>",
   ): number {
     const len = source.length;
@@ -259,7 +252,7 @@ export class UnifiedLexer extends Lexer {
   #skipToClose(
     source: string,
     start: number,
-    push: (type: string, s: number, e: number) => void,
+    push: (type: RawTokenType, s: number, e: number) => void,
   ): number {
     const len = source.length;
     let i = start;

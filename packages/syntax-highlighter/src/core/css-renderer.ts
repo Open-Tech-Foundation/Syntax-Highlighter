@@ -1,6 +1,5 @@
-import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
-
-const HIGHLIGHTABLE = new Set<string>(Object.values(TokenType));
+import { HIGHLIGHTABLE } from "./render-helpers.ts";
+import { type Token, WHITESPACE } from "./tokens.ts";
 export const HIGHLIGHT_PREFIX = "sh-";
 
 const instances = new Set<CSSHighlightRenderer>();

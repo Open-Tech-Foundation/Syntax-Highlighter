@@ -1,5 +1,5 @@
 import { assert, assertEquals, test } from "runtime:test";
-import { HIGHLIGHT_PREFIX } from "../src/core/renderer.ts";
+import { HIGHLIGHT_PREFIX } from "../src/core/css-renderer.ts";
 import { highlightElement } from "../src/index.ts";
 
 class FakeHighlight {

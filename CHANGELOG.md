@@ -12,6 +12,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **LOW:** Removed a brittle substring guard in `json-renderer.ts` `validateTokens` that rejected token types containing `"blue"`/`"dark-theme"`/`"theme"`. Validation is already enforced by the `ALLOWED_TYPES` allow-list, so the substring check was redundant and could false-positive on legitimate semantic types.
 
+- **HIGH:** Deduplicated `HIGHLIGHTABLE` set — `css-renderer.ts` now imports from `render-helpers.ts` instead of defining its own identical copy.
+
+- **HIGH:** Fixed type safety for markup tokens — `RawTokenType` now includes `"tag" | "attribute" | "text"`, removing unsafe `as string`/`as RawToken["type"]` casts in `unified-lexer.ts` and `unified-tokenizer.ts`.
+
+- **MEDIUM:** Added cycle detection to `loadLanguage()` alias chain resolution — prevents infinite loops from cyclic entries in `aliasToCanonical`.
+
+- **MEDIUM:** Removed dead `renderer.ts` re-export file (only imported by tests, now updated to use `css-renderer.ts` directly).
+
+- **MEDIUM:** Added `source` type validation to `Highlighter.highlight()` — now throws `TypeError` for non-string inputs instead of producing cryptic lexer errors.
+
+- **LOW:** Removed redundant `AnsiThemeType` alias from public API — `AnsiTheme` is already exported directly.
+
+- **LOW:** Removed dead ANSI theme alias files (`solarized.ts`, `github.ts`) that re-exported from other theme files but were never imported.
+
 ## [0.3.0] - 2026-08-25
 
 ### Fixed

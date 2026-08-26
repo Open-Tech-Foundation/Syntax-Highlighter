@@ -93,7 +93,10 @@ export type RawTokenType =
   | "comment"
   | "decorator"
   | "operator"
-  | "punctuation";
+  | "punctuation"
+  | "tag"
+  | "attribute"
+  | "text";
 
 export interface RawTokenDetail {
   quote?: string;

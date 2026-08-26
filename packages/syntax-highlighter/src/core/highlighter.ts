@@ -15,6 +15,7 @@ export class Highlighter {
   }
 
   highlight(source: string): Token[] {
+    if (typeof source !== "string") throw new TypeError("source must be a string");
     return this.tokenizer.tokenize(source);
   }
 }

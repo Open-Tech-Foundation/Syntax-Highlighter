@@ -2,7 +2,7 @@ import { CSSHighlightRenderer } from "./core/css-renderer.ts";
 import { Highlighter } from "./core/highlighter.ts";
 import { loadLanguage } from "./core/registry.ts";
 
-export type { AnsiTheme as AnsiThemeType, AnsiThemeName } from "./ansi/themes/types.ts";
+export type { AnsiThemeName } from "./ansi/themes/types.ts";
 export type { AnsiRenderOptions, AnsiTheme } from "./core/ansi-renderer.ts";
 export {
   ANSI_PALETTES,

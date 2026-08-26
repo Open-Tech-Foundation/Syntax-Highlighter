@@ -421,8 +421,11 @@ export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
   let loader = builtinLoaders[key];
   if (!loader) {
     let canonical: string | undefined = aliasToCanonical[key];
+    const visited = new Set<string>();
     // transitive: inifile -> conf -> ini etc.
     while (canonical) {
+      if (visited.has(canonical)) break;
+      visited.add(canonical);
       const nextLoader = builtinLoaders[canonical];
       if (nextLoader) {
         loader = nextLoader;

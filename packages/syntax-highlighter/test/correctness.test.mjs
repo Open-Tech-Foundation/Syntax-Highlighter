@@ -709,11 +709,7 @@ test("literal lists win over keywords (no double-classification)", () => {
     nulls: ["null"],
   };
   const tok = new UnifiedTokenizer(lang);
-  assertEquals(kinds(tok, "true false null"), [
-    "boolean:true",
-    "boolean:false",
-    "null:null",
-  ]);
+  assertEquals(kinds(tok, "true false null"), ["boolean:true", "boolean:false", "null:null"]);
 });
 
 test("Ruby: class", () => {
