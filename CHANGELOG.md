@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **MEDIUM:** Fixed markdown code block highlighting — added `codeFences` mechanism to the lexer for fenced code blocks. Markdown now correctly detects ` ```lang ... ``` ` blocks and emits the content as text tokens.
 
+### Added
+
+- **MEDIUM:** Extended the internal Shiki fidelity harness (`test/shiki-fidelity.mjs`, intentionally **not** run in CI — used for internal tracking only) from 4 to 26 languages. It now diffs the library's tokenizer output against Shiki's bundled TextMate grammars for Python, Java, Rust, Go, Ruby, C, C++, C#, Kotlin, Swift, Scala, PHP, Dart, Lua, Bash, Haskell, SQL, YAML, Elixir, R, Perl, and Zig alongside the original JavaScript, TypeScript, HTML, and JSON. Added a language-agnostic scope→semantic fallback mapper (so any Shiki grammar is scored without hand-written scope tables) plus `string`↔`regex` and `boolean`↔`null` equivalence groups. Overall alignment ~96.8%; the remaining JS/TS gaps are the deliberate `control`-token coloring and TS type-annotation handling.
+
 ## [0.4.0] - 2026-08-26
 
 ### Fixed

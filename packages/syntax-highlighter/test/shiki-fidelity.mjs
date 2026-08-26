@@ -26,8 +26,8 @@ const UNIFIED_MAP = {
   json: new UnifiedTokenizer(jsonDef),
 };
 
-function shikiTokens(src, lang) {
-  const result = shiki.codeToTokens(src, {
+function shikiTokens(src, lang, hl = shiki) {
+  const result = hl.codeToTokens(src, {
     lang,
     theme: "github-dark",
     includeExplanation: true,
@@ -49,8 +49,8 @@ function shikiTokens(src, lang) {
   return out;
 }
 
-function unifiedTokens(src, lang) {
-  const tok = UNIFIED_MAP[lang];
+function unifiedTokens(src, lang, umap = UNIFIED_MAP) {
+  const tok = umap[lang];
   const result = tok.tokenize(src);
   return result
     .filter((t) => t.type !== "whitespace")
@@ -185,6 +185,53 @@ function mapShikiToSemantic(scopes) {
   return "other";
 }
 
+/**
+ * Language-agnostic fallback: TextMate grammars share a common scope vocabulary
+ * (`entity.name.function`, `constant.numeric`, `keyword.control`, …) across all
+ * languages. Map the most-specific scope in the chain to our semantic token type
+ * so the fidelity harness works for any grammar Shiki ships, not just the
+ * hand-written JS/TS/HTML/JSON entries above.
+ */
+function genericShikiToSemantic(scopes) {
+  for (let i = scopes.length - 1; i >= 0; i--) {
+    const s = scopes[i].toLowerCase();
+    if (s.includes("comment")) return "comment";
+    if (s.includes("string") || s.includes("regexp") || s.includes("template")) return "string";
+    if (s.includes("constant.numeric")) return "number";
+    if (s.includes("constant.language")) {
+      if (/null|nil|none|undefined/.test(s)) return "null";
+      if (/true|false/.test(s)) return "boolean";
+      return "constant";
+    }
+    if (s.includes("constant")) return "constant";
+    if (s.includes("variable.parameter")) return "parameter";
+    if (
+      s.includes("entity.name.function") ||
+      s.includes("entity.name.method") ||
+      /\.function$/.test(s) ||
+      /\.method$/.test(s)
+    )
+      return "function";
+    if (
+      s.includes("entity.name.class") ||
+      s.includes("entity.name.type") ||
+      s.includes("entity.name.struct") ||
+      s.includes("entity.name.namespace") ||
+      s.includes("support.type")
+    )
+      return "class";
+    if (s.includes("entity.name.tag")) return "tag";
+    if (s.includes("entity.other.attribute-name")) return "attribute";
+    if (s.includes("keyword.control")) return "control";
+    if (s.includes("keyword")) return "keyword";
+    if (s.includes("storage")) return "keyword";
+    if (s.includes("variable")) return "variable";
+    if (s.includes("operator")) return "operator";
+    if (s.includes("punctuation")) return "punctuation";
+  }
+  return "other";
+}
+
 function buildSpans(tokens) {
   const spans = [];
   let pos = 0;
@@ -200,8 +247,8 @@ function buildSpans(tokens) {
   return spans;
 }
 
-function buildUnifiedSpans(src, lang) {
-  const tokens = unifiedTokens(src, lang);
+function buildUnifiedSpans(src, lang, umap = UNIFIED_MAP) {
+  const tokens = unifiedTokens(src, lang, umap);
   return tokens.map((t) => ({ start: t.start, end: t.end, type: t.type, value: t.value }));
 }
 
@@ -255,7 +302,8 @@ function isSemanticEquiv(a, b) {
     ["class", "type"],
     ["function", "method"],
     ["number"],
-    ["string"],
+    ["string", "regex"],
+    ["boolean", "null"],
     ["comment"],
     ["operator"],
     ["punctuation", "tag", "attribute"],
@@ -364,7 +412,7 @@ const JSON_SAMPLES = [
 // Run comparison
 // ======================================================================
 
-function runComparison(name, samples, shikiLang, unifiedLang) {
+function runComparison(name, samples, shikiLang, unifiedLang, hl = shiki, umap = UNIFIED_MAP) {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  ${name}`);
   console.log(`${"=".repeat(60)}`);
@@ -375,9 +423,9 @@ function runComparison(name, samples, shikiLang, unifiedLang) {
   const allMismatches = [];
 
   for (const sample of samples) {
-    const shikiRaw = shikiTokens(sample.src, shikiLang);
+    const shikiRaw = shikiTokens(sample.src, shikiLang, hl);
     const shikiSpans = buildSpans(shikiRaw);
-    const unifiedSpans = buildUnifiedSpans(sample.src, unifiedLang);
+    const unifiedSpans = buildUnifiedSpans(sample.src, unifiedLang, umap);
     const cmp = compareSpans(sample.src, shikiSpans, unifiedSpans);
 
     totalMatch += cmp.match;
@@ -422,31 +470,254 @@ const tsResults = runComparison("TypeScript", TS_SAMPLES, "typescript", "typescr
 const htmlResults = runComparison("HTML", HTML_SAMPLES, "html", "html");
 const jsonResults = runComparison("JSON", JSON_SAMPLES, "json", "json");
 
+// ======================================================================
+// Extended languages (TextMate grammars shipped by Shiki)
+// ======================================================================
+
+const EXT_LANGS = [
+  {
+    key: "python",
+    shiki: "python",
+    samples: [
+      { name: "class + method", src: "class Dog:\n    def bark(self):\n        return 42  # bark\n" },
+      { name: "control flow", src: "if x > 0:\n    for i in range(10):\n        print(i)\n" },
+      { name: "literals", src: 'name = "Bob"\nage = 30\ndone = True\n' },
+    ],
+  },
+  {
+    key: "java",
+    shiki: "java",
+    samples: [
+      { name: "class + method", src: "class App {\n  int run() {\n    return 1; // note\n  }\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (int i = 0; i < 10; i++) {} }\n" },
+      { name: "literals", src: 'String s = "hi"; int n = 3; boolean b = false;\n' },
+    ],
+  },
+  {
+    key: "rust",
+    shiki: "rust",
+    samples: [
+      { name: "fn + struct", src: "fn main() {\n  let x = 1; // c\n}\nstruct Foo { y: i32 }\n" },
+      { name: "control flow", src: "if x > 0 { for i in 0..10 {} } else {}\n" },
+      { name: "literals", src: 'let s = "hi"; let n = 3; let b = true;\n' },
+    ],
+  },
+  {
+    key: "go",
+    shiki: "go",
+    samples: [
+      { name: "func", src: "func add(a int) int {\n  return a // c\n}\n" },
+      { name: "control flow", src: "if x > 0 { for i := 0; i < 10; i++ {} }\n" },
+      { name: "literals", src: 's := "hi"\nn := 3\nb := true\n' },
+    ],
+  },
+  {
+    key: "ruby",
+    shiki: "ruby",
+    samples: [
+      { name: "class + method", src: "class Dog\n  def bark\n    puts \"hi\" # c\n  end\nend\n" },
+      { name: "control flow", src: "if x > 0\n  for i in 0..10\n    puts i\n  end\nend\n" },
+      { name: "literals", src: 'name = "Bob"\nn = 3\ndone = true\n' },
+    ],
+  },
+  {
+    key: "c",
+    shiki: "c",
+    samples: [
+      { name: "function", src: "int add(int a) {\n  return a; /* c */\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (int i=0;i<10;i++) {} }\n" },
+      { name: "literals", src: 'char* s = "hi"; int n = 3; const int M = 5;\n' },
+    ],
+  },
+  {
+    key: "cpp",
+    shiki: "cpp",
+    samples: [
+      { name: "class", src: "class App {\npublic:\n  void run() {}\n};\n" },
+      { name: "control flow", src: "if (x > 0) { while (i < 10) { i++; } }\n" },
+      { name: "literals", src: 'std::string s = "hi"; int n = 3; bool b = false;\n' },
+    ],
+  },
+  {
+    key: "csharp",
+    shiki: "csharp",
+    samples: [
+      { name: "class + method", src: "class App {\n  void Run() { /* c */ }\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (int i = 0; i < 10; i++) {} }\n" },
+      { name: "literals", src: 'string s = "hi"; int n = 3; bool b = false;\n' },
+    ],
+  },
+  {
+    key: "kotlin",
+    shiki: "kotlin",
+    samples: [
+      { name: "class + fun", src: "class App {\n  fun run() { /* c */ }\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (i in 0..10) {} }\n" },
+      { name: "literals", src: 'val s = "hi"\nval n = 3\nval b = true\n' },
+    ],
+  },
+  {
+    key: "swift",
+    shiki: "swift",
+    samples: [
+      { name: "class + func", src: "class App {\n  func run() { /* c */ }\n}\n" },
+      { name: "control flow", src: "if x > 0 { for i in 0..<10 {} }\n" },
+      { name: "literals", src: 'let s = "hi"\nlet n = 3\nlet b = true\n' },
+    ],
+  },
+  {
+    key: "scala",
+    shiki: "scala",
+    samples: [
+      { name: "class + def", src: "class App {\n  def run(): Unit = { /* c */ }\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (i <- 0 until 10) {} }\n" },
+      { name: "literals", src: 'val s = "hi"\nval n = 3\nval b = true\n' },
+    ],
+  },
+  {
+    key: "php",
+    shiki: "php",
+    samples: [
+      { name: "class + function", src: "<?php\nclass App {\n  function run() { /* c */ }\n}\n" },
+      { name: "control flow", src: "<?php\nif ($x > 0) { for ($i=0;$i<10;$i++) {} }\n" },
+      { name: "literals", src: '<?php\n$s = "hi"; $n = 3; $b = true;\n' },
+    ],
+  },
+  {
+    key: "dart",
+    shiki: "dart",
+    samples: [
+      { name: "class + void", src: "class App {\n  void run() { /* c */ }\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (var i = 0; i < 10; i++) {} }\n" },
+      { name: "literals", src: 'var s = "hi"; var n = 3; var b = true;\n' },
+    ],
+  },
+  {
+    key: "lua",
+    shiki: "lua",
+    samples: [
+      { name: "function", src: "function add(a)\n  return a -- c\nend\n" },
+      { name: "control flow", src: "if x > 0 then\n  for i=1,10 do\n    print(i)\n  end\nend\n" },
+      { name: "literals", src: 's = "hi"\nn = 3\nb = true\n' },
+    ],
+  },
+  {
+    key: "bash",
+    shiki: "bash",
+    samples: [
+      { name: "if/echo", src: 'if true; then\n  echo "hi" # c\nfi\n' },
+      { name: "for loop", src: 'for i in 1 2 3; do\n  echo "$i"\ndone\n' },
+      { name: "variables", src: 'name="Bob"\ncount=3\n' },
+    ],
+  },
+  {
+    key: "haskell",
+    shiki: "haskell",
+    samples: [
+      { name: "function", src: "add :: Int -> Int\nadd x = x + 1 -- c\n" },
+      { name: "literals", src: 'name = "Bob"\nn = 3\nb = True\n' },
+    ],
+  },
+  {
+    key: "sql",
+    shiki: "sql",
+    samples: [
+      { name: "select", src: "SELECT name FROM users WHERE id = 1; -- c\n" },
+      { name: "keywords", src: "INSERT INTO t (a, b) VALUES (1, 2);\n" },
+      { name: "literals", src: "SELECT 'hi', 3, true;\n" },
+    ],
+  },
+  {
+    key: "yaml",
+    shiki: "yaml",
+    samples: [
+      { name: "mapping", src: "name: John\nage: 30 # c\n" },
+      { name: "list", src: "- item1\n- item2\n" },
+      { name: "literals", src: "flag: true\ncount: 3\ntext: hello\n" },
+    ],
+  },
+  {
+    key: "elixir",
+    shiki: "elixir",
+    samples: [
+      { name: "module + def", src: "defmodule M do\n  def run, do: :ok # c\nend\n" },
+      { name: "control flow", src: "if x > 0 do\n  for i <- 1..10, do: IO.puts(i)\nend\n" },
+      { name: "literals", src: 's = "hi"\nn = 3\nb = true\n' },
+    ],
+  },
+  {
+    key: "r",
+    shiki: "r",
+    samples: [
+      { name: "function", src: "add <- function(a) {\n  return(a) # c\n}\n" },
+      { name: "control flow", src: "if (x > 0) { for (i in 1:10) { print(i) } }\n" },
+      { name: "literals", src: 's <- "hi"\nn <- 3\nb <- TRUE\n' },
+    ],
+  },
+  {
+    key: "perl",
+    shiki: "perl",
+    samples: [
+      { name: "sub", src: "sub add {\n  return 1; # c\n}\n" },
+      { name: "control flow", src: "if ($x > 0) { for (my $i=0;$i<10;$i++) {} }\n" },
+      { name: "literals", src: '$s = "hi"; $n = 3; $b = 1;\n' },
+    ],
+  },
+  {
+    key: "zig",
+    shiki: "zig",
+    samples: [
+      { name: "fn", src: "fn add(a: i32) i32 {\n  return a; // c\n}\n" },
+      { name: "control flow", src: "if (x > 0) { while (i < 10) : (i += 1) {} }\n" },
+      { name: "literals", src: 'const s = "hi"; const n = 3; const b = true;\n' },
+    ],
+  },
+];
+
+const extGrammarModules = await Promise.all(
+  EXT_LANGS.map((l) => import(`shiki/langs/${l.shiki}.mjs`)),
+);
+
+const shikiExt = createHighlighterCoreSync({
+  themes: [theme],
+  langs: extGrammarModules.map((m) => m.default),
+  engine: createJavaScriptRegexEngine(),
+});
+
+const extUnified = {};
+for (let i = 0; i < EXT_LANGS.length; i++) {
+  const def = (await import(`../dist/languages/${EXT_LANGS[i].key}.js`)).default;
+  extUnified[EXT_LANGS[i].key] = new UnifiedTokenizer(def);
+}
+
+const extResults = EXT_LANGS.map((l) =>
+  runComparison(l.key, l.samples, l.shiki, l.key, shikiExt, extUnified),
+);
+
 console.log(`\n${"=".repeat(60)}`);
 console.log(`  OVERALL SUMMARY`);
 console.log(`${"=".repeat(60)}`);
-const grandMatch =
-  jsResults.totalMatch + tsResults.totalMatch + htmlResults.totalMatch + jsonResults.totalMatch;
-const grandMismatch =
-  jsResults.totalMismatch +
-  tsResults.totalMismatch +
-  htmlResults.totalMismatch +
-  jsonResults.totalMismatch;
+const rows = [
+  ["JS", jsResults],
+  ["TS", tsResults],
+  ["HTML", htmlResults],
+  ["JSON", jsonResults],
+  ...EXT_LANGS.map((l, i) => [l.key, extResults[i]]),
+];
+let grandMatch = 0;
+let grandMismatch = 0;
+for (const [label, r] of rows) {
+  const tot = r.totalMatch + r.totalMismatch;
+  const pct = tot > 0 ? ((r.totalMatch / tot) * 100).toFixed(1) : "N/A";
+  console.log(`  ${label.padEnd(10)} ${r.totalMatch}/${tot} (${pct}%)`);
+  grandMatch += r.totalMatch;
+  grandMismatch += r.totalMismatch;
+}
 const grandTotal = grandMatch + grandMismatch;
 const grandPct = grandTotal > 0 ? ((grandMatch / grandTotal) * 100).toFixed(1) : "N/A";
-console.log(
-  `  JS:   ${jsResults.totalMatch}/${jsResults.totalMatch + jsResults.totalMismatch} (${((jsResults.totalMatch / (jsResults.totalMatch + jsResults.totalMismatch)) * 100).toFixed(1)}%)`,
-);
-console.log(
-  `  TS:   ${tsResults.totalMatch}/${tsResults.totalMatch + tsResults.totalMismatch} (${((tsResults.totalMatch / (tsResults.totalMatch + tsResults.totalMismatch)) * 100).toFixed(1)}%)`,
-);
-console.log(
-  `  HTML: ${htmlResults.totalMatch}/${htmlResults.totalMatch + htmlResults.totalMismatch} (${((htmlResults.totalMatch / (htmlResults.totalMatch + htmlResults.totalMismatch)) * 100).toFixed(1)}%)`,
-);
-console.log(
-  `  JSON: ${jsonResults.totalMatch}/${jsonResults.totalMatch + jsonResults.totalMismatch} (${((jsonResults.totalMatch / (jsonResults.totalMatch + jsonResults.totalMismatch)) * 100).toFixed(1)}%)`,
-);
 console.log(`  ────────────────────────────`);
 console.log(`  Grand Total: ${grandMatch}/${grandTotal} (${grandPct}%)`);
+console.log(`\n  ${rows.length} languages compared against Shiki TextMate grammars.`);
 
 shiki.dispose();
+shikiExt.dispose();
