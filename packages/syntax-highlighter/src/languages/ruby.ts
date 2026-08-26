@@ -45,6 +45,7 @@ const ruby: LanguageDefinition = {
     "__LINE__",
     "__ENCODING__",
   ],
+  controls: ["elsif", "unless", "rescue", "ensure"],
   booleans: ["true", "false"],
   nulls: ["nil"],
   operators: [

@@ -31,6 +31,7 @@ const go: LanguageDefinition = {
     "return",
     "var",
   ],
+  controls: ["select", "defer", "fallthrough", "goto"],
   booleans: ["true", "false"],
   nulls: ["nil"],
   operators: [

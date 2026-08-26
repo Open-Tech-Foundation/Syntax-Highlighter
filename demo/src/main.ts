@@ -505,9 +505,9 @@ function renderNow(source: string): void {
     const shikiLang = SHIKI_LANG_MAP[languageSelect.value] ?? languageSelect.value;
     const shikiTheme = getEffectiveMode() === "light" ? "light-plus" : "dark-plus";
     getShikiHighlighter()
-      .then((h) => h.codeToHtml(source, { lang: shikiLang, theme: shikiTheme }))
+      .then((h) => h?.codeToHtml(source, { lang: shikiLang, theme: shikiTheme }))
       .then((html) => {
-        shikiPane.innerHTML = html;
+        shikiPane.innerHTML = html ?? "";
       })
       .catch((err) => {
         console.error("Shiki error:", err);

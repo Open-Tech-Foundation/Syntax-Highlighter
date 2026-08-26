@@ -26,6 +26,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **LOW:** Removed dead ANSI theme alias files (`solarized.ts`, `github.ts`) that re-exported from other theme files but were never imported.
 
+- **MEDIUM:** Added tag/attribute color fallbacks in `renderANSI` — HTML/XML tokens now receive keyword/property colors when the theme doesn't define explicit tag/attribute colors, matching `shared.css` behavior.
+
+- **MEDIUM:** Added `controls?: string[]` field to `LanguageDefinition` — allows non-JS languages to classify language-specific control-flow keywords (e.g. Python `elif`/`raise`, Ruby `unless`/`rescue`, Rust `match`/`loop`, Go `select`/`defer`).
+
+- **MEDIUM:** Fixed demo typecheck error — null-safe access on Shiki highlighter promise resolves TS18047.
+
+- **LOW:** Updated `tasks.toml` typecheck to include `demo/` — CI now type-checks the demo app.
+
 ## [0.3.0] - 2026-08-25
 
 ### Fixed

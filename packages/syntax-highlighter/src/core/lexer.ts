@@ -35,6 +35,12 @@ export interface LanguageDefinition {
   booleans?: string[];
   nulls?: string[];
   constants?: string[];
+  /**
+   * Additional control-flow keywords beyond the built-in set. Merged with
+   * the default JS control keywords (if, else, return, for, while, etc.)
+   * so non-JS languages can classify their own control primitives.
+   */
+  controls?: string[];
   regexKeywords?: string[];
   operators?: string[];
   punctuation?: string[];

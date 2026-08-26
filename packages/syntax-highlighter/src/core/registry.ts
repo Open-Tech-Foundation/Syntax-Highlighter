@@ -293,6 +293,7 @@ function validateLanguageDefinition(value: unknown): asserts value is LanguageDe
     "booleans",
     "nulls",
     "constants",
+    "controls",
     "regexKeywords",
     "operators",
     "punctuation",

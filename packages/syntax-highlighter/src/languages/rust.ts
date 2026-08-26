@@ -94,6 +94,7 @@ const rust: LanguageDefinition = {
     "try",
     "union",
   ],
+  controls: ["match", "loop"],
   booleans: ["true", "false"],
   operators: [
     "=>",

@@ -85,6 +85,7 @@ export class UnifiedTokenizer {
   private booleans: Set<string>;
   private nulls: Set<string>;
   private constants: Set<string>;
+  private controlKeywords: Set<string>;
   private features: Required<TokenizerFeatures>;
   private sigIndex: Int32Array = new Int32Array(1);
 
@@ -99,6 +100,8 @@ export class UnifiedTokenizer {
     this.booleans = new Set((language.booleans ?? []).map(fold));
     this.nulls = new Set((language.nulls ?? []).map(fold));
     this.constants = new Set((language.constants ?? []).map(fold));
+    this.controlKeywords = new Set(CONTROL_KEYWORDS);
+    for (const c of language.controls ?? []) this.controlKeywords.add(fold(c));
     this.features = resolveFeatures(language);
   }
 
@@ -336,7 +339,7 @@ export class UnifiedTokenizer {
       return createToken(TokenType.CONSTANT, raw.start, raw.end);
     }
     if (this.keywords.has(val)) {
-      if (CONTROL_KEYWORDS.has(val)) {
+      if (this.controlKeywords.has(val)) {
         if (this.features.contextStack) setKeywordState(val, ctx);
         return createToken(TokenType.CONTROL, raw.start, raw.end);
       }

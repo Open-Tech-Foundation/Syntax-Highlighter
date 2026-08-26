@@ -1315,7 +1315,7 @@ test("advanced: Python *args **kwargs", () => {
   assertEquals(findToken(py, src, "b").type, "variable");
   assertEquals(findToken(py, src, "args").type, "variable");
   assertEquals(findToken(py, src, "kwargs").type, "variable");
-  assertEquals(findToken(py, src, "pass").type, "keyword");
+  assertEquals(findToken(py, src, "pass").type, "control");
 });
 
 test("advanced: Python class inheritance", () => {
@@ -1339,7 +1339,7 @@ test("advanced: Python list comprehension", () => {
 
 test("advanced: Python with statement", () => {
   const src = "with open('f') as fp: data = fp.read()";
-  assertEquals(findToken(py, src, "with").type, "keyword");
+  assertEquals(findToken(py, src, "with").type, "control");
   assertEquals(findToken(py, src, "open").type, "function");
   assertEquals(findToken(py, src, "as").type, "keyword");
   assertEquals(findToken(py, src, "fp").type, "variable");
@@ -1390,7 +1390,7 @@ test("advanced: Go range loop", () => {
 
 test("advanced: Go select statement", () => {
   const src = "select { case v := <-ch: process(v); }";
-  assertEquals(findToken(goTok, src, "select").type, "keyword");
+  assertEquals(findToken(goTok, src, "select").type, "control");
   assertEquals(findToken(goTok, src, "case").type, "control");
   assertEquals(findToken(goTok, src, "<-").type, "operator");
   assertEquals(findToken(goTok, src, "ch").type, "variable");
@@ -1451,7 +1451,7 @@ test("advanced: Rust closure", () => {
 
 test("advanced: Rust match expression", () => {
   const src = 'match result { Ok(v) => v, Err(e) => panic!("{}", e) }';
-  assertEquals(findToken(rustTok, src, "match").type, "keyword");
+  assertEquals(findToken(rustTok, src, "match").type, "control");
   assertEquals(findToken(rustTok, src, "Ok").type, "function");
   assertEquals(findToken(rustTok, src, "Err").type, "function");
   assertEquals(findToken(rustTok, src, "panic").type, "variable");

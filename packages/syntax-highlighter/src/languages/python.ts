@@ -40,6 +40,7 @@ const python: LanguageDefinition = {
     "match",
     "case",
   ],
+  controls: ["elif", "raise", "pass", "with"],
   booleans: ["True", "False"],
   nulls: ["None"],
   operators: [

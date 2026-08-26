@@ -81,12 +81,15 @@ export function renderANSI(
   const rawTheme: AnsiTheme = { ...defaultTheme, ...(options.theme ?? {}) };
   if (rawTheme.method == null && rawTheme.function != null) rawTheme.method = rawTheme.function;
   if (rawTheme.control == null && rawTheme.keyword != null) rawTheme.control = rawTheme.keyword;
+  if (rawTheme.tag == null && rawTheme.keyword != null) rawTheme.tag = rawTheme.keyword;
+  if (rawTheme.attribute == null && rawTheme.property != null)
+    rawTheme.attribute = rawTheme.property;
   if (options.theme?.type != null && options.theme?.class == null)
-    rawTheme.class = options.theme.type as string;
+    rawTheme.class = options.theme.type;
 
   const colors: Record<string, string | undefined> = {};
   for (const [k, v] of Object.entries(rawTheme)) {
-    if (v != null) colors[k] = themeValueToAnsi(v as string);
+    if (v != null) colors[k] = themeValueToAnsi(v);
   }
 
   const wrapWhitespace = options.wrapWhitespace ?? false;
