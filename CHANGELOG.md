@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **HIGH:** Fixed boolean/null/constant literals being misclassified as `keyword` — `classifyIdentifier` now checks `nulls`/`booleans`/`constants` *before* `keywords`, so a word listed in both (e.g. `true`/`false`/`null`/`nil` in Rust, C#, C++, TypeScript, Ruby, Bash, etc.) is tagged with its literal type and gets the correct theme color instead of collapsing to `keyword`.
+
 ## [0.3.0] - 2026-08-25
 
 ### Fixed

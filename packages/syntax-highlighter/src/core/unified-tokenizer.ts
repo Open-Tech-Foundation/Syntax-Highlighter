@@ -319,14 +319,11 @@ export class UnifiedTokenizer {
     }
 
     // ---- Word-list classification (all modes) ----
-    if (this.keywords.has(val)) {
-      if (CONTROL_KEYWORDS.has(val)) {
-        if (this.features.contextStack) setKeywordState(val, ctx);
-        return createToken(TokenType.CONTROL, raw.start, raw.end);
-      }
-      if (this.features.contextStack) setKeywordState(val, ctx);
-      return createToken(TokenType.KEYWORD, raw.start, raw.end);
-    }
+    // Literal lists (null/boolean/constant) are checked *before* `keywords` so a
+    // word present in both is classified by its literal role. Many languages
+    // list `true`/`false`/`null` in `keywords` as well as `booleans`/`nulls`;
+    // without this ordering they would all collapse to `keyword` and the
+    // dedicated boolean/null/constant theme colors would never apply.
     if (this.nulls.has(val)) {
       ctx.expectation = Expectation.NONE;
       return createToken(TokenType.NULL, raw.start, raw.end);
@@ -338,6 +335,14 @@ export class UnifiedTokenizer {
     if (this.constants.has(val)) {
       ctx.expectation = Expectation.NONE;
       return createToken(TokenType.CONSTANT, raw.start, raw.end);
+    }
+    if (this.keywords.has(val)) {
+      if (CONTROL_KEYWORDS.has(val)) {
+        if (this.features.contextStack) setKeywordState(val, ctx);
+        return createToken(TokenType.CONTROL, raw.start, raw.end);
+      }
+      if (this.features.contextStack) setKeywordState(val, ctx);
+      return createToken(TokenType.KEYWORD, raw.start, raw.end);
     }
 
     // ---- JS features: context-aware classification ----

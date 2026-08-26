@@ -260,7 +260,7 @@ test("TS: type alias", () => {
   assertEquals(findToken(ts, src, "T", 0).type, "constant");
   assertEquals(findToken(ts, src, "data").type, "property");
   assertEquals(findToken(ts, src, "error").type, "property");
-  assertEquals(findToken(ts, src, "null").type, "keyword");
+  assertEquals(findToken(ts, src, "null").type, "null");
 });
 
 test("TS: enum", () => {
@@ -696,7 +696,24 @@ test("Ruby: basics", () => {
 });
 
 test("Ruby: booleans and nil", () => {
-  assertEquals(kinds(rubyTok, "true nil"), ["keyword:true", "keyword:nil"]);
+  assertEquals(kinds(rubyTok, "true nil"), ["boolean:true", "null:nil"]);
+});
+
+test("literal lists win over keywords (no double-classification)", () => {
+  // A word present in both `keywords` and `booleans`/`nulls` must be classified
+  // by its literal role, not as a keyword (regression for shadowing bug).
+  const lang = {
+    name: "doublelit",
+    keywords: ["true", "false", "null"],
+    booleans: ["true", "false"],
+    nulls: ["null"],
+  };
+  const tok = new UnifiedTokenizer(lang);
+  assertEquals(kinds(tok, "true false null"), [
+    "boolean:true",
+    "boolean:false",
+    "null:null",
+  ]);
 });
 
 test("Ruby: class", () => {
@@ -757,7 +774,7 @@ test("Bash: constants", () => {
 test("Bash: keywords", () => {
   assertEquals(kinds(bashTok, "if true; then echo x; fi"), [
     "control:if",
-    "keyword:true",
+    "boolean:true",
     "operator:;",
     "keyword:then",
     "keyword:echo",
@@ -1279,7 +1296,7 @@ test("advanced: TS complex generic function", () => {
   assertEquals(findToken(ts, src, "extends").type, "keyword");
   assertEquals(findToken(ts, src, "keyof").type, "keyword");
   assertEquals(findToken(ts, src, "U").type, "constant");
-  assertEquals(findToken(ts, src, "null").type, "keyword");
+  assertEquals(findToken(ts, src, "null").type, "null");
 });
 
 test("advanced: TS conditional type", () => {
