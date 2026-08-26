@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **MEDIUM:** Added CSS variables and rules for semantic styles in `shared.css` — supports `sh-text-bold`, `sh-text-italic`, `sh-text-underline`, `sh-text-strikethrough`, `sh-code-inline`, `sh-code-block`, `sh-markup-heading`, `sh-markup-quote`, `sh-markup-list`, `sh-markup-link`, `sh-markup-image`, `sh-syntax-delimiter`, `sh-syntax-marker`, `sh-syntax-escape`. Updated all 16 theme files with appropriate color values.
 
+- **MEDIUM:** Refactored demo to load sample files from `demo/public/samples/` folder via manifest.json — samples are now loaded asynchronously from individual files instead of inline strings. Added sample files for JavaScript, TypeScript, Python, JSON, Bash, SQL, YAML, Markdown, Java, Go, and Rust.
+
 ### Fixed
 
 - **MEDIUM:** Fixed string interpolation in PHP, Ruby, and Kotlin — double-quoted strings now support template expressions (`${expr}`, `{$var}`, `#{expr}`). Added `interpolation` field to `StringDef` for custom interpolation prefixes.

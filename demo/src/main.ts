@@ -22,7 +22,7 @@ import {
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 
-import { editHint, LEDE, LINKS, SAMPLES, statusMessage } from "./page.ts";
+import { editHint, LEDE, LINKS, loadSamples, statusMessage } from "./page.ts";
 
 const DEBOUNCE_MS = 60;
 
@@ -194,7 +194,7 @@ root.replaceChildren(
         labeledSelect(
           "sample",
           "Sample",
-          SAMPLES.map((s) => s.name),
+          [],
         ),
       ]),
 
@@ -809,8 +809,11 @@ syntaxThemeSelect.addEventListener("change", () => {
   if (activePreview === "ansi") rerenderAnsi();
 });
 
-sampleSelect.addEventListener("change", () => {
-  const sample = SAMPLES[sampleSelect.selectedIndex];
+// Store loaded samples for reference
+let loadedSamples: Array<{ name: string; language: string; source: string }> = [];
+
+sampleSelect.addEventListener("change", async () => {
+  const sample = loadedSamples[sampleSelect.selectedIndex];
   if (!sample) return;
   inputLayer.value = sample.source;
   // Keep language in sync with the chosen sample.
@@ -853,10 +856,37 @@ registerBtn.addEventListener("click", () => {
 /* ------------------------------------------------------------------ boot */
 
 renderer = new CSSHighlightRenderer(highlightLayer);
-// Start with first sample's language.
-if (SAMPLES[0]?.language) languageSelect.value = SAMPLES[0].language;
-inputLayer.value = SAMPLES[0]?.source ?? "";
 applyTheme("auto");
-setStatus("ok", "ready");
+setStatus("ok", "loading samples...");
 activatePanel("editor");
-queueRender();
+
+// Load samples asynchronously from files
+async function initSamples(): Promise<void> {
+  try {
+    const samples = await loadSamples();
+    if (samples.length === 0) {
+      setStatus("error", "no samples found");
+      return;
+    }
+
+    // Store samples for reference
+    loadedSamples = samples;
+
+    // Populate sample select dropdown
+    sampleSelect.innerHTML = "";
+    for (const sample of samples) {
+      sampleSelect.add(new Option(sample.name, sample.name));
+    }
+
+    // Load first sample
+    const first = samples[0];
+    if (first?.language) languageSelect.value = first.language;
+    inputLayer.value = first?.source ?? "";
+    setStatus("ok", "ready");
+    queueRender();
+  } catch (err) {
+    setStatus("error", `failed to load samples: ${err}`);
+  }
+}
+
+void initSamples();

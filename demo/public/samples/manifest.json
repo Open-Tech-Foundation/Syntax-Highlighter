@@ -1,0 +1,57 @@
+[
+  {
+    "name": "javascript — async / await",
+    "language": "javascript",
+    "file": "javascript.js"
+  },
+  {
+    "name": "typescript — generics & types",
+    "language": "typescript",
+    "file": "typescript.ts"
+  },
+  {
+    "name": "python — def & f-string",
+    "language": "python",
+    "file": "python.py"
+  },
+  {
+    "name": "json — config",
+    "language": "json",
+    "file": "json.json"
+  },
+  {
+    "name": "bash — script",
+    "language": "bash",
+    "file": "bash.sh"
+  },
+  {
+    "name": "sql — query",
+    "language": "sql",
+    "file": "sql.sql"
+  },
+  {
+    "name": "yaml — workflow",
+    "language": "yaml",
+    "file": "yaml.yml"
+  },
+  {
+    "name": "markdown — doc",
+    "language": "markdown",
+    "file": "markdown.md"
+  },
+  {
+    "name": "java — class",
+    "language": "java",
+    "file": "java.java"
+  },
+  {
+    "name": "go — func",
+    "language": "go",
+    "file": "go.go"
+  },
+  {
+    "name": "rust — fn",
+    "language": "rust",
+    "file": "rust.rs"
+  }
+]
