@@ -8,6 +8,7 @@ import type { TokenType, WHITESPACE } from "../../core/tokens.ts";
 export type AnsiTheme = Partial<Record<TokenType | typeof WHITESPACE | "type", string>>;
 
 export type AnsiThemeName =
+  | "dark-plus"
   | "default"
   | "default-light"
   | "dracula"
@@ -15,6 +16,7 @@ export type AnsiThemeName =
   | "github-dark"
   | "github-light"
   | "gruvbox-dark"
+  | "light-plus"
   | "monokai"
   | "nord"
   | "one-dark"

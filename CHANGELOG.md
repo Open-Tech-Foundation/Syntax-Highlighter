@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **MEDIUM:** Added `dark-plus` and `light-plus` themes — VS Code's default dark and light themes, matching Shiki's bundled theme colors for direct comparison.
+
 ### Fixed
 
 - **MEDIUM:** Fixed string interpolation in PHP, Ruby, and Kotlin — double-quoted strings now support template expressions (`${expr}`, `{$var}`, `#{expr}`). Added `interpolation` field to `StringDef` for custom interpolation prefixes.

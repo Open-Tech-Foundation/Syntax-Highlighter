@@ -19,6 +19,7 @@ import { contrast } from "./helpers/wcag.mjs";
  *      floor but still bound by the universal 2:1 floor.
  */
 const THEME_BACKGROUND = {
+  "dark-plus": "#1e1e1e",
   default: "#1e1e1e",
   "default-light": "#ffffff",
   dracula: "#282a36",
@@ -26,6 +27,7 @@ const THEME_BACKGROUND = {
   "github-dark": "#0d1117",
   "github-light": "#ffffff",
   "gruvbox-dark": "#282828",
+  "light-plus": "#ffffff",
   monokai: "#272822",
   nord: "#2e3440",
   "one-dark": "#282c34",

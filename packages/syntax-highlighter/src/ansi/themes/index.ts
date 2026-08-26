@@ -1,3 +1,4 @@
+export { darkPlus } from "./dark-plus.ts";
 export { defaultTheme } from "./default.ts";
 export { defaultLight } from "./default-light.ts";
 export { dracula } from "./dracula.ts";
@@ -5,6 +6,7 @@ export { dracula } from "./dracula.ts";
 export { githubDark, githubDark as github } from "./github-dark.ts";
 export { githubLight } from "./github-light.ts";
 export { gruvboxDark } from "./gruvbox-dark.ts";
+export { lightPlus } from "./light-plus.ts";
 export { monokai } from "./monokai.ts";
 export { nord } from "./nord.ts";
 export { oneDark } from "./one-dark.ts";
@@ -15,12 +17,14 @@ export type { AnsiTheme, AnsiThemeName } from "./types.ts";
 export { vscodeDark } from "./vscode-dark.ts";
 export { vscodeLight } from "./vscode-light.ts";
 
+import { darkPlus } from "./dark-plus.ts";
 import { defaultTheme } from "./default.ts";
 import { defaultLight } from "./default-light.ts";
 import { dracula } from "./dracula.ts";
 import { githubDark } from "./github-dark.ts";
 import { githubLight } from "./github-light.ts";
 import { gruvboxDark } from "./gruvbox-dark.ts";
+import { lightPlus } from "./light-plus.ts";
 import { monokai } from "./monokai.ts";
 import { nord } from "./nord.ts";
 import { oneDark } from "./one-dark.ts";
@@ -36,12 +40,14 @@ import { vscodeLight } from "./vscode-light.ts";
  * Themes are plain RGB objects; renderer converts to truecolor SGR.
  */
 export const ANSI_THEMES: Record<string, AnsiTheme> = {
+  "dark-plus": darkPlus,
   default: defaultTheme,
   "default-light": defaultLight,
   dracula,
   "github-dark": githubDark,
   "github-light": githubLight,
   "gruvbox-dark": gruvboxDark,
+  "light-plus": lightPlus,
   monokai,
   nord,
   "one-dark": oneDark,

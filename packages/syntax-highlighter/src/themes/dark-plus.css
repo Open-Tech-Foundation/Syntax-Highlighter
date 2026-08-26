@@ -1,0 +1,29 @@
+/* Dark+ (Shiki) — VS Code's default dark theme. */
+@import "./shared.css";
+
+:root {
+  --sh-keyword: #569cd6;
+  --sh-control: #c586c0;
+  --sh-string: #ce9178;
+  --sh-number: #b5cea8;
+  --sh-boolean: #569cd6;
+  --sh-null: #569cd6;
+  --sh-constant: #4fc1ff;
+  --sh-comment: #6a9955;
+  --sh-function: #dcdcaa;
+  --sh-method: #dcdcaa;
+  --sh-class: #4ec9b0;
+  --sh-variable: #9cdcfe;
+  --sh-identifier: #d4d4d4;
+  --sh-property: #9cdcfe;
+  --sh-key: #9cdcfe;
+  --sh-parameter: #9cdcfe;
+  --sh-operator: #d4d4d4;
+  --sh-punctuation: #808080;
+  --sh-decorator: #dcdcaa;
+  --sh-regex: #d16969;
+  --sh-addition: #6a9955;
+  --sh-deletion: #f44747;
+  --sh-hunk: #569cd6;
+  --sh-header: #569cd6;
+}
