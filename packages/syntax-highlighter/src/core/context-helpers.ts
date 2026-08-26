@@ -1,4 +1,10 @@
-import { type Context, ContextKind, createContext, type HighlightState } from "./state.ts";
+import {
+  type Context,
+  ContextKind,
+  createContext,
+  type Expectation,
+  type HighlightState,
+} from "./state.ts";
 import { type Token, TokenType } from "./tokens.ts";
 
 const OBJECT_STARTERS = new Set([
@@ -18,10 +24,15 @@ const OBJECT_STARTERS = new Set([
   "var",
 ]);
 
-export function setKeywordState(val: string, ctx: HighlightState): void {
-  if (val === "function") ctx.expectation = "EXPECT_FUNCTION_NAME";
-  else if (val === "class") ctx.expectation = "EXPECT_CLASS_NAME";
-  else if (val === "import") {
+export function setKeywordState(
+  val: string,
+  ctx: HighlightState,
+  declarationKeywords: Record<string, string>,
+): void {
+  const expectation = declarationKeywords[val];
+  if (expectation) {
+    ctx.expectation = expectation as Expectation;
+  } else if (val === "import") {
     ctx.contexts.push(createContext(ContextKind.IMPORT));
     ctx.expectation = null;
   } else if (val === "export") {

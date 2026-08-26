@@ -45,25 +45,20 @@ const CONTROL_KEYWORDS = new Set([
   "await",
 ]);
 
-const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
-const TYPE_DECL_KEYWORDS = new Set(["interface", "enum", "type"]);
-
 /**
- * Resolve feature flags: when `semantic === "javascript"`, all features
- * default to `true`; otherwise all default to `false`. Per-language overrides
- * in `features` take precedence.
+ * Resolve feature flags. All features default to `false` unless explicitly
+ * set in the language definition's `features` field.
  */
 function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> {
-  const isJS = lang.semantic === "javascript";
   const f = lang.features ?? {};
   return {
-    parameterBindings: f.parameterBindings ?? isJS,
+    parameterBindings: f.parameterBindings ?? false,
     contextStack: f.contextStack ?? true,
     declarations: f.declarations ?? true,
-    retroactiveRewrite: f.retroactiveRewrite ?? isJS,
-    typeAnnotationAware: f.typeAnnotationAware ?? isJS,
+    retroactiveRewrite: f.retroactiveRewrite ?? false,
+    typeAnnotationAware: f.typeAnnotationAware ?? false,
     propertyKeys: f.propertyKeys ?? false,
-    classDetection: f.classDetection ?? isJS,
+    classDetection: f.classDetection ?? false,
   };
 }
 
@@ -72,11 +67,11 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
  *
  * Uses `UnifiedLexer` which handles both code and markup tokenization at the
  * lexing stage. The classifier runs a single loop over the raw token stream,
- * with optional JS-specific features (parameter bindings, context tracking,
- * declarations, retroactive rewriting) gated behind `LanguageDefinition.features`.
+ * with optional features (parameter bindings, context tracking, declarations,
+ * retroactive rewriting) gated behind `LanguageDefinition.features`.
  *
- * No mode-specific scan methods. No `if (semantic === "javascript")` branches
- * in `tokenize()`. The language definition's data controls everything.
+ * No mode-specific scan methods. No language-specific branches in `tokenize()`.
+ * The language definition's data controls everything.
  */
 export class UnifiedTokenizer {
   readonly language: LanguageDefinition;
@@ -86,6 +81,10 @@ export class UnifiedTokenizer {
   private nulls: Set<string>;
   private constants: Set<string>;
   private controlKeywords: Set<string>;
+  private classKeywords: Set<string>;
+  private typeDeclKeywords: Set<string>;
+  private classUsageKeywords: Set<string>;
+  private declarationKeywords: Record<string, string>;
   private features: Required<TokenizerFeatures>;
   private sigIndex: Int32Array = new Int32Array(1);
 
@@ -102,6 +101,10 @@ export class UnifiedTokenizer {
     this.constants = new Set((language.constants ?? []).map(fold));
     this.controlKeywords = new Set(CONTROL_KEYWORDS);
     for (const c of language.controls ?? []) this.controlKeywords.add(fold(c));
+    this.classKeywords = new Set((language.classKeywords ?? []).map(fold));
+    this.typeDeclKeywords = new Set((language.typeDeclKeywords ?? []).map(fold));
+    this.classUsageKeywords = new Set((language.classUsageKeywords ?? []).map(fold));
+    this.declarationKeywords = language.declarationKeywords ?? {};
     this.features = resolveFeatures(language);
   }
 
@@ -340,10 +343,10 @@ export class UnifiedTokenizer {
     }
     if (this.keywords.has(val)) {
       if (this.controlKeywords.has(val)) {
-        if (this.features.contextStack) setKeywordState(val, ctx);
+        if (this.features.contextStack) setKeywordState(val, ctx, this.declarationKeywords);
         return createToken(TokenType.CONTROL, raw.start, raw.end);
       }
-      if (this.features.classDetection) setKeywordState(val, ctx);
+      if (this.features.classDetection) setKeywordState(val, ctx, this.declarationKeywords);
       return createToken(TokenType.KEYWORD, raw.start, raw.end);
     }
 
@@ -361,13 +364,13 @@ export class UnifiedTokenizer {
         return createToken(TokenType.PARAMETER, raw.start, raw.end);
       }
 
-      // Class/type detection — gated behind classDetection (JS-specific).
+      // Class/type detection — gated behind classDetection.
       if (this.features.classDetection) {
         const prev = ctx.previousToken;
         if (
           (prev?.type === TokenType.KEYWORD || prev?.type === TokenType.CONTROL) &&
           ctx.previousValue != null &&
-          CLASS_KEYWORDS.has(ctx.previousValue)
+          this.classUsageKeywords.has(ctx.previousValue)
         ) {
           return createToken(TokenType.CLASS, raw.start, raw.end);
         }
@@ -375,7 +378,7 @@ export class UnifiedTokenizer {
         if (
           prev?.type === TokenType.KEYWORD &&
           ctx.previousValue != null &&
-          TYPE_DECL_KEYWORDS.has(ctx.previousValue) &&
+          this.typeDeclKeywords.has(ctx.previousValue) &&
           (ctx.previousValue !== "type" || isTypeAliasName(raws, idx, this.sigIndex))
         ) {
           ctx.afterTypeDecl = true;

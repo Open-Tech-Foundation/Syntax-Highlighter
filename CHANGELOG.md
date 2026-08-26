@@ -34,6 +34,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **MEDIUM:** Added `classDetection` feature flag to `TokenizerFeatures` — gates keyword-based class/type name detection (e.g. `class Foo {}` → `Foo` is `class`). Enabled by default for JS, opt-in for other languages.
 
+- **HIGH:** Refactored core to be fully language-agnostic — removed all JS-specific constants (`CLASS_KEYWORDS`, `TYPE_DECL_KEYWORDS`) and hardcoded keyword checks from the core. Added `classKeywords`, `typeDeclKeywords`, `classUsageKeywords`, `declarationKeywords` fields to `LanguageDefinition` so each language defines its own keyword semantics. Generalized `semantic` field to accept any string.
+
+- **HIGH:** Added `spec.md` — core specification documenting the language-agnostic architecture and all feature flags.
+
 - **MEDIUM:** Fixed demo typecheck error — null-safe access on Shiki highlighter promise resolves TS18047.
 
 - **LOW:** Updated `tasks.toml` typecheck to include `demo/` — CI now type-checks the demo app.

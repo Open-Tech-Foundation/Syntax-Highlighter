@@ -45,10 +45,10 @@ export interface LanguageDefinition {
   operators?: string[];
   punctuation?: string[];
   /**
-   * Semantic classifier. Defaults to `generic`; JavaScript opts into
-   * `javascript` (context-aware subclass of the generic tokenizer).
+   * Semantic classifier. Defaults to `generic`; languages opt into their
+   * own semantic mode. The core never checks for specific values.
    */
-  semantic?: "javascript" | "generic";
+  semantic?: string;
   /** Match the word lists (keywords/booleans/nulls/constants) ignoring ASCII
    * case — for case-insensitive languages like SQL. Defaults to false.
    */
@@ -61,9 +61,32 @@ export interface LanguageDefinition {
    */
   markup?: MarkupConfig;
   /**
-   * Opt-in semantic features for the unified tokenizer. When `semantic` is
-   * `"javascript"`, all features default to `true`. Otherwise all default
-   * to `false`.
+   * Keywords that introduce class-like declarations (e.g. `class`, `struct`,
+   * `enum`, `trait`). When `classDetection` is enabled, the identifier
+   * following one of these keywords is classified as `class`.
+   */
+  classKeywords?: string[];
+  /**
+   * Keywords that introduce type declarations (e.g. `interface`, `type`,
+   * `enum`). When `classDetection` is enabled, the identifier following one
+   * of these keywords is classified as `class`.
+   */
+  typeDeclKeywords?: string[];
+  /**
+   * Keywords that precede class names in usage context (e.g. `new`,
+   * `extends`, `instanceof`). When `classDetection` is enabled, the
+   * identifier following one of these keywords is classified as `class`.
+   */
+  classUsageKeywords?: string[];
+  /**
+   * Maps keywords to expectation types. When a keyword is seen, the
+   * expectation is set so the next identifier is classified accordingly.
+   * Example: `{ "function": "EXPECT_FUNCTION_NAME", "class": "EXPECT_CLASS_NAME" }`
+   */
+  declarationKeywords?: Record<string, string>;
+  /**
+   * Opt-in semantic features for the unified tokenizer. All features
+   * default to `false` unless explicitly set by the language definition.
    */
   features?: TokenizerFeatures;
 }

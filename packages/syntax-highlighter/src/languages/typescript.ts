@@ -81,6 +81,24 @@ const typescript: LanguageDefinition = {
   booleans: ["true", "false"],
   nulls: ["null", "undefined"],
   constants: ["NaN", "Infinity"],
+
+  classKeywords: ["class"],
+  typeDeclKeywords: ["interface", "enum", "type"],
+  classUsageKeywords: ["new", "extends", "instanceof"],
+  declarationKeywords: {
+    function: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+  },
+
+  features: {
+    parameterBindings: true,
+    contextStack: true,
+    declarations: true,
+    retroactiveRewrite: true,
+    typeAnnotationAware: true,
+    classDetection: true,
+  },
+
   operators: [
     "=>",
     "...",

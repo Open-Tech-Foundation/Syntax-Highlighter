@@ -301,12 +301,8 @@ function validateLanguageDefinition(value: unknown): asserts value is LanguageDe
     validateStringArray(value[field], `Language definition ${field}`);
   }
 
-  if (
-    value.semantic !== undefined &&
-    value.semantic !== "javascript" &&
-    value.semantic !== "generic"
-  ) {
-    throw new Error('Language definition semantic must be "javascript" or "generic"');
+  if (value.semantic !== undefined && typeof value.semantic !== "string") {
+    throw new Error("Language definition semantic must be a string");
   }
 
   if (value.lex === undefined) return;

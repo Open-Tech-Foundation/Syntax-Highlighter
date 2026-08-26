@@ -141,6 +141,23 @@ const javascript: LanguageDefinition = {
   operators,
   punctuation,
 
+  classKeywords: ["class"],
+  typeDeclKeywords: [],
+  classUsageKeywords: ["new", "extends", "instanceof"],
+  declarationKeywords: {
+    function: "EXPECT_FUNCTION_NAME",
+    class: "EXPECT_CLASS_NAME",
+  },
+
+  features: {
+    parameterBindings: true,
+    contextStack: true,
+    declarations: true,
+    retroactiveRewrite: true,
+    typeAnnotationAware: true,
+    classDetection: true,
+  },
+
   lex: {
     strings: [
       { open: "'", close: "'", escape: "\\", multiline: false },
