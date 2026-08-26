@@ -22,6 +22,18 @@ const graphql: LanguageDefinition = {
   ],
   booleans: ["true", "false", "null"],
   nulls: ["null"],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: [],
+  typeDeclKeywords: ["type", "interface", "union", "enum", "input", "scalar"],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    type: "EXPECT_CLASS_NAME",
+    interface: "EXPECT_CLASS_NAME",
+    union: "EXPECT_CLASS_NAME",
+    enum: "EXPECT_CLASS_NAME",
+    input: "EXPECT_CLASS_NAME",
+    scalar: "EXPECT_CLASS_NAME",
+  },
   operators: ["=", "!", "?", "&", "|", ":", "@", "$", "..."],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", "!", "?", "@", "$", "&", "|", ".", ":"],
   lex: {

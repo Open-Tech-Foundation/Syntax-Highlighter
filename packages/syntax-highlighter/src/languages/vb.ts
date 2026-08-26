@@ -24,6 +24,16 @@ const vb: LanguageDefinition = {
     "False",
     "Nothing",
   ],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: ["Class", "Module"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    Function: "EXPECT_FUNCTION_NAME",
+    Sub: "EXPECT_FUNCTION_NAME",
+    Class: "EXPECT_CLASS_NAME",
+    Module: "EXPECT_CLASS_NAME",
+  },
   operators: [
     "=",
     "==",

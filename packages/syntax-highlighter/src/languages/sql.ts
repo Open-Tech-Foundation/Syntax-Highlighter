@@ -73,6 +73,17 @@ const sql: LanguageDefinition = {
   ],
   booleans: ["true", "false"],
   nulls: ["null"],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: ["table", "view", "database"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    table: "EXPECT_CLASS_NAME",
+    view: "EXPECT_CLASS_NAME",
+    database: "EXPECT_CLASS_NAME",
+    function: "EXPECT_FUNCTION_NAME",
+    procedure: "EXPECT_FUNCTION_NAME",
+  },
   operators: [
     "=",
     "<",

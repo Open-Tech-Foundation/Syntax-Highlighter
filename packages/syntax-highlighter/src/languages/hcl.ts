@@ -63,6 +63,18 @@ const hcl: LanguageDefinition = {
     "->",
     "<-",
   ],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: ["resource", "data", "provider"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    resource: "EXPECT_CLASS_NAME",
+    data: "EXPECT_CLASS_NAME",
+    provider: "EXPECT_CLASS_NAME",
+    variable: "EXPECT_CLASS_NAME",
+    output: "EXPECT_CLASS_NAME",
+    module: "EXPECT_CLASS_NAME",
+  },
   punctuation: [
     "{",
     "}",

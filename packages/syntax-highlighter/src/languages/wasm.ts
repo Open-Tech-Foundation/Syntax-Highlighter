@@ -19,6 +19,14 @@ const wasm: LanguageDefinition = {
     "f32",
     "f64",
   ],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: ["module"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    func: "EXPECT_FUNCTION_NAME",
+    module: "EXPECT_CLASS_NAME",
+  },
   operators: [
     "=",
     "==",

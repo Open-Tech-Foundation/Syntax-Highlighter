@@ -43,6 +43,16 @@ const protobuf: LanguageDefinition = {
     "false",
   ],
   booleans: ["true", "false"],
+  features: { declarations: true, contextStack: true, classDetection: true },
+  classKeywords: ["message", "enum", "service"],
+  typeDeclKeywords: [],
+  classUsageKeywords: [],
+  declarationKeywords: {
+    message: "EXPECT_CLASS_NAME",
+    service: "EXPECT_CLASS_NAME",
+    rpc: "EXPECT_FUNCTION_NAME",
+    enum: "EXPECT_CLASS_NAME",
+  },
   operators: ["=", ";", "==", "!="],
   punctuation: [
     "{",
