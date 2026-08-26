@@ -44,9 +44,6 @@ export function validateTokens(source: string, tokens: Token[]): void {
     if (typeof type !== "string" || !ALLOWED_TYPES.has(type)) {
       throw new TypeError(`token at index ${i} has invalid type ${JSON.stringify(type)}`);
     }
-    if (type.includes("blue") || type.includes("dark-theme") || type.includes("theme")) {
-      throw new TypeError(`token at index ${i} type must be semantic, got ${JSON.stringify(type)}`);
-    }
     if ("text" in token || "value" in token || "modifiers" in token) {
       throw new Error(`token at index ${i} must not contain text/value/modifiers`);
     }

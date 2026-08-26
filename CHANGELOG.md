@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **HIGH:** Fixed boolean/null/constant literals being misclassified as `keyword` — `classifyIdentifier` now checks `nulls`/`booleans`/`constants` *before* `keywords`, so a word listed in both (e.g. `true`/`false`/`null`/`nil` in Rust, C#, C++, TypeScript, Ruby, Bash, etc.) is tagged with its literal type and gets the correct theme color instead of collapsing to `keyword`.
 
+- **LOW:** Removed a brittle substring guard in `json-renderer.ts` `validateTokens` that rejected token types containing `"blue"`/`"dark-theme"`/`"theme"`. Validation is already enforced by the `ALLOWED_TYPES` allow-list, so the substring check was redundant and could false-positive on legitimate semantic types.
+
 ## [0.3.0] - 2026-08-25
 
 ### Fixed

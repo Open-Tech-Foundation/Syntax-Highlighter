@@ -44,6 +44,17 @@ test("renderJSON rejects visual type leak", () => {
   assertThrows(() => renderJSON(src, bad));
 });
 
+test("validateTokens rejects non-semantic types via allow-list, not substring", () => {
+  // Regression: a brittle substring guard (`type.includes("theme")`) was removed.
+  // Rejection must come solely from ALLOWED_TYPES, so a non-semantic type that
+  // does NOT contain any magic substring is still rejected.
+  const src = "const x = 42;";
+  const toks = tokens(src);
+  const bad = toks.map((t) => ({ ...t }));
+  bad[0] = { start: 0, end: 5, type: "banana" };
+  assertThrows(() => renderJSON(src, bad));
+});
+
 test("renderJSON rejects text/value/modifiers fields", () => {
   const src = "const x = 42;";
   const bad = [{ start: 0, end: 5, type: "keyword", text: "const" }];
