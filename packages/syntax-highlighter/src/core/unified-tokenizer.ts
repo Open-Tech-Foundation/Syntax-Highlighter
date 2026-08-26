@@ -207,19 +207,22 @@ export class UnifiedTokenizer {
     parens: Map<number, number>,
     parameterBindings: Set<number>,
   ): Token {
+    // Preserve semantic from raw token detail
+    const semantic = raw.detail?.semantic;
+
     // ---- Markup types: pass through directly (produced by UnifiedLexer) ----
-    if (raw.type === "tag") return createToken(TokenType.TAG, raw.start, raw.end);
-    if (raw.type === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end);
-    if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end);
+    if (raw.type === "tag") return createToken(TokenType.TAG, raw.start, raw.end, semantic);
+    if (raw.type === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end, semantic);
+    if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end, semantic);
 
     // ---- Diff/patch types: pass through directly ----
-    if (raw.type === "addition") return createToken(TokenType.ADDITION, raw.start, raw.end);
-    if (raw.type === "deletion") return createToken(TokenType.DELETION, raw.start, raw.end);
-    if (raw.type === "hunk") return createToken(TokenType.HUNK, raw.start, raw.end);
-    if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end);
+    if (raw.type === "addition") return createToken(TokenType.ADDITION, raw.start, raw.end, semantic);
+    if (raw.type === "deletion") return createToken(TokenType.DELETION, raw.start, raw.end, semantic);
+    if (raw.type === "hunk") return createToken(TokenType.HUNK, raw.start, raw.end, semantic);
+    if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end, semantic);
 
     // ---- Line-prefix types from lexer (markdown headings, blockquotes, etc.) ----
-    if (raw.type === "keyword") return createToken(TokenType.KEYWORD, raw.start, raw.end);
+    if (raw.type === "keyword") return createToken(TokenType.KEYWORD, raw.start, raw.end, semantic);
 
     // ---- Whitespace: always the same ----
     if (raw.type === "whitespace") {
@@ -249,34 +252,34 @@ export class UnifiedTokenizer {
         break;
       case "number":
         ctx.expectation = Expectation.NONE;
-        tok = createToken(TokenType.NUMBER, raw.start, raw.end);
+        tok = createToken(TokenType.NUMBER, raw.start, raw.end, semantic);
         break;
       case "string": {
         ctx.expectation = Expectation.NONE;
         if (this.features.propertyKeys) {
           const nxt = this.nextSig(raws, idx);
           if (nxt?.value === ":") {
-            tok = createToken(TokenType.KEY, raw.start, raw.end);
+            tok = createToken(TokenType.KEY, raw.start, raw.end, semantic);
             break;
           }
         }
-        tok = createToken(TokenType.STRING, raw.start, raw.end);
+        tok = createToken(TokenType.STRING, raw.start, raw.end, semantic);
         break;
       }
       case "regex":
         ctx.expectation = Expectation.NONE;
-        tok = createToken(TokenType.REGEX, raw.start, raw.end);
+        tok = createToken(TokenType.REGEX, raw.start, raw.end, semantic);
         break;
       case "comment":
         ctx.expectation = Expectation.NONE;
-        tok = createToken(TokenType.COMMENT, raw.start, raw.end);
+        tok = createToken(TokenType.COMMENT, raw.start, raw.end, semantic);
         break;
       case "decorator":
         ctx.expectation = Expectation.NONE;
-        tok = createToken(TokenType.DECORATOR, raw.start, raw.end);
+        tok = createToken(TokenType.DECORATOR, raw.start, raw.end, semantic);
         break;
       default:
-        tok = createToken(TokenType.IDENTIFIER, raw.start, raw.end);
+        tok = createToken(TokenType.IDENTIFIER, raw.start, raw.end, semantic);
     }
 
     // ---- JS: update previous token state for next iteration ----

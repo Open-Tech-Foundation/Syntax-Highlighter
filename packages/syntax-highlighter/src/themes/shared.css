@@ -112,3 +112,72 @@
 .sh-header {
   color: var(--sh-header, var(--sh-keyword));
 }
+
+/* --- Semantic text styles --- */
+::highlight(sh-text-bold),
+.sh-text-bold {
+  color: var(--sh-text-bold, inherit);
+  font-weight: bold;
+}
+::highlight(sh-text-italic),
+.sh-text-italic {
+  color: var(--sh-text-italic, inherit);
+  font-style: italic;
+}
+::highlight(sh-text-underline),
+.sh-text-underline {
+  color: var(--sh-text-underline, inherit);
+  text-decoration: underline;
+}
+::highlight(sh-text-strikethrough),
+.sh-text-strikethrough {
+  color: var(--sh-text-strikethrough, inherit);
+  text-decoration: line-through;
+}
+
+/* --- Semantic code styles --- */
+::highlight(sh-code-inline),
+.sh-code-inline {
+  color: var(--sh-code-inline, var(--sh-string));
+}
+::highlight(sh-code-block),
+.sh-code-block {
+  color: var(--sh-code-block, var(--sh-string));
+}
+
+/* --- Semantic markup styles --- */
+::highlight(sh-markup-heading),
+.sh-markup-heading {
+  color: var(--sh-markup-heading, var(--sh-keyword));
+}
+::highlight(sh-markup-quote),
+.sh-markup-quote {
+  color: var(--sh-markup-quote, var(--sh-comment));
+}
+::highlight(sh-markup-list),
+.sh-markup-list {
+  color: var(--sh-markup-list, var(--sh-operator));
+}
+::highlight(sh-markup-link),
+.sh-markup-link {
+  color: var(--sh-markup-link, var(--sh-keyword));
+  text-decoration: underline;
+}
+::highlight(sh-markup-image),
+.sh-markup-image {
+  color: var(--sh-markup-image, var(--sh-keyword));
+}
+
+/* --- Semantic syntax styles --- */
+::highlight(sh-syntax-delimiter),
+.sh-syntax-delimiter {
+  color: var(--sh-syntax-delimiter, var(--sh-punctuation));
+}
+::highlight(sh-syntax-marker),
+.sh-syntax-marker {
+  color: var(--sh-syntax-marker, var(--sh-punctuation));
+}
+::highlight(sh-syntax-escape),
+.sh-syntax-escape {
+  color: var(--sh-syntax-escape, var(--sh-variable));
+}

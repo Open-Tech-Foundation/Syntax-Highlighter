@@ -8,7 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **MEDIUM:** Added `dark-plus` and `light-plus` themes — VS Code's default dark and light themes, matching Shiki's bundled theme colors for direct comparison.
+- **HIGH:** Added generic semantic registry (`core/semantics.ts`) for language-agnostic semantic metadata — provides a central namespace for text styles (bold, italic, underline, strikethrough), code styles (inline, block), markup styles (heading, quote, list, link, image), and syntax styles (delimiter, marker, escape). Recursive `Semantic` type supports nested names like `text.bold`.
+
+- **HIGH:** Added `DelimiterDef` interface to lexer for paired semantic constructs (like `**bold**`, `_italic_`, `~~strikethrough`). Languages can define delimiters with open/close patterns and semantic metadata. Lexer scans delimiters and emits open/content/close tokens with semantic metadata.
+
+- **MEDIUM:** Added `semantic?: string` field to `Token` type and `RawTokenDetail` — allows tokens to carry semantic metadata beyond their syntactic type. UnifiedTokenizer preserves semantic through classification.
+
+- **MEDIUM:** Updated markdown language definition with delimiter support — `**`/`__` for bold, `*`/`_` for italic, `~~` for strikethrough, all mapped to semantic text styles.
+
+- **MEDIUM:** Added CSS variables and rules for semantic styles in `shared.css` — supports `sh-text-bold`, `sh-text-italic`, `sh-text-underline`, `sh-text-strikethrough`, `sh-code-inline`, `sh-code-block`, `sh-markup-heading`, `sh-markup-quote`, `sh-markup-list`, `sh-markup-link`, `sh-markup-image`, `sh-syntax-delimiter`, `sh-syntax-marker`, `sh-syntax-escape`. Updated all 16 theme files with appropriate color values.
 
 ### Fixed
 

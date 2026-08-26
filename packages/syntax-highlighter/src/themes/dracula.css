@@ -26,4 +26,22 @@
   --sh-deletion: #ff5555;
   --sh-hunk: #bd93f9;
   --sh-header: #bd93f9;
+  /* Semantic text styles */
+  --sh-text-bold: #ff79c6;
+  --sh-text-italic: #ff79c6;
+  --sh-text-underline: #ff79c6;
+  --sh-text-strikethrough: #6272a4;
+  /* Semantic code styles */
+  --sh-code-inline: #f1fa8c;
+  --sh-code-block: #f1fa8c;
+  /* Semantic markup styles */
+  --sh-markup-heading: #bd93f9;
+  --sh-markup-quote: #6272a4;
+  --sh-markup-list: #f8f8f2;
+  --sh-markup-link: #8be9fd;
+  --sh-markup-image: #8be9fd;
+  /* Semantic syntax styles */
+  --sh-syntax-delimiter: #f8f8f2;
+  --sh-syntax-marker: #f8f8f2;
+  --sh-syntax-escape: #bd93f9;
 }

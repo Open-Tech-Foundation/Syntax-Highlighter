@@ -66,10 +66,17 @@ export type Token = {
   type: TokenType | typeof WHITESPACE;
   start: number;
   end: number;
+  /** Optional semantic identity from the central registry (e.g., "text.bold", "markup.link") */
+  semantic?: string;
 };
 
-export function createToken(type: Token["type"], start: number, end: number): Token {
-  return { type, start, end };
+export function createToken(
+  type: Token["type"],
+  start: number,
+  end: number,
+  semantic?: string,
+): Token {
+  return semantic !== undefined ? { type, start, end, semantic } : { type, start, end };
 }
 
 export function isSignificant(token: Token | null | undefined): boolean {

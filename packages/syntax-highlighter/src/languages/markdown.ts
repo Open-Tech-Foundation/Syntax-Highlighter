@@ -1,4 +1,5 @@
 import type { LanguageDefinition } from "../core/lexer.ts";
+import { semantics } from "../core/semantics.ts";
 
 const markdown: LanguageDefinition = {
   name: "markdown",
@@ -49,6 +50,13 @@ const markdown: LanguageDefinition = {
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     comments: [{ open: "<!--", close: "-->" }],
+    delimiters: [
+      { open: "**", close: "**", semantic: semantics.text.bold },
+      { open: "__", close: "__", semantic: semantics.text.bold },
+      { open: "*", close: "*", semantic: semantics.text.italic },
+      { open: "_", close: "_", semantic: semantics.text.italic },
+      { open: "~~", close: "~~", semantic: semantics.text.strikethrough },
+    ],
     regex: false,
     linePrefixes: {
       "#": "keyword",

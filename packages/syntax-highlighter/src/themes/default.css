@@ -39,6 +39,24 @@
   --sh-deletion: #cf222e;
   --sh-hunk: #0550ae;
   --sh-header: #8250df;
+  /* Semantic text styles */
+  --sh-text-bold: #cf222e;
+  --sh-text-italic: #cf222e;
+  --sh-text-underline: #cf222e;
+  --sh-text-strikethrough: #6e7781;
+  /* Semantic code styles */
+  --sh-code-inline: #0a3069;
+  --sh-code-block: #0a3069;
+  /* Semantic markup styles */
+  --sh-markup-heading: #8250df;
+  --sh-markup-quote: #6e7781;
+  --sh-markup-list: #24292f;
+  --sh-markup-link: #0550ae;
+  --sh-markup-image: #0550ae;
+  /* Semantic syntax styles */
+  --sh-syntax-delimiter: #24292f;
+  --sh-syntax-marker: #24292f;
+  --sh-syntax-escape: #0550ae;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -67,6 +85,24 @@
     --sh-deletion: #f85149;
     --sh-hunk: #58a6ff;
     --sh-header: #bc8cff;
+    /* Semantic text styles */
+    --sh-text-bold: #c678dd;
+    --sh-text-italic: #c678dd;
+    --sh-text-underline: #c678dd;
+    --sh-text-strikethrough: #7f848e;
+    /* Semantic code styles */
+    --sh-code-inline: #98c379;
+    --sh-code-block: #98c379;
+    /* Semantic markup styles */
+    --sh-markup-heading: #bc8cff;
+    --sh-markup-quote: #7f848e;
+    --sh-markup-list: #abb2bf;
+    --sh-markup-link: #58a6ff;
+    --sh-markup-image: #58a6ff;
+    /* Semantic syntax styles */
+    --sh-syntax-delimiter: #abb2bf;
+    --sh-syntax-marker: #abb2bf;
+    --sh-syntax-escape: #56b6c2;
   }
 }
 
@@ -95,4 +131,22 @@
   --sh-deletion: #f85149;
   --sh-hunk: #58a6ff;
   --sh-header: #bc8cff;
+  /* Semantic text styles */
+  --sh-text-bold: #c678dd;
+  --sh-text-italic: #c678dd;
+  --sh-text-underline: #c678dd;
+  --sh-text-strikethrough: #7f848e;
+  /* Semantic code styles */
+  --sh-code-inline: #98c379;
+  --sh-code-block: #98c379;
+  /* Semantic markup styles */
+  --sh-markup-heading: #bc8cff;
+  --sh-markup-quote: #7f848e;
+  --sh-markup-list: #abb2bf;
+  --sh-markup-link: #58a6ff;
+  --sh-markup-image: #58a6ff;
+  /* Semantic syntax styles */
+  --sh-syntax-delimiter: #abb2bf;
+  --sh-syntax-marker: #abb2bf;
+  --sh-syntax-escape: #56b6c2;
 }

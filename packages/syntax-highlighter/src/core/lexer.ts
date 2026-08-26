@@ -20,9 +20,27 @@ export interface CommentDef {
   line?: boolean;
 }
 
+/**
+ * Delimiter definition — paired semantic constructs like `**bold**`, `_italic_`,
+ * `~~strikethrough~~`. Unlike `StringDef`, delimiters attach a semantic identity
+ * rather than treating content as a string literal.
+ */
+export interface DelimiterDef {
+  /** Opening delimiter (e.g., "**", "_", "~~") */
+  open: string;
+  /** Closing delimiter (e.g., "**", "_", "~~") */
+  close: string;
+  /**
+   * Semantic identity attached to the delimited content.
+   * Must be a value from the central semantics registry.
+   */
+  semantic?: string;
+}
+
 export interface LexDefinition {
   strings?: StringDef[];
   comments?: CommentDef[];
+  delimiters?: DelimiterDef[];
   identifierStart?: RegExp;
   identifierPart?: RegExp;
   operators?: string[];
@@ -173,6 +191,8 @@ export interface RawTokenDetail {
   templateClose?: boolean;
   controlClose?: boolean;
   unknown?: boolean;
+  /** Semantic identity from the central registry (e.g., "text.bold", "markup.link") */
+  semantic?: string;
 }
 
 export interface RawToken {
@@ -301,6 +321,7 @@ interface ScanFrame {
 export class Lexer {
   strings: StringDef[];
   comments: CommentDef[];
+  delimiters: DelimiterDef[];
   identifierStart: RegExp;
   identifierPart: RegExp;
   operators: string[];
@@ -317,6 +338,7 @@ export class Lexer {
   embedRegions: Array<[number, number, LanguageDefinition]> = [];
 
   private stringOpeners: Map<string, StringDef[]>;
+  private delimiterOpeners: Map<string, DelimiterDef[]>;
   private operatorByChar: Map<string, string[]>;
   private punctuationByChar: Map<string, string[]>;
   private identifierRe: RegExp;
@@ -333,6 +355,7 @@ export class Lexer {
     const lex = language.lex ?? {};
     this.strings = lex.strings ?? [];
     this.comments = (lex.comments ?? []).slice().sort((a, b) => b.open.length - a.open.length);
+    this.delimiters = lex.delimiters ?? [];
     this.identifierStart = lex.identifierStart ?? DEFAULT_IDENTIFIER_START;
     this.identifierPart = lex.identifierPart ?? DEFAULT_IDENTIFIER_PART;
     this.operators = sortByLengthDesc(lex.operators ?? language.operators ?? []);
@@ -354,6 +377,17 @@ export class Lexer {
       else this.stringOpeners.set(def.open[0], [def]);
     }
     for (const defs of this.stringOpeners.values()) {
+      defs.sort((a, b) => b.open.length - a.open.length);
+    }
+
+    this.delimiterOpeners = new Map();
+    for (const def of this.delimiters) {
+      if (!def.open) continue;
+      const defs = this.delimiterOpeners.get(def.open[0]);
+      if (defs) defs.push(def);
+      else this.delimiterOpeners.set(def.open[0], [def]);
+    }
+    for (const defs of this.delimiterOpeners.values()) {
       defs.sort((a, b) => b.open.length - a.open.length);
     }
 
@@ -527,6 +561,38 @@ export class Lexer {
       this.pos += 1;
     }
     this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+  }
+
+  /**
+   * Scan a delimiter — paired semantic constructs like `**bold**`, `_italic_`.
+   * Unlike strings, delimiters emit the open/content/close as separate tokens
+   * with semantic metadata attached.
+   */
+  scanDelimiter(def: DelimiterDef): void {
+    const s = this.source;
+    const start = this.pos;
+    // Emit the opening delimiter
+    this.emit("punctuation", start, start + def.open.length, { semantic: def.semantic });
+    this.pos += def.open.length;
+    // Scan content until closing delimiter
+    const contentStart = this.pos;
+    while (this.pos < this.length) {
+      if (s.startsWith(def.close, this.pos)) {
+        // Emit content
+        if (this.pos > contentStart) {
+          this.emit("text", contentStart, this.pos, { semantic: def.semantic });
+        }
+        // Emit closing delimiter
+        this.emit("punctuation", this.pos, this.pos + def.close.length, { semantic: def.semantic });
+        this.pos += def.close.length;
+        return;
+      }
+      this.pos += 1;
+    }
+    // Unterminated — emit remaining as content
+    if (this.pos > contentStart) {
+      this.emit("text", contentStart, this.pos, { semantic: def.semantic });
+    }
   }
 
   scanLineComment(def: CommentDef): void {
@@ -710,6 +776,14 @@ export class Lexer {
         } else {
           this.scanString(strDef);
         }
+        continue;
+      }
+
+      // Delimiters (paired semantic constructs like **bold**, _italic_)
+      const delimDefs = this.delimiterOpeners.get(ch);
+      const delimDef = delimDefs?.find((def) => s.startsWith(def.open, this.pos));
+      if (delimDef) {
+        this.scanDelimiter(delimDef);
         continue;
       }
 

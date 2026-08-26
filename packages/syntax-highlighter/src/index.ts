@@ -20,6 +20,7 @@ export { renderHTML } from "./core/html-renderer.ts";
 export { renderJSON, validateTokens } from "./core/json-renderer.ts";
 export type {
   CommentDef,
+  DelimiterDef,
   LanguageDefinition,
   LexDefinition,
   RawToken,
@@ -33,6 +34,7 @@ export {
   registerLanguage,
   UnknownLanguageError,
 } from "./core/registry.ts";
+export { semantics, type Semantic } from "./core/semantics.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
 export { UnifiedLexer } from "./core/unified-lexer.ts";
