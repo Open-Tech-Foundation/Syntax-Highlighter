@@ -81,6 +81,8 @@ export interface TokenizerFeatures {
   typeAnnotationAware?: boolean;
   /** Detect string keys before `:` and classify as `property` instead of `string`. */
   propertyKeys?: boolean;
+  /** Detect class/type names from keyword patterns (e.g. `class Foo {`). */
+  classDetection?: boolean;
 }
 
 export interface MarkupConfig {

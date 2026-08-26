@@ -25,8 +25,6 @@ import { UnifiedLexer } from "./unified-lexer.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
-const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
-
 const CONTROL_KEYWORDS = new Set([
   "return",
   "throw",
@@ -47,6 +45,7 @@ const CONTROL_KEYWORDS = new Set([
   "await",
 ]);
 
+const CLASS_KEYWORDS = new Set(["new", "extends", "instanceof"]);
 const TYPE_DECL_KEYWORDS = new Set(["interface", "enum", "type"]);
 
 /**
@@ -59,11 +58,12 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
   const f = lang.features ?? {};
   return {
     parameterBindings: f.parameterBindings ?? isJS,
-    contextStack: f.contextStack ?? isJS,
-    declarations: f.declarations ?? isJS,
+    contextStack: f.contextStack ?? true,
+    declarations: f.declarations ?? true,
     retroactiveRewrite: f.retroactiveRewrite ?? isJS,
     typeAnnotationAware: f.typeAnnotationAware ?? isJS,
     propertyKeys: f.propertyKeys ?? false,
+    classDetection: f.classDetection ?? isJS,
   };
 }
 
@@ -343,11 +343,11 @@ export class UnifiedTokenizer {
         if (this.features.contextStack) setKeywordState(val, ctx);
         return createToken(TokenType.CONTROL, raw.start, raw.end);
       }
-      if (this.features.contextStack) setKeywordState(val, ctx);
+      if (this.features.classDetection) setKeywordState(val, ctx);
       return createToken(TokenType.KEYWORD, raw.start, raw.end);
     }
 
-    // ---- JS features: context-aware classification ----
+    // ---- Context-aware classification (all languages) ----
     if (this.features.contextStack) {
       const top = topCtx(ctx);
       if (top?.kind === ContextKind.PARAMETERS && top.expectName && top.names) {
@@ -361,23 +361,26 @@ export class UnifiedTokenizer {
         return createToken(TokenType.PARAMETER, raw.start, raw.end);
       }
 
-      const prev = ctx.previousToken;
-      if (
-        (prev?.type === TokenType.KEYWORD || prev?.type === TokenType.CONTROL) &&
-        ctx.previousValue != null &&
-        CLASS_KEYWORDS.has(ctx.previousValue)
-      ) {
-        return createToken(TokenType.CLASS, raw.start, raw.end);
-      }
+      // Class/type detection — gated behind classDetection (JS-specific).
+      if (this.features.classDetection) {
+        const prev = ctx.previousToken;
+        if (
+          (prev?.type === TokenType.KEYWORD || prev?.type === TokenType.CONTROL) &&
+          ctx.previousValue != null &&
+          CLASS_KEYWORDS.has(ctx.previousValue)
+        ) {
+          return createToken(TokenType.CLASS, raw.start, raw.end);
+        }
 
-      if (
-        prev?.type === TokenType.KEYWORD &&
-        ctx.previousValue != null &&
-        TYPE_DECL_KEYWORDS.has(ctx.previousValue) &&
-        (ctx.previousValue !== "type" || isTypeAliasName(raws, idx, this.sigIndex))
-      ) {
-        ctx.afterTypeDecl = true;
-        return createToken(TokenType.CLASS, raw.start, raw.end);
+        if (
+          prev?.type === TokenType.KEYWORD &&
+          ctx.previousValue != null &&
+          TYPE_DECL_KEYWORDS.has(ctx.previousValue) &&
+          (ctx.previousValue !== "type" || isTypeAliasName(raws, idx, this.sigIndex))
+        ) {
+          ctx.afterTypeDecl = true;
+          return createToken(TokenType.CLASS, raw.start, raw.end);
+        }
       }
 
       const decl = ctx.declarations.get(val);

@@ -30,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **MEDIUM:** Added `controls?: string[]` field to `LanguageDefinition` — allows non-JS languages to classify language-specific control-flow keywords (e.g. Python `elif`/`raise`, Ruby `unless`/`rescue`, Rust `match`/`loop`, Go `select`/`defer`).
 
+- **HIGH:** Enabled `declarations` and `contextStack` for ALL languages (not just JS) — non-JS languages now get function/parameter/property detection via universal structural patterns (`identifier (` → function, `.` → property, context stack for parameters).
+
+- **MEDIUM:** Added `classDetection` feature flag to `TokenizerFeatures` — gates keyword-based class/type name detection (e.g. `class Foo {}` → `Foo` is `class`). Enabled by default for JS, opt-in for other languages.
+
 - **MEDIUM:** Fixed demo typecheck error — null-safe access on Shiki highlighter promise resolves TS18047.
 
 - **LOW:** Updated `tasks.toml` typecheck to include `demo/` — CI now type-checks the demo app.
