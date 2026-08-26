@@ -159,6 +159,7 @@ export type RawTokenType =
   | "tag"
   | "attribute"
   | "text"
+  | "keyword"
   | "addition"
   | "deletion"
   | "hunk"
@@ -312,6 +313,8 @@ export class Lexer {
   regexKeywords: Set<string>;
   linePrefixes: Map<string, string>;
   codeFences: CodeFenceDef[];
+  /** Embedded regions: [bodyStart, bodyEnd, embedDef] — populated during tokenize(). */
+  embedRegions: Array<[number, number, LanguageDefinition]> = [];
 
   private stringOpeners: Map<string, StringDef[]>;
   private operatorByChar: Map<string, string[]>;
@@ -626,10 +629,12 @@ export class Lexer {
               const infoStart = this.pos + fence.open.length;
               let infoEnd = s.indexOf("\n", infoStart);
               if (infoEnd === -1) infoEnd = this.length;
+              // Extract language identifier from info string
+              const langId = s.slice(infoStart, infoEnd).trim().toLowerCase();
               // Emit the fence + info string as a single token
               this.emit("punctuation", start, infoEnd);
               this.pos = infoEnd;
-              // Skip to closing fence, emitting content as text
+              // Skip to closing fence
               const contentStart = this.pos;
               const closeSearch = `${fence.close}\n`;
               let contentEnd = s.indexOf(closeSearch, contentStart);
@@ -639,7 +644,21 @@ export class Lexer {
                 this.emit("text", contentStart, this.length);
                 this.pos = this.length;
               } else {
-                if (contentEnd > contentStart) {
+                // Look up embedded language definition
+                const embedDef = fence.embed?.[langId];
+                if (embedDef && contentEnd > contentStart) {
+                  // Tokenize body with embedded language's lexer
+                  const bodyLexer = new Lexer(embedDef);
+                  const bodyTokens = bodyLexer.tokenize(s.slice(contentStart, contentEnd));
+                  for (const tok of bodyTokens) {
+                    this.tokens.push({
+                      ...tok,
+                      start: tok.start + contentStart,
+                      end: tok.end + contentStart,
+                    });
+                  }
+                  this.embedRegions.push([contentStart, contentEnd, embedDef]);
+                } else if (contentEnd > contentStart) {
                   this.emit("text", contentStart, contentEnd);
                 }
                 this.emit("punctuation", contentEnd, contentEnd + fence.close.length);

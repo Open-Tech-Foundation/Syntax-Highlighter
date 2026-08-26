@@ -18,8 +18,6 @@ const WS_RE = /\s+/y;
 export class UnifiedLexer extends Lexer {
   private markupTags: boolean;
   private embed?: Record<string, LanguageDefinition>;
-  /** Embedded regions: [bodyStart, bodyEnd, embedDef] — populated during tokenize(). */
-  embedRegions: Array<[number, number, LanguageDefinition]> = [];
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     super(language);

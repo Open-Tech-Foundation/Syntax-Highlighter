@@ -45,12 +45,23 @@ const markdown: LanguageDefinition = {
   lex: {
     strings: [
       { open: "`", close: "`", escape: "\\", multiline: false },
-      { open: "```", close: "```", escape: "\\", multiline: true },
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     comments: [{ open: "<!--", close: "-->" }],
     regex: false,
+    linePrefixes: {
+      "#": "keyword",
+      "##": "keyword",
+      "###": "keyword",
+      "####": "keyword",
+      "#####": "keyword",
+      "######": "keyword",
+      ">": "comment",
+      "-": "operator",
+      "*": "operator",
+      "+": "operator",
+    },
   },
 };
 

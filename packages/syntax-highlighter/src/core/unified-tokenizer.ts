@@ -218,6 +218,9 @@ export class UnifiedTokenizer {
     if (raw.type === "hunk") return createToken(TokenType.HUNK, raw.start, raw.end);
     if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end);
 
+    // ---- Line-prefix types from lexer (markdown headings, blockquotes, etc.) ----
+    if (raw.type === "keyword") return createToken(TokenType.KEYWORD, raw.start, raw.end);
+
     // ---- Whitespace: always the same ----
     if (raw.type === "whitespace") {
       return createToken(WHITESPACE, raw.start, raw.end);
