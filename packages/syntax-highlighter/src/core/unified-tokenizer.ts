@@ -212,6 +212,12 @@ export class UnifiedTokenizer {
     if (raw.type === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end);
     if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end);
 
+    // ---- Diff/patch types: pass through directly ----
+    if (raw.type === "addition") return createToken(TokenType.ADDITION, raw.start, raw.end);
+    if (raw.type === "deletion") return createToken(TokenType.DELETION, raw.start, raw.end);
+    if (raw.type === "hunk") return createToken(TokenType.HUNK, raw.start, raw.end);
+    if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end);
+
     // ---- Whitespace: always the same ----
     if (raw.type === "whitespace") {
       return createToken(WHITESPACE, raw.start, raw.end);

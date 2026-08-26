@@ -6,6 +6,12 @@ export interface StringDef {
   escape?: string;
   multiline?: boolean;
   template?: boolean;
+  /**
+   * Custom interpolation prefix. Defaults to `"$"`. Set to `"#"` for Ruby's
+   * `#{expr}` syntax, or `["$", "{$"]` to support both `${expr}` and `{$expr}`.
+   * When an array is provided, the lexer tries each prefix in order.
+   */
+  interpolation?: string | string[];
 }
 
 export interface CommentDef {
@@ -26,6 +32,31 @@ export interface LexDefinition {
   shebang?: boolean;
   scanNumber?: ScanNumberFn;
   scanString?: (def: StringDef, source: string, pos: number) => number;
+  /**
+   * Line-prefix tokens. When the first non-whitespace character of a line
+   * matches a key, emit a token of the specified type for the prefix (and
+   * any immediately following characters of the same kind). Used for diff
+   * (`+`/`-`/`@@`), log levels, etc.
+   */
+  linePrefixes?: Record<string, string>;
+  /**
+   * Code fence definitions for languages like Markdown. When the lexer
+   * encounters an opening fence, it extracts the language identifier from
+   * the info string and creates an embed region for the fenced content.
+   */
+  codeFences?: CodeFenceDef[];
+}
+
+export interface CodeFenceDef {
+  /** Opening delimiter (e.g., "```") */
+  open: string;
+  /** Closing delimiter (e.g., "```") */
+  close: string;
+  /**
+   * Map from language identifiers (lowercase) to LanguageDefinition objects.
+   * The lexer uses this to look up the embedded language's definition.
+   */
+  embed?: Record<string, LanguageDefinition>;
 }
 
 export interface LanguageDefinition {
@@ -127,7 +158,11 @@ export type RawTokenType =
   | "punctuation"
   | "tag"
   | "attribute"
-  | "text";
+  | "text"
+  | "addition"
+  | "deletion"
+  | "hunk"
+  | "header";
 
 export interface RawTokenDetail {
   quote?: string;
@@ -275,6 +310,8 @@ export class Lexer {
   scanNumber: ScanNumberFn;
   scanStringFn: ((def: StringDef, source: string, pos: number) => number) | null;
   regexKeywords: Set<string>;
+  linePrefixes: Map<string, string>;
+  codeFences: CodeFenceDef[];
 
   private stringOpeners: Map<string, StringDef[]>;
   private operatorByChar: Map<string, string[]>;
@@ -303,6 +340,8 @@ export class Lexer {
     this.scanNumber = lex.scanNumber ?? defaultScanNumber;
     this.scanStringFn = lex.scanString ?? null;
     this.regexKeywords = new Set(language.regexKeywords ?? []);
+    this.linePrefixes = new Map(Object.entries(lex.linePrefixes ?? {}));
+    this.codeFences = lex.codeFences ?? [];
 
     this.stringOpeners = new Map();
     for (const def of this.strings) {
@@ -516,7 +555,7 @@ export class Lexer {
     const frames: ScanFrame[] = [{ kind: "code", untilClose: untilTemplateClose, depth: 0 }];
     const s = this.source;
 
-    while (frames.length > 0) {
+    codeFrame: while (frames.length > 0) {
       const frame = frames[frames.length - 1];
       if (!frame) break;
 
@@ -532,7 +571,6 @@ export class Lexer {
           frames.pop();
           continue;
         }
-        const ch = s[this.pos];
         const escape = def.escape ?? "\\";
         if (escape && s.startsWith(escape, this.pos)) {
           this.pos += escape.length;
@@ -545,18 +583,24 @@ export class Lexer {
           frames.pop();
           continue;
         }
-        if (ch === "$" && s[this.pos + 1] === "{") {
-          this.emit("string", start, this.pos, { quote: def.open });
-          const open = this.pos;
-          this.pos += 2;
-          this.emit("punctuation", open, this.pos, { templateOpen: true });
-          // This chunk is finished; the interpolation frame owns resuming the
-          // template after its closing `}`. Popping first is what keeps a
-          // stale chunk frame from re-scanning the rest of the source.
-          frames.pop();
-          frames.push({ kind: "code", untilClose: true, depth: 0, resumeTemplate: def });
-          continue;
+        // Check for interpolation prefix (default: "${")
+        const prefixes = Array.isArray(def.interpolation)
+          ? def.interpolation
+          : [def.interpolation ?? "$"];
+        let matched = false;
+        for (const prefix of prefixes) {
+          if (s.startsWith(prefix, this.pos) && s[this.pos + prefix.length] === "{") {
+            this.emit("string", start, this.pos, { quote: def.open });
+            const open = this.pos;
+            this.pos += prefix.length + 1; // skip prefix + "{"
+            this.emit("punctuation", open, this.pos, { templateOpen: true });
+            frames.pop();
+            frames.push({ kind: "code", untilClose: true, depth: 0, resumeTemplate: def });
+            matched = true;
+            break;
+          }
         }
+        if (matched) continue;
         this.pos += 1;
         continue;
       }
@@ -571,6 +615,63 @@ export class Lexer {
       }
       const start = this.pos;
       const ch = s[this.pos];
+
+      // Code fence detection (markdown ```lang ... ```)
+      if (this.codeFences.length > 0) {
+        const atLineStart = this.pos === 0 || s[this.pos - 1] === "\n";
+        if (atLineStart) {
+          for (const fence of this.codeFences) {
+            if (s.startsWith(fence.open, this.pos)) {
+              // Find end of info string (rest of line after opening fence)
+              const infoStart = this.pos + fence.open.length;
+              let infoEnd = s.indexOf("\n", infoStart);
+              if (infoEnd === -1) infoEnd = this.length;
+              // Emit the fence + info string as a single token
+              this.emit("punctuation", start, infoEnd);
+              this.pos = infoEnd;
+              // Skip to closing fence, emitting content as text
+              const contentStart = this.pos;
+              const closeSearch = `${fence.close}\n`;
+              let contentEnd = s.indexOf(closeSearch, contentStart);
+              if (contentEnd === -1) contentEnd = s.indexOf(fence.close, contentStart);
+              if (contentEnd === -1) {
+                // No closing fence — treat rest as text
+                this.emit("text", contentStart, this.length);
+                this.pos = this.length;
+              } else {
+                if (contentEnd > contentStart) {
+                  this.emit("text", contentStart, contentEnd);
+                }
+                this.emit("punctuation", contentEnd, contentEnd + fence.close.length);
+                this.pos = contentEnd + fence.close.length;
+              }
+              continue codeFrame;
+            }
+          }
+        }
+      }
+
+      // Line-prefix tokens (diff +/-, log levels, etc.)
+      if (this.linePrefixes.size > 0) {
+        const atLineStart = this.pos === 0 || s[this.pos - 1] === "\n";
+        if (atLineStart) {
+          // Check for multi-char prefixes first (longest match)
+          for (const [prefix, type] of this.linePrefixes) {
+            if (s.startsWith(prefix, this.pos)) {
+              // Consume the prefix plus any following chars of the same kind
+              let end = this.pos + prefix.length;
+              if (prefix.length === 1) {
+                const ch0 = prefix[0];
+                while (end < this.length && s[end] === ch0) end += 1;
+              }
+              this.emit(type as RawTokenType, start, end);
+              this.pos = end;
+              break;
+            }
+          }
+          if (this.pos !== start) continue;
+        }
+      }
 
       if (isWhitespaceChar(ch)) {
         let i = this.pos + 1;

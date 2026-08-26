@@ -22,6 +22,10 @@ export interface TokenTypeConst {
   readonly TAG: "tag";
   readonly ATTRIBUTE: "attribute";
   readonly TEXT: "text";
+  readonly ADDITION: "addition";
+  readonly DELETION: "deletion";
+  readonly HUNK: "hunk";
+  readonly HEADER: "header";
 }
 
 export const TokenType: TokenTypeConst = Object.freeze({
@@ -48,6 +52,10 @@ export const TokenType: TokenTypeConst = Object.freeze({
   TAG: "tag",
   ATTRIBUTE: "attribute",
   TEXT: "text",
+  ADDITION: "addition",
+  DELETION: "deletion",
+  HUNK: "hunk",
+  HEADER: "header",
 });
 
 export type TokenType = TokenTypeConst[keyof TokenTypeConst];

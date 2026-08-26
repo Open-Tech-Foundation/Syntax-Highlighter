@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **MEDIUM:** Fixed string interpolation in PHP, Ruby, and Kotlin — double-quoted strings now support template expressions (`${expr}`, `{$var}`, `#{expr}`). Added `interpolation` field to `StringDef` for custom interpolation prefixes.
+
+- **HIGH:** Fixed diff/patch highlighting — added `linePrefixes` mechanism to the lexer for line-oriented formats. Diff now correctly highlights `+` (additions), `-` (deletions), `@@` (hunk headers), and `---`/`+++` (file headers) with distinct token types.
+
+- **MEDIUM:** Fixed markdown code block highlighting — added `codeFences` mechanism to the lexer for fenced code blocks. Markdown now correctly detects ` ```lang ... ``` ` blocks and emits the content as text tokens.
+
 ## [0.4.0] - 2026-08-26
 
 ### Fixed

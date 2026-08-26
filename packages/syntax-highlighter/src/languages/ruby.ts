@@ -99,7 +99,7 @@ const ruby: LanguageDefinition = {
   features: { declarations: true, contextStack: true, classDetection: true },
   lex: {
     strings: [
-      { open: '"', close: '"', escape: "\\", multiline: false },
+      { open: '"', close: '"', escape: "\\", multiline: false, template: true, interpolation: "#" },
       { open: "'", close: "'", escape: "\\", multiline: false },
       { open: "`", close: "`", escape: "\\", multiline: false },
     ],

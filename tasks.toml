@@ -3,7 +3,7 @@
 # Inspect without executing: `tsr <task> --dry-run`  •  List: `tsr --list`  •  Edit: `tsr --config`
 
 [workspace]
-members = ["packages/*", "demo"]
+members = ["packages/*"]
 
 # ------------------------------------------------------------------ demo
 # Live demo workbench (IDE-style playground) — `esdev start` defaults to http://localhost:5173
@@ -18,7 +18,7 @@ dir = "packages/syntax-highlighter"
 
 # ------------------------------------------------------------------ typecheck / test
 [tasks.typecheck]
-packages = ["packages/*", "demo"]
+packages = ["packages/*"]
 run = "tsc --noEmit"
 
 # Tests run from the workspace root (not the package dir) so esdev's module

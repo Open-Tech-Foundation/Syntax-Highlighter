@@ -96,3 +96,19 @@
 .sh-attribute {
   color: var(--sh-attribute, var(--sh-property));
 }
+::highlight(sh-addition),
+.sh-addition {
+  color: var(--sh-addition, var(--sh-string));
+}
+::highlight(sh-deletion),
+.sh-deletion {
+  color: var(--sh-deletion, var(--sh-comment));
+}
+::highlight(sh-hunk),
+.sh-hunk {
+  color: var(--sh-hunk, var(--sh-keyword));
+}
+::highlight(sh-header),
+.sh-header {
+  color: var(--sh-header, var(--sh-keyword));
+}
