@@ -21,6 +21,10 @@ export const solarizedDark: AnsiTheme = {
   decorator: "#cb4b16",
   boolean: "#d33682",
   null: "#d33682",
+  addition: "#859900",
+  deletion: "#dc322f",
+  hunk: "#268bd2",
+  header: "#6c71c4",
 };
 
 export default solarizedDark;

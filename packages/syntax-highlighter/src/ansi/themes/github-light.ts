@@ -21,6 +21,10 @@ export const githubLight: AnsiTheme = {
   decorator: "#953800",
   boolean: "#0550ae",
   null: "#0550ae",
+  addition: "#1a7f37",
+  deletion: "#cf222e",
+  hunk: "#0550ae",
+  header: "#8250df",
 };
 
 export default githubLight;

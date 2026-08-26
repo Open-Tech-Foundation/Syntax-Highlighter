@@ -21,6 +21,10 @@ export const vscodeLight: AnsiTheme = {
   punctuation: "#000000",
   decorator: "#795E26",
   regex: "#811F3F",
+  addition: "#008000",
+  deletion: "#cd3131",
+  hunk: "#0000ff",
+  header: "#0000ff",
 };
 
 export default vscodeLight;

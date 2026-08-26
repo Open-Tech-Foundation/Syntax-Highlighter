@@ -21,6 +21,10 @@ export const oneDark: AnsiTheme = {
   decorator: "#d19a66",
   boolean: "#d19a66",
   null: "#d19a66",
+  addition: "#98c379",
+  deletion: "#e06c75",
+  hunk: "#61afef",
+  header: "#c678dd",
 };
 
 export default oneDark;

@@ -21,6 +21,10 @@ export const nord: AnsiTheme = {
   decorator: "#d08770",
   boolean: "#b48ead",
   null: "#b48ead",
+  addition: "#a3be8c",
+  deletion: "#bf616a",
+  hunk: "#81a1c1",
+  header: "#b48ead",
 };
 
 export default nord;

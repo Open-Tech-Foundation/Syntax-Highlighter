@@ -21,6 +21,10 @@ export const defaultTheme: AnsiTheme = {
   decorator: "#d19a66",
   boolean: "#d19a66",
   null: "#d19a66",
+  addition: "#3fb950",
+  deletion: "#f85149",
+  hunk: "#58a6ff",
+  header: "#bc8cff",
 };
 
 // keep `theme` and alias for convenience

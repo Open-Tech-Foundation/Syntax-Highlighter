@@ -21,6 +21,10 @@ export const monokai: AnsiTheme = {
   decorator: "#fd971f",
   boolean: "#ae81ff",
   null: "#ae81ff",
+  addition: "#a6e22e",
+  deletion: "#f92672",
+  hunk: "#66d9ef",
+  header: "#ae81ff",
 };
 
 export default monokai;

@@ -21,6 +21,10 @@ export const vscodeDark: AnsiTheme = {
   punctuation: "#D4D4D4",
   decorator: "#DCDCAA",
   regex: "#D16969",
+  addition: "#6a9955",
+  deletion: "#f44747",
+  hunk: "#569cd6",
+  header: "#c586c0",
 };
 
 export default vscodeDark;

@@ -35,6 +35,10 @@
   --sh-decorator: #953800;
   --sh-boolean: #0550ae;
   --sh-null: #0550ae;
+  --sh-addition: #1a7f37;
+  --sh-deletion: #cf222e;
+  --sh-hunk: #0550ae;
+  --sh-header: #8250df;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -59,6 +63,10 @@
     --sh-decorator: #d19a66;
     --sh-boolean: #d19a66;
     --sh-null: #d19a66;
+    --sh-addition: #3fb950;
+    --sh-deletion: #f85149;
+    --sh-hunk: #58a6ff;
+    --sh-header: #bc8cff;
   }
 }
 
@@ -83,4 +91,8 @@
   --sh-decorator: #d19a66;
   --sh-boolean: #d19a66;
   --sh-null: #d19a66;
+  --sh-addition: #3fb950;
+  --sh-deletion: #f85149;
+  --sh-hunk: #58a6ff;
+  --sh-header: #bc8cff;
 }

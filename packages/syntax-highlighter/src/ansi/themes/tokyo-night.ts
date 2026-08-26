@@ -21,6 +21,10 @@ export const tokyoNight: AnsiTheme = {
   decorator: "#e0af68",
   boolean: "#ff9e64",
   null: "#ff9e64",
+  addition: "#9ece6a",
+  deletion: "#f7768e",
+  hunk: "#7aa2f7",
+  header: "#bb9af7",
 };
 
 export default tokyoNight;

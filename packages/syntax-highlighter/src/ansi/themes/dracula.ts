@@ -21,6 +21,10 @@ export const dracula: AnsiTheme = {
   decorator: "#ffb86c",
   boolean: "#bd93f9",
   null: "#bd93f9",
+  addition: "#50fa7b",
+  deletion: "#ff5555",
+  hunk: "#bd93f9",
+  header: "#bd93f9",
 };
 
 export default dracula;

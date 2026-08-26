@@ -21,6 +21,10 @@ export const githubDark: AnsiTheme = {
   decorator: "#ffa657",
   boolean: "#79c0ff",
   null: "#79c0ff",
+  addition: "#3fb950",
+  deletion: "#f85149",
+  hunk: "#58a6ff",
+  header: "#bc8cff",
 };
 
 export default githubDark;

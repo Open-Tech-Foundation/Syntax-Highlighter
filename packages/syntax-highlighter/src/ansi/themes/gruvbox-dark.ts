@@ -21,6 +21,10 @@ export const gruvboxDark: AnsiTheme = {
   decorator: "#fe8019",
   boolean: "#d3869b",
   null: "#d3869b",
+  addition: "#b8bb26",
+  deletion: "#fb4934",
+  hunk: "#83a598",
+  header: "#d3869b",
 };
 
 export default gruvboxDark;

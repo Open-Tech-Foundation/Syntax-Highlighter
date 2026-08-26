@@ -22,4 +22,8 @@
   --sh-decorator: #fe8019;
   --sh-boolean: #d3869b;
   --sh-null: #d3869b;
+  --sh-addition: #b8bb26;
+  --sh-deletion: #fb4934;
+  --sh-hunk: #83a598;
+  --sh-header: #d3869b;
 }

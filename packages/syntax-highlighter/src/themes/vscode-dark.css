@@ -22,4 +22,8 @@
   --sh-punctuation: #d4d4d4;
   --sh-decorator: #dcdcaa;
   --sh-regex: #d16969;
+  --sh-addition: #6a9955;
+  --sh-deletion: #f44747;
+  --sh-hunk: #569cd6;
+  --sh-header: #c586c0;
 }
