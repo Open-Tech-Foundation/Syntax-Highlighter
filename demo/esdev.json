@@ -2,7 +2,8 @@
   "targets": {
     "web": {
       "entry": "index.html",
-      "outdir": "dist"
+      "outdir": "dist",
+      "assets": ["public"]
     }
   }
 }

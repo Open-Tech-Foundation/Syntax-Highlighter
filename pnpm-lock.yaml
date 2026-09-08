@@ -20,6 +20,9 @@ importers:
 
   demo:
     dependencies:
+      '@opentf/micro-ui':
+        specifier: latest
+        version: 0.11.0
       '@opentf/syntax-highlighter':
         specifier: workspace:*
         version: link:../packages/syntax-highlighter
@@ -116,6 +119,9 @@ packages:
 
   '@opentf/esrun-types@0.3.0':
     resolution: {integrity: sha512-uz4vkaTq2p6Eej8cVMCxHl3BjOqeXtohy53cyk3Zxmy562U3JPQJxVT0mMMlW7HPDY30GVyiwDH0mpBYmfXuTg==}
+
+  '@opentf/micro-ui@0.11.0':
+    resolution: {integrity: sha512-l7jIUNMT/Vw6EAxgJlTJEe0fpw3ZB4BP4jtJ3TLysgQzV9pbV7kpw4oqvbiC3bShanZ7FqmPqQXac/nfsWjWUA==}
 
   '@opentf/std@0.18.0':
     resolution: {integrity: sha512-860vQJifbxZhm/LmxOssz2gvltkNCUALZ6SEI8PwkcyuTzvGSkTEZBxdCF4JR0OWBGLTW+uHODyElb2zM7+3DA==}
@@ -764,6 +770,8 @@ snapshots:
     optional: true
 
   '@opentf/esrun-types@0.3.0': {}
+
+  '@opentf/micro-ui@0.11.0': {}
 
   '@opentf/std@0.18.0': {}
 

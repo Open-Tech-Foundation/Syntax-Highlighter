@@ -5,6 +5,8 @@
  * editor with a line-number gutter, a tabbed bottom panel (tokens / custom
  * language), and a status bar.
  */
+
+import { define, html } from "@opentf/micro-ui";
 import {
   ANSI_PALETTES,
   ANSI_THEMES,
@@ -131,8 +133,24 @@ function labeledSelect(id: string, label: string, options: string[]): HTMLLabelE
 
 /* ----------------------------------------------------------------- layout */
 
-const root = document.getElementById("app");
-if (!root) throw new Error("index.html has no #app for this module to render into");
+const app = document.getElementById("app");
+if (!app) throw new Error("index.html has no #app for this module to render into");
+
+/**
+ * Micro-UI owns the document entry point. The editor and terminal are kept as
+ * imperative islands because both libraries retain DOM state between updates.
+ */
+define(
+  "x-syntax-workbench",
+  () => () =>
+    html`
+  <div class="micro-ui-root" data-testid="micro-ui-root"></div>
+`,
+);
+
+app.replaceChildren(document.createElement("x-syntax-workbench"));
+const root = app.querySelector<HTMLElement>(".micro-ui-root");
+if (!root) throw new Error("Micro-UI did not mount the workbench root");
 
 root.replaceChildren(
   element("header", { className: "titlebar" }, [
@@ -191,11 +209,7 @@ root.replaceChildren(
         element("span", { className: "spacer" }),
         labeledSelect("language", "Language", []),
         labeledSelect("syntax-theme", "Theme", [...SYNTAX_THEMES] as unknown as string[]),
-        labeledSelect(
-          "sample",
-          "Sample",
-          [],
-        ),
+        labeledSelect("sample", "Sample", []),
       ]),
 
       element("div", { className: "editor-preview" }, [

@@ -52,6 +52,12 @@ a {
   height: 100vh;
 }
 
+/* Micro-UI's component shell should not add a layout row around the workbench. */
+x-syntax-workbench,
+.micro-ui-root {
+  display: contents;
+}
+
 /* --------------------------------------------------------------- titlebar */
 
 .titlebar {

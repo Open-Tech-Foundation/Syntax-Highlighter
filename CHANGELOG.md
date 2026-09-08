@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **MEDIUM:** Converted the demo entry point to mount through a Micro-UI `x-syntax-workbench` component while preserving the editor and terminal DOM islands.
+- **HIGH:** Fixed demo sample loading in static builds by copying `public/` assets into the deployment output.
+- **HIGH:** Preserved the workbench grid through the Micro-UI shell so editor and preview scrolling retain their full-height layout.
+
 ### Added
 
 - **HIGH:** Added generic semantic registry (`core/semantics.ts`) for language-agnostic semantic metadata — provides a central namespace for text styles (bold, italic, underline, strikethrough), code styles (inline, block), markup styles (heading, quote, list, link, image), and syntax styles (delimiter, marker, escape). Recursive `Semantic` type supports nested names like `text.bold`.
