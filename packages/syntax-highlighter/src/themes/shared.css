@@ -182,6 +182,14 @@
 .sh-markup-task {
   color: var(--sh-markup-task, var(--sh-constant));
 }
+::highlight(sh-markup-task-checked),
+.sh-markup-task-checked {
+  color: var(--sh-markup-task-checked, var(--sh-string));
+}
+::highlight(sh-markup-task-unchecked),
+.sh-markup-task-unchecked {
+  color: var(--sh-markup-task-unchecked, var(--sh-comment));
+}
 ::highlight(sh-markup-footnote),
 .sh-markup-footnote {
   color: var(--sh-markup-footnote, var(--sh-decorator));

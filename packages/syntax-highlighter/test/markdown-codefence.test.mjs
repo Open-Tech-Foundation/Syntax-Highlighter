@@ -112,11 +112,22 @@ test("markdown: links, images, escapes, and list markers carry markup semantics"
 });
 
 test("markdown: tables, tasks, footnotes, and HTML tags carry markup semantics", () => {
-  const src = ["| Name | Value |", "- [x] Completed task [^1]", "<details>"].join("\n");
+  const src = [
+    "| Name | Value |",
+    "- [x] Completed task [^1]",
+    "- [ ] Open task",
+    "<details>",
+  ].join("\n");
   const semantics = new Set(
     new UnifiedTokenizer(markdown).tokenize(src).map((token) => token.semantic),
   );
-  for (const semantic of ["markup.table", "markup.task", "markup.footnote", "markup.html"]) {
+  for (const semantic of [
+    "markup.table",
+    "markup.task-checked",
+    "markup.task-unchecked",
+    "markup.footnote",
+    "markup.html",
+  ]) {
     assert(semantics.has(semantic), `expected ${semantic}`);
   }
 });

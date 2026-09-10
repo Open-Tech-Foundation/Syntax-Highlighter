@@ -24,6 +24,8 @@ export const semantics = {
     image: "markup.image",
     table: "markup.table",
     task: "markup.task",
+    taskChecked: "markup.task-checked",
+    taskUnchecked: "markup.task-unchecked",
     footnote: "markup.footnote",
     html: "markup.html",
   },

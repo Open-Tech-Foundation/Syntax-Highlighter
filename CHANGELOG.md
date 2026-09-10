@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** Differentiate checked and unchecked Markdown task checkboxes with dedicated semantic styles; corrected the demo's escaped-emphasis example.
 - **MEDIUM:** Added semantic highlighting for Markdown tables, task checkboxes, footnote references, and inline HTML tags.
 - **HIGH:** Expanded built-in Markdown semantics to cover headings, quotes, list markers, inline code, links, images, and escapes. Markdown fenced JavaScript, TypeScript, and Python blocks now delegate to their language tokenizers.
 - **HIGH:** Fixed Markdown line tokenization: ordered and indented unordered list markers now highlight correctly, paragraph text no longer inherits property state after headings, paired emphasis cannot consume later lines, and `***…***`/`___…___` render as combined bold-italic semantic text.

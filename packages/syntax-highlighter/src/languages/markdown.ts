@@ -58,7 +58,8 @@ const markdown: LanguageDefinition = {
     inlinePatterns: [
       { pattern: /^!\[[^\]\n]*\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.image },
       { pattern: /^\[\^[^\]\n]+\]/, type: "text", semantic: semantics.markup.footnote },
-      { pattern: /^\[[ xX]\]/, type: "text", semantic: semantics.markup.task },
+      { pattern: /^\[[xX]\]/, type: "text", semantic: semantics.markup.taskChecked },
+      { pattern: /^\[ \]/, type: "text", semantic: semantics.markup.taskUnchecked },
       { pattern: /^\[[^\]\n]+\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.link },
       { pattern: /^<\/?[A-Za-z][^>\n]*>/, type: "text", semantic: semantics.markup.html },
       { pattern: /^\\./, type: "text", semantic: semantics.syntax.escape },

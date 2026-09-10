@@ -122,7 +122,7 @@ No syntax highlighting should be applied.
 
 ## 9. Escaping Markdown
 
-*This text is not italicized.*
+\*This text is not italicized.\*
 
 # This is not a heading.
 
