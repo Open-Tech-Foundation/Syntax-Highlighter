@@ -1,0 +1,1 @@
+{"name":"@opentf/syntax-highlighter-site","private":true,"type":"module","scripts":{"dev":"otfw dev","build":"otfw build --ssg"},"dependencies":{"@opentf/web":"latest","@opentf/web-docs":"latest"},"devDependencies":{"@opentf/web-cli":"latest"}}

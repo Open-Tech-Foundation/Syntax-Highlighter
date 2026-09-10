@@ -1,0 +1,14 @@
+---
+title: Getting started
+description: Install and render your first token stream.
+---
+# Getting started
+
+```sh
+npm install @opentf/syntax-highlighter
+```
+
+```ts
+const highlighter = await createHighlighter({ language: "typescript" });
+const tokens = highlighter.highlight(source);
+```

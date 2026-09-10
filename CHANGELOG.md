@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- **MEDIUM:** Added an OTF Web public-facing `website/` scaffold with a marketing landing page and MDX documentation layout.
+
 - **HIGH:** Added generic semantic registry (`core/semantics.ts`) for language-agnostic semantic metadata — provides a central namespace for text styles (bold, italic, underline, strikethrough), code styles (inline, block), markup styles (heading, quote, list, link, image), and syntax styles (delimiter, marker, escape). Recursive `Semantic` type supports nested names like `text.bold`.
 
 - **HIGH:** Added `DelimiterDef` interface to lexer for paired semantic constructs (like `**bold**`, `_italic_`, `~~strikethrough`). Languages can define delimiters with open/close patterns and semantic metadata. Lexer scans delimiters and emits open/content/close tokens with semantic metadata.
