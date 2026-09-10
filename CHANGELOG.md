@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **MEDIUM:** Loaded the official OTF Web Docs theme so documentation navigation, sidebar, typography, and theme controls render correctly.
 - **MEDIUM:** Added Markdown semantics for reference links, autolinks, bare HTTP(S) URLs, and footnote definitions.
 - **LOW:** Differentiate checked and unchecked Markdown task checkboxes with dedicated semantic styles; corrected the demo's escaped-emphasis example.
 - **MEDIUM:** Added semantic highlighting for Markdown tables, task checkboxes, footnote references, and inline HTML tags.
@@ -18,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **LOW:** Reused the OTF Web Docs navbar on the public landing page, including its GitHub action and theme control.
 - **MEDIUM:** Redesigned the public website landing page with a syntax-highlighted product preview, clearer capability proof, responsive navigation, and a production-ready call to action.
 - **LOW:** Included the public `website/` in the pnpm workspace and added the `tsr dev:website` development task.
 - **LOW:** Updated the website scaffold's global styling to work with the current OTF Web/Rolldown build pipeline.

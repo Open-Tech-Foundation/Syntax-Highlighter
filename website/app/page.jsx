@@ -1,20 +1,14 @@
+import { Navbar } from "@opentf/web-docs";
+import config from "../otfw.config.js";
+import { landingNavbarStyles } from "./landing-navbar.js";
+
 const CodeLine = (props) => <div class="code-line">{props.children}</div>;
 
 export default function Home() {
   return (
-    <main>
-      <nav>
-        <a class="brand" href="/" aria-label="Syntax Highlighter home">
-          <span class="brand-mark">/</span> syntax<span>highlighter</span>
-        </a>
-        <div class="nav-links">
-          <a href="/docs">Docs</a>
-          <a href="/docs/renderers">Renderers</a>
-          <a class="github-link" href="https://github.com/Open-Tech-Foundation/Syntax-Highlighter">
-            <span>GitHub</span> ↗
-          </a>
-        </div>
-      </nav>
+    <main class="marketing">
+      <style>{landingNavbarStyles}</style>
+      <Navbar config={config.docs} />
 
       <section class="hero-grid">
         <div class="hero-copy">
