@@ -1,6 +1,7 @@
 import { Navbar } from "@opentf/web-docs";
 import config from "../otfw.config.js";
 import { landingNavbarStyles } from "./landing-navbar.js";
+import { landingThemeStyles } from "./landing-theme.js";
 
 const CodeLine = (props) => <div class="code-line">{props.children}</div>;
 
@@ -8,6 +9,7 @@ export default function Home() {
   return (
     <main class="marketing">
       <style>{landingNavbarStyles}</style>
+      <style>{landingThemeStyles}</style>
       <Navbar config={config.docs} />
 
       <section class="hero-grid">
