@@ -61,6 +61,9 @@ const markdown: LanguageDefinition = {
       { pattern: /^\[[xX]\]/, type: "text", semantic: semantics.markup.taskChecked },
       { pattern: /^\[ \]/, type: "text", semantic: semantics.markup.taskUnchecked },
       { pattern: /^\[[^\]\n]+\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^\[[^\]\n]+\]\[[^\]\n]*\]/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^<https?:\/\/[^>\s]+>/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^https?:\/\/[^\s<>()]+/, type: "text", semantic: semantics.markup.link },
       { pattern: /^<\/?[A-Za-z][^>\n]*>/, type: "text", semantic: semantics.markup.html },
       { pattern: /^\\./, type: "text", semantic: semantics.syntax.escape },
     ],
@@ -89,6 +92,8 @@ const markdown: LanguageDefinition = {
     },
     linePrefixPatterns: [
       { pattern: /^#{1,6}\s+/, type: "keyword", semantic: semantics.markup.heading },
+      { pattern: /^\[\^[^\]\n]+\]:/, type: "text", semantic: semantics.markup.footnote },
+      { pattern: /^\[[^\]\n]+\]:\s+https?:\/\//, type: "text", semantic: semantics.markup.link },
       { pattern: /^>\s?/, type: "comment", semantic: semantics.markup.quote, wholeLine: false },
       { pattern: /^\|[^\n]*\|\s*(?:\n|$)/, type: "text", semantic: semantics.markup.table },
       { pattern: /^[-+*]\s+/, type: "operator", semantic: semantics.markup.list, wholeLine: false },

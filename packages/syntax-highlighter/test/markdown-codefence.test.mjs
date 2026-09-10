@@ -132,6 +132,21 @@ test("markdown: tables, tasks, footnotes, and HTML tags carry markup semantics",
   }
 });
 
+test("markdown: reference links, URLs, and footnote definitions carry semantics", () => {
+  const src = [
+    "[Guide][guide] <https://example.com> https://example.org/docs",
+    "[guide]: https://example.com/guide",
+    "[^note]: Footnote definition",
+  ].join("\n");
+  const tokens = new UnifiedTokenizer(markdown).tokenize(src);
+  const links = tokens.filter((token) => token.semantic === "markup.link");
+  assert(links.length >= 4, `expected link forms, got ${JSON.stringify(tokens)}`);
+  assert(
+    tokens.some((token) => token.semantic === "markup.footnote"),
+    "expected footnote definition",
+  );
+});
+
 test("markdown: built-in code fences delegate JavaScript and Python", () => {
   const src = "```javascript\nconst value = true;\n```\n```python\ndef greet():\n  return 42\n```";
   const k = kinds(new UnifiedTokenizer(markdown), src);

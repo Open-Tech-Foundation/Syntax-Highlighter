@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **MEDIUM:** Added Markdown semantics for reference links, autolinks, bare HTTP(S) URLs, and footnote definitions.
 - **LOW:** Differentiate checked and unchecked Markdown task checkboxes with dedicated semantic styles; corrected the demo's escaped-emphasis example.
 - **MEDIUM:** Added semantic highlighting for Markdown tables, task checkboxes, footnote references, and inline HTML tags.
 - **HIGH:** Expanded built-in Markdown semantics to cover headings, quotes, list markers, inline code, links, images, and escapes. Markdown fenced JavaScript, TypeScript, and Python blocks now delegate to their language tokenizers.
