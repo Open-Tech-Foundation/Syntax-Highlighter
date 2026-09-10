@@ -21,6 +21,7 @@ export { renderJSON, validateTokens } from "./core/json-renderer.ts";
 export type {
   CommentDef,
   DelimiterDef,
+  InlinePattern,
   LanguageDefinition,
   LexDefinition,
   LinePrefixPattern,

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **HIGH:** Expanded built-in Markdown semantics to cover headings, quotes, list markers, inline code, links, images, and escapes. Markdown fenced JavaScript, TypeScript, and Python blocks now delegate to their language tokenizers.
 - **HIGH:** Fixed Markdown line tokenization: ordered and indented unordered list markers now highlight correctly, paragraph text no longer inherits property state after headings, paired emphasis cannot consume later lines, and `***…***`/`___…___` render as combined bold-italic semantic text.
 - **HIGH:** Restored semantic token rendering end-to-end: HTML and CSS Custom Highlight renderers now use semantic identities (for example, `text.bold` → `sh-text-bold`), ANSI renders supported text styles, the tokenizer preserves semantic metadata on punctuation and operators, and JSON rendering accepts validated semantic metadata.
 - **HIGH:** Fixed Markdown emphasis at the start of a line being consumed as a list marker before paired-delimiter parsing.

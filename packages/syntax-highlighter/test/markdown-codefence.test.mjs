@@ -31,10 +31,17 @@ const tok = new UnifiedTokenizer(mdWithEmbed);
 
 test("markdown: headings use linePrefixes", () => {
   const src = "# Heading 1\n## Heading 2\n### Heading 3";
-  const k = kinds(tok, src);
+  const tokenizer = new UnifiedTokenizer(markdown);
+  const k = kinds(tokenizer, src);
   assert(k.includes("keyword:# Heading 1"), `expected keyword for h1, got ${k}`);
   assert(k.includes("keyword:## Heading 2"), `expected keyword for h2, got ${k}`);
   assert(k.includes("keyword:### Heading 3"), `expected keyword for h3, got ${k}`);
+  assert(
+    tokenizer
+      .tokenize(src)
+      .every((token) => token.type === "whitespace" || token.semantic === "markup.heading"),
+    "headings should carry markup.heading semantics",
+  );
 });
 
 test("markdown: blockquotes", () => {
@@ -83,11 +90,32 @@ test("markdown: code fence without matching lang falls back to text", () => {
 
 test("markdown: inline code", () => {
   const src = "Use `code` here";
-  const k = kinds(tok, src);
+  const tokenizer = new UnifiedTokenizer(markdown);
+  const k = kinds(tokenizer, src);
   assert(
     k.some((x) => x.startsWith("string:`code`")),
     `expected string for inline code, got ${k}`,
   );
+  assert(
+    tokenizer.tokenize(src).some((token) => token.semantic === "code.inline"),
+    "inline code should carry code.inline semantics",
+  );
+});
+
+test("markdown: links, images, escapes, and list markers carry markup semantics", () => {
+  const src = "- [link](https://example.com) ![image](image.png) \\*";
+  const tokens = new UnifiedTokenizer(markdown).tokenize(src);
+  const semantics = new Set(tokens.map((token) => token.semantic));
+  for (const semantic of ["markup.list", "markup.link", "markup.image", "syntax.escape"]) {
+    assert(semantics.has(semantic), `expected ${semantic}, got ${JSON.stringify(tokens)}`);
+  }
+});
+
+test("markdown: built-in code fences delegate JavaScript and Python", () => {
+  const src = "```javascript\nconst value = true;\n```\n```python\ndef greet():\n  return 42\n```";
+  const k = kinds(new UnifiedTokenizer(markdown), src);
+  assert(k.includes("keyword:const"), `expected JavaScript tokens, got ${k}`);
+  assert(k.includes("keyword:def"), `expected Python tokens, got ${k}`);
 });
 
 test("markdown: complete emphasis at a line start preserves semantic metadata", () => {
@@ -111,13 +139,10 @@ test("markdown: line tokens reset punctuation state before the next paragraph", 
 
 test("markdown: recognizes ordered and indented unordered list markers", () => {
   const ordered = kinds(new UnifiedTokenizer(markdown), "1. First item");
-  assert(
-    ordered.includes("operator:1. First item"),
-    `expected ordered list marker, got ${ordered}`,
-  );
+  assert(ordered.includes("operator:1. "), `expected ordered list marker, got ${ordered}`);
 
   const nested = kinds(new UnifiedTokenizer(markdown), "  * Nested item");
-  assert(nested.includes("operator:* Nested item"), `expected nested list marker, got ${nested}`);
+  assert(nested.includes("operator:* "), `expected nested list marker, got ${nested}`);
   assert(
     !nested.some((token) => token.includes("text: Nested item")),
     `unexpected emphasis: ${nested}`,

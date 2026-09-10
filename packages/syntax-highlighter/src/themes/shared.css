@@ -155,6 +155,7 @@
 ::highlight(sh-markup-heading),
 .sh-markup-heading {
   color: var(--sh-markup-heading, var(--sh-keyword));
+  font-weight: bold;
 }
 ::highlight(sh-markup-quote),
 .sh-markup-quote {

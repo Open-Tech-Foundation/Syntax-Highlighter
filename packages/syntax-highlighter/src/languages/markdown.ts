@@ -1,5 +1,8 @@
 import type { LanguageDefinition } from "../core/lexer.ts";
 import { semantics } from "../core/semantics.ts";
+import javascript from "./javascript.ts";
+import python from "./python.ts";
+import typescript from "./typescript.ts";
 
 const markdown: LanguageDefinition = {
   name: "markdown",
@@ -48,9 +51,14 @@ const markdown: LanguageDefinition = {
   ],
   lex: {
     strings: [
-      { open: "`", close: "`", escape: "\\", multiline: false },
+      { open: "`", close: "`", escape: "\\", multiline: false, semantic: semantics.code.inline },
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },
+    ],
+    inlinePatterns: [
+      { pattern: /^!\[[^\]\n]*\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.image },
+      { pattern: /^\[[^\]\n]+\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^\\./, type: "text", semantic: semantics.syntax.escape },
     ],
     comments: [{ open: "<!--", close: "-->" }],
     delimiters: [
@@ -75,7 +83,31 @@ const markdown: LanguageDefinition = {
       "*": "operator",
       "+": "operator",
     },
-    linePrefixPatterns: [{ pattern: /^\d+[.)]\s+/, type: "operator" }],
+    linePrefixPatterns: [
+      { pattern: /^#{1,6}\s+/, type: "keyword", semantic: semantics.markup.heading },
+      { pattern: /^>\s?/, type: "comment", semantic: semantics.markup.quote, wholeLine: false },
+      { pattern: /^[-+*]\s+/, type: "operator", semantic: semantics.markup.list, wholeLine: false },
+      {
+        pattern: /^\d+[.)]\s+/,
+        type: "operator",
+        semantic: semantics.markup.list,
+        wholeLine: false,
+      },
+    ],
+    codeFences: [
+      {
+        open: "```",
+        close: "```",
+        embed: {
+          javascript,
+          js: javascript,
+          typescript,
+          ts: typescript,
+          python,
+          py: python,
+        },
+      },
+    ],
   },
 };
 

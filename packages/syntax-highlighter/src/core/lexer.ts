@@ -6,6 +6,8 @@ export interface StringDef {
   escape?: string;
   multiline?: boolean;
   template?: boolean;
+  /** Optional semantic identity attached to the resulting string token. */
+  semantic?: string;
   /**
    * Custom interpolation prefix. Defaults to `"$"`. Set to `"#"` for Ruby's
    * `#{expr}` syntax, or `["$", "{$"]` to support both `${expr}` and `{$expr}`.
@@ -44,6 +46,19 @@ export interface LinePrefixPattern {
   pattern: RegExp;
   /** Raw token type emitted for the complete line. */
   type: string;
+  /** Optional semantic identity attached to the complete line token. */
+  semantic?: string;
+  /** Whether to emit the full line. Defaults to true; false emits only the matched marker. */
+  wholeLine?: boolean;
+}
+
+export interface InlinePattern {
+  /** Anchored pattern matched at the current source position. */
+  pattern: RegExp;
+  /** Raw token type emitted for the full match. */
+  type: RawTokenType;
+  /** Optional semantic identity attached to the full match. */
+  semantic?: string;
 }
 
 export interface LexDefinition {
@@ -68,6 +83,8 @@ export interface LexDefinition {
   linePrefixes?: Record<string, string>;
   /** Pattern-based line prefixes, such as Markdown ordered-list markers. */
   linePrefixPatterns?: LinePrefixPattern[];
+  /** Inline constructs such as Markdown links and images. */
+  inlinePatterns?: InlinePattern[];
   /**
    * Code fence definitions for languages like Markdown. When the lexer
    * encounters an opening fence, it extracts the language identifier from
@@ -347,6 +364,7 @@ export class Lexer {
   regexKeywords: Set<string>;
   linePrefixes: Map<string, string>;
   linePrefixPatterns: LinePrefixPattern[];
+  inlinePatterns: InlinePattern[];
   codeFences: CodeFenceDef[];
   /** Embedded regions: [bodyStart, bodyEnd, embedDef] — populated during tokenize(). */
   embedRegions: Array<[number, number, LanguageDefinition]> = [];
@@ -382,6 +400,7 @@ export class Lexer {
     this.regexKeywords = new Set(language.regexKeywords ?? []);
     this.linePrefixes = new Map(Object.entries(lex.linePrefixes ?? {}));
     this.linePrefixPatterns = lex.linePrefixPatterns ?? [];
+    this.inlinePatterns = lex.inlinePatterns ?? [];
     this.codeFences = lex.codeFences ?? [];
 
     this.stringOpeners = new Map();
@@ -550,7 +569,7 @@ export class Lexer {
           // Hook only consumed the opener (e.g. Rust lifetime) → punctuation
           this.emit("punctuation", start, end);
         } else {
-          this.emit("string", start, end, { quote: def.open });
+          this.emit("string", start, end, { quote: def.open, semantic: def.semantic });
         }
         return;
       }
@@ -570,12 +589,16 @@ export class Lexer {
       if (!def.multiline && c === "\n") break;
       if (s.startsWith(def.close, this.pos)) {
         this.pos += def.close.length;
-        this.emit("string", start, this.pos, { quote: def.open });
+        this.emit("string", start, this.pos, { quote: def.open, semantic: def.semantic });
         return;
       }
       this.pos += 1;
     }
-    this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+    this.emit("string", start, this.pos, {
+      quote: def.open,
+      unterminated: true,
+      semantic: def.semantic,
+    });
   }
 
   /**
@@ -771,11 +794,16 @@ export class Lexer {
           });
           // Check for multi-char prefixes first (longest match)
           if (!hasCompleteDelimiter) {
-            for (const { pattern, type } of this.linePrefixPatterns) {
+            for (const { pattern, type, semantic, wholeLine = true } of this.linePrefixPatterns) {
               pattern.lastIndex = 0;
-              if (!pattern.test(s.slice(this.pos))) continue;
-              const end = lineEnd === -1 ? this.length : lineEnd;
-              this.emit(type as RawTokenType, start, end);
+              const match = pattern.exec(s.slice(this.pos));
+              if (!match?.[0] || match.index !== 0) continue;
+              const end = wholeLine
+                ? lineEnd === -1
+                  ? this.length
+                  : lineEnd
+                : this.pos + match[0].length;
+              this.emit(type as RawTokenType, start, end, { semantic });
               this.pos = end;
               break;
             }
@@ -802,6 +830,16 @@ export class Lexer {
         this.emit("whitespace", start, i);
         this.pos = i;
         continue;
+      }
+
+      for (const { pattern, type, semantic } of this.inlinePatterns) {
+        pattern.lastIndex = 0;
+        const match = pattern.exec(s.slice(this.pos));
+        if (!match?.[0] || match.index !== 0) continue;
+        const end = this.pos + match[0].length;
+        this.emit(type, start, end, { semantic });
+        this.pos = end;
+        continue codeFrame;
       }
 
       // Prefixed literals (rust `br#"…"#`, csharp `$"…"` …) must beat the
