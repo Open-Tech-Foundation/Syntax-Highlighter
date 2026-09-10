@@ -41,6 +41,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+# OTF Web generated development and production output
+website/.dev/
+website/dist/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -146,4 +150,3 @@ vite.config.ts.timestamp-*
 demo/verify_*.mjs
 verify_*.mjs
 *.headless.*
-

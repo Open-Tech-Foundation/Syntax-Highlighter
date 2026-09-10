@@ -11,6 +11,11 @@ members = ["packages/*"]
 run = "esdev start"
 dir = "demo"
 
+# Public marketing site and MDX documentation
+[tasks."dev:website"]
+run = "otfw dev"
+dir = "website"
+
 # ------------------------------------------------------------------ build
 [tasks.build]
 run = "esdev build --lib src --dts-bundle && cp ../../README.md README.md"
@@ -49,4 +54,3 @@ deps = ["typecheck", "lint", "fmt:check", "test"]
 
 [tasks.ci]
 deps = ["typecheck", "lint", "fmt:check", "test", "build"]
-

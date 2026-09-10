@@ -1,1 +1,5 @@
-export default { index: "Introduction", "getting-started": "Getting started", renderers: "Renderers" };
+export default {
+  index: "Introduction",
+  "getting-started": "Getting started",
+  renderers: "Renderers",
+};

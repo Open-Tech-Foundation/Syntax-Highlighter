@@ -1,3 +1,6 @@
 packages:
   - packages/*
   - demo
+  - website
+allowBuilds:
+  '@opentf/web-compiler': true
