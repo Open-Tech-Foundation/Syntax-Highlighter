@@ -9,6 +9,7 @@ export const ANSI_RESET = "\x1b[0m";
 
 const SEMANTIC_ANSI_STYLES: Record<string, string> = {
   "text.bold": "\x1b[1m",
+  "text.bold-italic": "\x1b[1m\x1b[3m",
   "text.italic": "\x1b[3m",
   "text.underline": "\x1b[4m",
   "text.strikethrough": "\x1b[9m",

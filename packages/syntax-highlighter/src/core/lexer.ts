@@ -35,6 +35,15 @@ export interface DelimiterDef {
    * Must be a value from the central semantics registry.
    */
   semantic?: string;
+  /** Whether a matching close delimiter may occur on a later line. Defaults to false. */
+  multiline?: boolean;
+}
+
+export interface LinePrefixPattern {
+  /** Anchored pattern matched against the start of a line after indentation. */
+  pattern: RegExp;
+  /** Raw token type emitted for the complete line. */
+  type: string;
 }
 
 export interface LexDefinition {
@@ -57,6 +66,8 @@ export interface LexDefinition {
    * (`+`/`-`/`@@`), log levels, etc.
    */
   linePrefixes?: Record<string, string>;
+  /** Pattern-based line prefixes, such as Markdown ordered-list markers. */
+  linePrefixPatterns?: LinePrefixPattern[];
   /**
    * Code fence definitions for languages like Markdown. When the lexer
    * encounters an opening fence, it extracts the language identifier from
@@ -155,6 +166,8 @@ export interface TokenizerFeatures {
   propertyKeys?: boolean;
   /** Detect class/type names from keyword patterns (e.g. `class Foo {`). */
   classDetection?: boolean;
+  /** Clear a pending property expectation when a line ends. Useful for markup languages. */
+  lineBreakResetsExpectation?: boolean;
 }
 
 export interface MarkupConfig {
@@ -333,6 +346,7 @@ export class Lexer {
   scanStringFn: ((def: StringDef, source: string, pos: number) => number) | null;
   regexKeywords: Set<string>;
   linePrefixes: Map<string, string>;
+  linePrefixPatterns: LinePrefixPattern[];
   codeFences: CodeFenceDef[];
   /** Embedded regions: [bodyStart, bodyEnd, embedDef] — populated during tokenize(). */
   embedRegions: Array<[number, number, LanguageDefinition]> = [];
@@ -367,6 +381,7 @@ export class Lexer {
     this.scanStringFn = lex.scanString ?? null;
     this.regexKeywords = new Set(language.regexKeywords ?? []);
     this.linePrefixes = new Map(Object.entries(lex.linePrefixes ?? {}));
+    this.linePrefixPatterns = lex.linePrefixPatterns ?? [];
     this.codeFences = lex.codeFences ?? [];
 
     this.stringOpeners = new Map();
@@ -587,6 +602,7 @@ export class Lexer {
         this.pos += def.close.length;
         return;
       }
+      if (!def.multiline && s[this.pos] === "\n") break;
       this.pos += 1;
     }
     // Unterminated — emit remaining as content
@@ -687,7 +703,8 @@ export class Lexer {
 
       // Code fence detection (markdown ```lang ... ```)
       if (this.codeFences.length > 0) {
-        const atLineStart = this.pos === 0 || s[this.pos - 1] === "\n";
+        const lineStart = s.lastIndexOf("\n", this.pos - 1) + 1;
+        const atLineStart = s.slice(lineStart, this.pos).trim().length === 0;
         if (atLineStart) {
           for (const fence of this.codeFences) {
             if (s.startsWith(fence.open, this.pos)) {
@@ -737,22 +754,33 @@ export class Lexer {
       }
 
       // Line-prefix tokens (diff +/-, log levels, etc.)
-      if (this.linePrefixes.size > 0) {
-        const atLineStart = this.pos === 0 || s[this.pos - 1] === "\n";
+      if (this.linePrefixes.size > 0 || this.linePrefixPatterns.length > 0) {
+        const lineStart = s.lastIndexOf("\n", this.pos - 1) + 1;
+        const atLineStart = s.slice(lineStart, this.pos).trim().length === 0;
         if (atLineStart) {
           // A complete paired delimiter such as `**bold**` takes precedence
           // over a single-character line marker such as Markdown's `*` list
           // prefix. Unterminated delimiters still fall through to the prefix.
-          const hasCompleteDelimiter = this.delimiterOpeners
-            .get(ch)
-            ?.some(
-              (def) =>
-                s.startsWith(def.open, this.pos) &&
-                s.indexOf(def.close, this.pos + def.open.length) !== -1,
+          const lineEnd = s.indexOf("\n", this.pos);
+          const hasCompleteDelimiter = this.delimiterOpeners.get(ch)?.some((def) => {
+            if (!s.startsWith(def.open, this.pos)) return false;
+            const close = s.indexOf(def.close, this.pos + def.open.length);
+            return (
+              close !== -1 && (def.multiline || close < (lineEnd === -1 ? this.length : lineEnd))
             );
+          });
           // Check for multi-char prefixes first (longest match)
           if (!hasCompleteDelimiter) {
+            for (const { pattern, type } of this.linePrefixPatterns) {
+              pattern.lastIndex = 0;
+              if (!pattern.test(s.slice(this.pos))) continue;
+              const end = lineEnd === -1 ? this.length : lineEnd;
+              this.emit(type as RawTokenType, start, end);
+              this.pos = end;
+              break;
+            }
             for (const [prefix, type] of this.linePrefixes) {
+              if (this.pos !== start) break;
               if (s.startsWith(prefix, this.pos)) {
                 // Consume the entire line (prefix + content) as one token
                 let end = this.pos + prefix.length;

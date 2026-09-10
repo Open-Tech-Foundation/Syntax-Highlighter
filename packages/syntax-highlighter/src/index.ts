@@ -23,6 +23,7 @@ export type {
   DelimiterDef,
   LanguageDefinition,
   LexDefinition,
+  LinePrefixPattern,
   RawToken,
   StringDef,
   TokenizerFeatures,

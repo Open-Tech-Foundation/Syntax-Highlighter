@@ -5,6 +5,9 @@ const markdown: LanguageDefinition = {
   name: "markdown",
   aliases: ["md", "mdx", "mkd"],
   semantic: "generic",
+  features: {
+    lineBreakResetsExpectation: true,
+  },
   keywords: [],
   operators: [
     "#",
@@ -51,6 +54,8 @@ const markdown: LanguageDefinition = {
     ],
     comments: [{ open: "<!--", close: "-->" }],
     delimiters: [
+      { open: "***", close: "***", semantic: semantics.text.boldItalic },
+      { open: "___", close: "___", semantic: semantics.text.boldItalic },
       { open: "**", close: "**", semantic: semantics.text.bold },
       { open: "__", close: "__", semantic: semantics.text.bold },
       { open: "*", close: "*", semantic: semantics.text.italic },
@@ -70,6 +75,7 @@ const markdown: LanguageDefinition = {
       "*": "operator",
       "+": "operator",
     },
+    linePrefixPatterns: [{ pattern: /^\d+[.)]\s+/, type: "operator" }],
   },
 };
 

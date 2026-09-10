@@ -101,3 +101,35 @@ test("markdown: complete emphasis at a line start preserves semantic metadata", 
   assert(renderHTML(src, tokens).includes('<span class="sh-text-bold">bold</span>'));
   assert(JSON.parse(renderJSON(src, tokens)).every((token) => token.semantic === "text.bold"));
 });
+
+test("markdown: line tokens reset punctuation state before the next paragraph", () => {
+  const src = "This is **bold**.\n\nThis is *italic*.";
+  const tokens = new UnifiedTokenizer(markdown).tokenize(src);
+  const text = tokens.filter((token) => src.slice(token.start, token.end) === "This")[1];
+  assert(text?.type === "variable", `expected paragraph text, got ${JSON.stringify(text)}`);
+});
+
+test("markdown: recognizes ordered and indented unordered list markers", () => {
+  const ordered = kinds(new UnifiedTokenizer(markdown), "1. First item");
+  assert(
+    ordered.includes("operator:1. First item"),
+    `expected ordered list marker, got ${ordered}`,
+  );
+
+  const nested = kinds(new UnifiedTokenizer(markdown), "  * Nested item");
+  assert(nested.includes("operator:* Nested item"), `expected nested list marker, got ${nested}`);
+  assert(
+    !nested.some((token) => token.includes("text: Nested item")),
+    `unexpected emphasis: ${nested}`,
+  );
+});
+
+test("markdown: combined emphasis stays on one line and has one semantic style", () => {
+  const src = "***bold and italic***";
+  const tokens = new UnifiedTokenizer(markdown).tokenize(src);
+  assert(
+    tokens.every((token) => token.semantic === "text.bold-italic"),
+    `expected combined emphasis semantics, got ${JSON.stringify(tokens)}`,
+  );
+  assert(renderHTML(src, tokens).includes('class="sh-text-bold-italic"'));
+});

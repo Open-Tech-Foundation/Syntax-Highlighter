@@ -119,6 +119,12 @@
   color: var(--sh-text-bold, inherit);
   font-weight: bold;
 }
+::highlight(sh-text-bold-italic),
+.sh-text-bold-italic {
+  color: var(--sh-text-bold-italic, var(--sh-text-bold, inherit));
+  font-style: italic;
+  font-weight: bold;
+}
 ::highlight(sh-text-italic),
 .sh-text-italic {
   color: var(--sh-text-italic, inherit);

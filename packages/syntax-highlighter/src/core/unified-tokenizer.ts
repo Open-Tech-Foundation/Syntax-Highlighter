@@ -59,6 +59,7 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
     typeAnnotationAware: f.typeAnnotationAware ?? false,
     propertyKeys: f.propertyKeys ?? false,
     classDetection: f.classDetection ?? false,
+    lineBreakResetsExpectation: f.lineBreakResetsExpectation ?? false,
   };
 }
 
@@ -225,10 +226,16 @@ export class UnifiedTokenizer {
     if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end, semantic);
 
     // ---- Line-prefix types from lexer (markdown headings, blockquotes, etc.) ----
-    if (raw.type === "keyword") return createToken(TokenType.KEYWORD, raw.start, raw.end, semantic);
+    if (raw.type === "keyword") {
+      ctx.expectation = Expectation.NONE;
+      return createToken(TokenType.KEYWORD, raw.start, raw.end, semantic);
+    }
 
     // ---- Whitespace: always the same ----
     if (raw.type === "whitespace") {
+      if (this.features.lineBreakResetsExpectation && raw.value.includes("\n")) {
+        ctx.expectation = Expectation.NONE;
+      }
       return createToken(WHITESPACE, raw.start, raw.end);
     }
 

@@ -7,6 +7,7 @@
 export const semantics = {
   text: {
     bold: "text.bold",
+    boldItalic: "text.bold-italic",
     italic: "text.italic",
     underline: "text.underline",
     strikethrough: "text.strikethrough",
