@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **MEDIUM:** Redesigned the public website landing page with a syntax-highlighted product preview, clearer capability proof, responsive navigation, and a production-ready call to action.
 - **LOW:** Included the public `website/` in the pnpm workspace and added the `tsr dev:website` development task.
 - **LOW:** Updated the website scaffold's global styling to work with the current OTF Web/Rolldown build pipeline.
 - **MEDIUM:** Converted the demo entry point to mount through a Micro-UI `x-syntax-workbench` component while preserving the editor and terminal DOM islands.
