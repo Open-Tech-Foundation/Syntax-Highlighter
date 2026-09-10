@@ -22,6 +22,10 @@ export const semantics = {
     list: "markup.list",
     link: "markup.link",
     image: "markup.image",
+    table: "markup.table",
+    task: "markup.task",
+    footnote: "markup.footnote",
+    html: "markup.html",
   },
   syntax: {
     delimiter: "syntax.delimiter",

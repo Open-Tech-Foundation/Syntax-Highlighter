@@ -111,6 +111,16 @@ test("markdown: links, images, escapes, and list markers carry markup semantics"
   }
 });
 
+test("markdown: tables, tasks, footnotes, and HTML tags carry markup semantics", () => {
+  const src = ["| Name | Value |", "- [x] Completed task [^1]", "<details>"].join("\n");
+  const semantics = new Set(
+    new UnifiedTokenizer(markdown).tokenize(src).map((token) => token.semantic),
+  );
+  for (const semantic of ["markup.table", "markup.task", "markup.footnote", "markup.html"]) {
+    assert(semantics.has(semantic), `expected ${semantic}`);
+  }
+});
+
 test("markdown: built-in code fences delegate JavaScript and Python", () => {
   const src = "```javascript\nconst value = true;\n```\n```python\ndef greet():\n  return 42\n```";
   const k = kinds(new UnifiedTokenizer(markdown), src);
