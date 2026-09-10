@@ -1,6 +1,5 @@
 import { Navbar } from "@opentf/web-docs";
 import config from "../otfw.config.js";
-import { landingNavbarStyles } from "./landing-navbar.js";
 import { landingThemeStyles } from "./landing-theme.js";
 
 const CodeLine = (props) => <div class="code-line">{props.children}</div>;
@@ -8,7 +7,6 @@ const CodeLine = (props) => <div class="code-line">{props.children}</div>;
 export default function Home() {
   return (
     <main class="marketing">
-      <style>{landingNavbarStyles}</style>
       <style>{landingThemeStyles}</style>
       <Navbar config={config.docs} />
 
@@ -152,11 +150,39 @@ export default function Home() {
           Read the quickstart <span>→</span>
         </a>
       </section>
-      <footer>
-        <span>© Open Tech Foundation</span>
-        <div>
-          <a href="/docs">Documentation</a>
-          <a href="https://github.com/Open-Tech-Foundation/Syntax-Highlighter">Source</a>
+      <footer class="site-footer">
+        <div class="site-footer-inner">
+          <div class="site-footer-org">
+            <a
+              class="site-footer-org-link"
+              href="https://opentechf.org/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="otf-mark" aria-hidden="true">
+                OTF
+              </span>
+              <span>© Open Tech Foundation</span>
+            </a>
+            <span class="site-footer-license">— MIT</span>
+          </div>
+          <a
+            class="site-footer-badge"
+            href="https://web.opentechf.org/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Built with OTF Web"
+          >
+            <span class="site-footer-badge-mark" aria-hidden="true">
+              ▦
+            </span>
+            <span class="site-footer-badge-copy">
+              <span class="site-footer-badge-muted">Built with</span>
+              <span class="site-footer-badge-brand">
+                <b>OTF</b> Web
+              </span>
+            </span>
+          </a>
         </div>
       </footer>
     </main>

@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **MEDIUM:** Restored the default OTF Web Docs navbar behavior on the landing page, refined light-theme code token colors, and adopted the organization footer pattern used by the Micro-UI site.
 - **MEDIUM:** Added a responsive light theme for the public landing page and loaded the official Docs navbar stylesheet there so both theme modes share the same navigation behavior.
 - **LOW:** Made dark mode the first-visit default so the documentation experience visually matches the public landing page while retaining the Docs theme toggle.
 - **LOW:** Reused the OTF Web Docs navbar on the public landing page, including its GitHub action and theme control.
