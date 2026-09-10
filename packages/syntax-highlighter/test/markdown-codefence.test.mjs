@@ -1,4 +1,6 @@
 import { assert, test } from "runtime:test";
+import { renderHTML } from "../src/core/html-renderer.ts";
+import { renderJSON } from "../src/core/json-renderer.ts";
 import { UnifiedTokenizer } from "../src/core/unified-tokenizer.ts";
 import javascript from "../src/languages/javascript.ts";
 import markdown from "../src/languages/markdown.ts";
@@ -86,4 +88,16 @@ test("markdown: inline code", () => {
     k.some((x) => x.startsWith("string:`code`")),
     `expected string for inline code, got ${k}`,
   );
+});
+
+test("markdown: complete emphasis at a line start preserves semantic metadata", () => {
+  const src = "**bold**";
+  const tokens = new UnifiedTokenizer(markdown).tokenize(src);
+
+  assert(
+    tokens.every((token) => token.semantic === "text.bold"),
+    `expected bold semantics on every delimiter token, got ${JSON.stringify(tokens)}`,
+  );
+  assert(renderHTML(src, tokens).includes('<span class="sh-text-bold">bold</span>'));
+  assert(JSON.parse(renderJSON(src, tokens)).every((token) => token.semantic === "text.bold"));
 });

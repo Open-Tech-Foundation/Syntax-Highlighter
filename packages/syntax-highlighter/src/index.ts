@@ -34,7 +34,7 @@ export {
   registerLanguage,
   UnknownLanguageError,
 } from "./core/registry.ts";
-export { semantics, type Semantic } from "./core/semantics.ts";
+export { type Semantic, semantics } from "./core/semantics.ts";
 export type { Token } from "./core/tokens.ts";
 export { createToken, isSignificant, TokenType, WHITESPACE } from "./core/tokens.ts";
 export { UnifiedLexer } from "./core/unified-lexer.ts";

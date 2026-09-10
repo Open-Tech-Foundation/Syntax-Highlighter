@@ -4,4 +4,4 @@ async function fetchUser(id) {
   return res.json();
 }
 
-const user = await fetchUser(42);
+const _user = await fetchUser(42);

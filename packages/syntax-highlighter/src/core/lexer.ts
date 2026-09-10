@@ -740,16 +740,28 @@ export class Lexer {
       if (this.linePrefixes.size > 0) {
         const atLineStart = this.pos === 0 || s[this.pos - 1] === "\n";
         if (atLineStart) {
+          // A complete paired delimiter such as `**bold**` takes precedence
+          // over a single-character line marker such as Markdown's `*` list
+          // prefix. Unterminated delimiters still fall through to the prefix.
+          const hasCompleteDelimiter = this.delimiterOpeners
+            .get(ch)
+            ?.some(
+              (def) =>
+                s.startsWith(def.open, this.pos) &&
+                s.indexOf(def.close, this.pos + def.open.length) !== -1,
+            );
           // Check for multi-char prefixes first (longest match)
-          for (const [prefix, type] of this.linePrefixes) {
-            if (s.startsWith(prefix, this.pos)) {
-              // Consume the entire line (prefix + content) as one token
-              let end = this.pos + prefix.length;
-              const lineEnd = s.indexOf("\n", end);
-              end = lineEnd === -1 ? this.length : lineEnd;
-              this.emit(type as RawTokenType, start, end);
-              this.pos = end;
-              break;
+          if (!hasCompleteDelimiter) {
+            for (const [prefix, type] of this.linePrefixes) {
+              if (s.startsWith(prefix, this.pos)) {
+                // Consume the entire line (prefix + content) as one token
+                let end = this.pos + prefix.length;
+                const lineEnd = s.indexOf("\n", end);
+                end = lineEnd === -1 ? this.length : lineEnd;
+                this.emit(type as RawTokenType, start, end);
+                this.pos = end;
+                break;
+              }
             }
           }
           if (this.pos !== start) continue;

@@ -2,6 +2,15 @@ import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 export const HIGHLIGHTABLE: Set<string> = new Set<string>(Object.values(TokenType));
 
+/**
+ * Return the CSS Custom Highlight / HTML class suffix for a token. Semantic
+ * identities take precedence so `text.bold` maps to `text-bold`, matching the
+ * shared theme selectors.
+ */
+export function tokenStyleName(token: Token): string {
+  return token.semantic?.replaceAll(".", "-").replaceAll(/[^A-Za-z0-9_-]/g, "-") ?? token.type;
+}
+
 export function isValidToken(token: unknown): token is Token {
   if (token == null || typeof token !== "object") return false;
   const t = token as Record<string, unknown>;

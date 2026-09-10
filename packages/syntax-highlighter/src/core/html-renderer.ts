@@ -1,4 +1,4 @@
-import { HIGHLIGHTABLE, iterateTokens } from "./render-helpers.ts";
+import { HIGHLIGHTABLE, iterateTokens, tokenStyleName } from "./render-helpers.ts";
 import { type Token, WHITESPACE } from "./tokens.ts";
 
 export interface HtmlRenderOptions {
@@ -53,7 +53,7 @@ export function renderHTML(
     if (token.type === WHITESPACE) {
       html += wrapWhitespace ? `<span class="${prefix}${token.type}">${escaped}</span>` : escaped;
     } else if (HIGHLIGHTABLE.has(token.type)) {
-      html += `<span class="${prefix}${token.type}">${escaped}</span>`;
+      html += `<span class="${prefix}${tokenStyleName(token)}">${escaped}</span>`;
     } else {
       html += escaped;
     }

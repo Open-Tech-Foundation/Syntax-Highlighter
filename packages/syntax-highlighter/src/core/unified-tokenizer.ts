@@ -212,12 +212,15 @@ export class UnifiedTokenizer {
 
     // ---- Markup types: pass through directly (produced by UnifiedLexer) ----
     if (raw.type === "tag") return createToken(TokenType.TAG, raw.start, raw.end, semantic);
-    if (raw.type === "attribute") return createToken(TokenType.ATTRIBUTE, raw.start, raw.end, semantic);
+    if (raw.type === "attribute")
+      return createToken(TokenType.ATTRIBUTE, raw.start, raw.end, semantic);
     if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end, semantic);
 
     // ---- Diff/patch types: pass through directly ----
-    if (raw.type === "addition") return createToken(TokenType.ADDITION, raw.start, raw.end, semantic);
-    if (raw.type === "deletion") return createToken(TokenType.DELETION, raw.start, raw.end, semantic);
+    if (raw.type === "addition")
+      return createToken(TokenType.ADDITION, raw.start, raw.end, semantic);
+    if (raw.type === "deletion")
+      return createToken(TokenType.DELETION, raw.start, raw.end, semantic);
     if (raw.type === "hunk") return createToken(TokenType.HUNK, raw.start, raw.end, semantic);
     if (raw.type === "header") return createToken(TokenType.HEADER, raw.start, raw.end, semantic);
 
@@ -283,6 +286,7 @@ export class UnifiedTokenizer {
     }
 
     // ---- JS: update previous token state for next iteration ----
+    if (semantic !== undefined && tok.semantic === undefined) tok.semantic = semantic;
     ctx.previousToken = tok;
     ctx.previousValue = raw.value;
 

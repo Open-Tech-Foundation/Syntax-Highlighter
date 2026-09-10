@@ -182,7 +182,7 @@ function mapShikiToSemantic(scopes) {
     const mapped = SHIKI_SCOPE_TO_SEMANTIC[scopes[i]];
     if (mapped) return mapped;
   }
-  return "other";
+  return genericShikiToSemantic(scopes);
 }
 
 /**
@@ -479,7 +479,10 @@ const EXT_LANGS = [
     key: "python",
     shiki: "python",
     samples: [
-      { name: "class + method", src: "class Dog:\n    def bark(self):\n        return 42  # bark\n" },
+      {
+        name: "class + method",
+        src: "class Dog:\n    def bark(self):\n        return 42  # bark\n",
+      },
       { name: "control flow", src: "if x > 0:\n    for i in range(10):\n        print(i)\n" },
       { name: "literals", src: 'name = "Bob"\nage = 30\ndone = True\n' },
     ],
@@ -488,7 +491,10 @@ const EXT_LANGS = [
     key: "java",
     shiki: "java",
     samples: [
-      { name: "class + method", src: "class App {\n  int run() {\n    return 1; // note\n  }\n}\n" },
+      {
+        name: "class + method",
+        src: "class App {\n  int run() {\n    return 1; // note\n  }\n}\n",
+      },
       { name: "control flow", src: "if (x > 0) { for (int i = 0; i < 10; i++) {} }\n" },
       { name: "literals", src: 'String s = "hi"; int n = 3; boolean b = false;\n' },
     ],
@@ -515,7 +521,7 @@ const EXT_LANGS = [
     key: "ruby",
     shiki: "ruby",
     samples: [
-      { name: "class + method", src: "class Dog\n  def bark\n    puts \"hi\" # c\n  end\nend\n" },
+      { name: "class + method", src: 'class Dog\n  def bark\n    puts "hi" # c\n  end\nend\n' },
       { name: "control flow", src: "if x > 0\n  for i in 0..10\n    puts i\n  end\nend\n" },
       { name: "literals", src: 'name = "Bob"\nn = 3\ndone = true\n' },
     ],

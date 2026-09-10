@@ -26,6 +26,11 @@ test("renderANSI wraps semantic tokens with truecolor by default", () => {
   assert(ansi.includes(ANSI_RESET));
 });
 
+test("renderANSI applies supported semantic text styles", () => {
+  const out = renderANSI("bold", [{ type: "text", start: 0, end: 4, semantic: "text.bold" }]);
+  assertEquals(out, "\x1b[1mbold\x1b[0m");
+});
+
 test("renderANSI recovers text via source.slice", () => {
   const src = "const x = 42;";
   const toks = highlighter.highlight(src);

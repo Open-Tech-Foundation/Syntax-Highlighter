@@ -25,13 +25,21 @@ export function validateTokens(source: string, tokens: Token[]): void {
     }
 
     const keys = Object.keys(token).sort();
-    if (keys.length !== 3 || keys[0] !== "end" || keys[1] !== "start" || keys[2] !== "type") {
+    const hasBaseShape =
+      keys.length === 3 && keys[0] === "end" && keys[1] === "start" && keys[2] === "type";
+    const hasSemanticShape =
+      keys.length === 4 &&
+      keys[0] === "end" &&
+      keys[1] === "semantic" &&
+      keys[2] === "start" &&
+      keys[3] === "type";
+    if (!hasBaseShape && !hasSemanticShape) {
       throw new Error(
-        `token at index ${i} must have exactly {start,end,type} — got ${JSON.stringify(keys)}`,
+        `token at index ${i} must have {start,end,type} with optional semantic — got ${JSON.stringify(keys)}`,
       );
     }
 
-    const { start, end, type } = token as unknown as Token;
+    const { start, end, type, semantic } = token as unknown as Token;
 
     if (!Number.isInteger(start) || !Number.isInteger(end)) {
       throw new TypeError(`token at index ${i} start/end must be integers`);
@@ -43,6 +51,9 @@ export function validateTokens(source: string, tokens: Token[]): void {
     }
     if (typeof type !== "string" || !ALLOWED_TYPES.has(type)) {
       throw new TypeError(`token at index ${i} has invalid type ${JSON.stringify(type)}`);
+    }
+    if (semantic !== undefined && (typeof semantic !== "string" || semantic.length === 0)) {
+      throw new TypeError(`token at index ${i} has invalid semantic ${JSON.stringify(semantic)}`);
     }
     if ("text" in token || "value" in token || "modifiers" in token) {
       throw new Error(`token at index ${i} must not contain text/value/modifiers`);

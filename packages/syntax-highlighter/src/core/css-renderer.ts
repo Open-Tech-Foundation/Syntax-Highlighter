@@ -1,4 +1,4 @@
-import { HIGHLIGHTABLE } from "./render-helpers.ts";
+import { HIGHLIGHTABLE, tokenStyleName } from "./render-helpers.ts";
 import { type Token, WHITESPACE } from "./tokens.ts";
 export const HIGHLIGHT_PREFIX = "sh-";
 
@@ -33,10 +33,11 @@ export class CSSHighlightRenderer {
       if (token.type === WHITESPACE || !HIGHLIGHTABLE.has(token.type)) continue;
       if (token.end <= token.start) continue;
       if (token.start < 0 || token.end > source.length) continue;
-      let ranges = byType.get(token.type);
+      const styleName = tokenStyleName(token);
+      let ranges = byType.get(styleName);
       if (!ranges) {
         ranges = [];
-        byType.set(token.type, ranges);
+        byType.set(styleName, ranges);
       }
       const range = this.#range(token.start, token.end);
       if (range) ranges.push(range);

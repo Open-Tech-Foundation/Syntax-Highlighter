@@ -61,6 +61,16 @@ test("renderJSON rejects text/value/modifiers fields", () => {
   assertThrows(() => renderJSON(src, bad));
 });
 
+test("renderJSON preserves valid semantic metadata", () => {
+  const src = "bold";
+  const semantic = [{ start: 0, end: 4, type: "text", semantic: "text.bold" }];
+  assertEquals(JSON.parse(renderJSON(src, semantic)), semantic);
+});
+
+test("renderJSON rejects an empty semantic identity", () => {
+  assertThrows(() => renderJSON("bold", [{ start: 0, end: 4, type: "text", semantic: "" }]));
+});
+
 test("renderJSON rejects split surrogate pair", () => {
   const src = "const 𝒜 = 1;";
   const bad = [

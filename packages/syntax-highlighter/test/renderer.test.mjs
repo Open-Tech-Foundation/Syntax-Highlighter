@@ -72,6 +72,13 @@ test("ranges use UTF-16 offsets and start inclusive end exclusive", () => {
   renderer.dispose();
 });
 
+test("semantic metadata selects the semantic highlight name", () => {
+  const renderer = new CSSHighlightRenderer(element());
+  renderer.render("bold", [{ type: "text", start: 0, end: 4, semantic: "text.bold" }]);
+  assert(highlights.has(`${HIGHLIGHT_PREFIX}text-bold`));
+  renderer.dispose();
+});
+
 test("repeated render(source,tokens) removes stale highlights", () => {
   const el = element();
   const renderer = new CSSHighlightRenderer(el);

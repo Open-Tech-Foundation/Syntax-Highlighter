@@ -7,6 +7,13 @@ import { type Token, WHITESPACE } from "./tokens.ts";
 
 export const ANSI_RESET = "\x1b[0m";
 
+const SEMANTIC_ANSI_STYLES: Record<string, string> = {
+  "text.bold": "\x1b[1m",
+  "text.italic": "\x1b[3m",
+  "text.underline": "\x1b[4m",
+  "text.strikethrough": "\x1b[9m",
+};
+
 export type { AnsiTheme };
 export { ANSI_PALETTES, ANSI_THEMES, defaultLight, defaultTheme };
 
@@ -109,7 +116,8 @@ export function renderANSI(
         }
       } else if (HIGHLIGHTABLE.has(token.type)) {
         const color = colors[token.type];
-        out += color ? `${color}${text}${ANSI_RESET}` : text;
+        const style = token.semantic == null ? undefined : SEMANTIC_ANSI_STYLES[token.semantic];
+        out += color || style ? `${style ?? ""}${color ?? ""}${text}${ANSI_RESET}` : text;
       } else {
         out += text;
       }

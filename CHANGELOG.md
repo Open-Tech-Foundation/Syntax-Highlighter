@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **HIGH:** Restored semantic token rendering end-to-end: HTML and CSS Custom Highlight renderers now use semantic identities (for example, `text.bold` → `sh-text-bold`), ANSI renders supported text styles, the tokenizer preserves semantic metadata on punctuation and operators, and JSON rendering accepts validated semantic metadata.
+- **HIGH:** Fixed Markdown emphasis at the start of a line being consumed as a list marker before paired-delimiter parsing.
+
 ### Changed
 
 - **MEDIUM:** Converted the demo entry point to mount through a Micro-UI `x-syntax-workbench` component while preserving the editor and terminal DOM islands.

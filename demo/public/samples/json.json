@@ -2,6 +2,6 @@
   "name": "demo",
   "version": "1.0.0",
   "private": true,
-  // comment (jsonc)
+  "note": "JSONC comments are supported through the jsonc alias",
   "keywords": ["demo", "test"]
 }
