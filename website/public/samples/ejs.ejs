@@ -1,0 +1,47 @@
+<%# Showcase: EJS — embedded JavaScript templates. %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title || "Demo" %></title>
+</head>
+<body>
+  <% if (user) { %>
+    <p>Hello, <%= user.name %>!</p>
+  <% } else { %>
+    <p>Hello, stranger. <a href="/login">Log in</a></p>
+  <% } %>
+
+  <ul>
+    <% todos.forEach((todo, i) => { %>
+      <li class="<%= todo.done ? "is-done" : "" %>">
+        <%= i + 1 %>. <%- todo.html %>
+      </li>
+    <% }); %>
+  </ul>
+
+  <%_ const total = items.reduce((a, b) => a + b.price, 0); _%>
+  <p>Total: $<%= total.toFixed(2) %></p>
+
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+      <% for (const item of items) { %>
+        <tr>
+          <td><%= item.name %></td>
+          <td>$<%= item.price.toFixed(2) %></td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <% if (promo) { %>
+    <p class="promo"><%- promo.html %></p>
+  <% } %>
+
+  <%# A comment that emits nothing. %>
+  <%- include("partials/footer", { year: 2026 }) %>
+</body>
+</html>

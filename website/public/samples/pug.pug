@@ -1,0 +1,56 @@
+//- Showcase: Pug — indentation-based templates with logic.
+//- layout.pug
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    title= pageTitle || "Demo"
+    link(rel="stylesheet" href="/app.css")
+  body
+    block content
+
+//- index.pug
+extends layout.pug
+
+block append scripts
+  script(src="/app.js" defer)
+
+block content
+  - const langs = ["js", "py", "rs"];
+  h1 Highlight demo
+  p.lede One tokenizer, #{langs.length} favorites.
+
+  if user
+    p Hello, #{user.name}!
+  else
+    p Hello, stranger. #[a(href="/login") Log in]
+
+  ul.todos
+    each todo, i in todos
+      li(class=todo.done ? "is-done" : "") #{i + 1}. #{todo.text}
+    else
+      li Nothing here yet.
+
+  case status
+    when "loading"
+      p Loading…
+    when "error"
+      p.error Something broke.
+    default
+      p Ready.
+
+  mixin field(id, label, type="text")
+    label(for=id)= label
+    input(id=id name=id type=type required)
+
+  form(action="/signup" method="post")
+    +field("email", "Email", "email")
+    +field("password", "Password", "password")
+    button(type="submit") Sign up
+
+  pre: code.language-js const x = 1;
+
+  // Conditional comment for old IE
+  <!--[if IE 8]>
+  p Please upgrade.
+  <![endif]-->

@@ -1,0 +1,50 @@
+# Showcase: regex.txt — one pattern per line, explained above each.
+# Simple email (good enough for demos, not RFC 5322)
+/^(?<user>[^@\s]+)@(?<host>[^@\s]+\.[a-z]{2,})$/i
+
+# ISO date with capture groups
+/^(\d{4})-(\d{2})-(\d{2})$/
+
+# Hex color, 3 or 6 digits
+/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+
+# Words with apostrophes, unicode-aware
+/[\p{L}']+/u
+
+# Balanced quotes via backreference
+/(["'])(?:\\\1|(?!\1).)*\1/
+
+# Lookahead password rule: 8+ chars, letter and digit
+/^(?=.*[A-Za-z])(?=.*\d).{8,}$/
+
+# URL splitter, verbose mode
+/
+  ^(?<scheme>https?)://
+  (?<host>[^/:]+)
+  (:(?<port>\d+))?
+  (?<path>/\S*)?
+$/x
+
+# Match ANSI SGR sequences
+/\x1b\[[0-9;]*m/
+
+# Duplicate words on a line
+/\b(\w+)\s+\1\b/i
+
+# Semver with prerelease and build metadata
+/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$/
+
+# IPv4 dotted quad
+/\b(?:\d{1,3}\.){3}\d{1,3}\b/
+
+# Time HH:MM, 24-hour clock
+/^([01]\d|2[0-3]):[0-5]\d$/
+
+# HTML tag with attributes
+/<([a-z][a-z0-9]*)\b[^>]*>(.*?)<\/\1>/is
+
+# Markdown inline code span
+/`([^`\n]+)`/
+
+# Snake to kebab preview (replace _ with -)
+/(?<=^|_) pri (?=_|$)/x

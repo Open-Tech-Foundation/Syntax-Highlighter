@@ -1,0 +1,68 @@
+// Showcase: Less — variables, mixins with guards, and operations.
+@bg: #0b1120;
+@fg: #e2e8f0;
+@accent: #7c6cf0;
+@radius: 0.625rem;
+@gap: 1rem;
+
+.card(@pad: 1.5rem) {
+  border: 1px solid #1e293b;
+  border-radius: @radius;
+  padding: @pad;
+}
+
+.theme(@mode) when (@mode = dark) {
+  color-scheme: dark;
+  background: @bg;
+  color: @fg;
+}
+.theme(@mode) when (@mode = light) {
+  color-scheme: light;
+  background: #fff;
+  color: #182033;
+}
+.theme(@_) {
+  // fallback for anything else
+  background: transparent;
+}
+
+.playground {
+  .card();
+  .theme(dark);
+  display: grid;
+  gap: @gap;
+
+  h2 {
+    font-size: 1.25rem;
+    margin: 0 0 @gap / 2;
+  }
+
+  & > textarea {
+    width: 100%;
+
+    &:focus {
+      border-color: @accent;
+    }
+  }
+
+  .actions {
+    .button + .button {
+      margin-left: (@gap / 2);
+    }
+  }
+}
+
+@iterations: 4;
+.loop(@i) when (@i > 0) {
+  .mt-@{i} {
+    margin-top: (@i * 4px);
+  }
+  .loop(@i - 1);
+}
+.loop(@iterations);
+
+@media (max-width: 56rem) {
+  .playground {
+    grid-template-columns: 1fr;
+  }
+}

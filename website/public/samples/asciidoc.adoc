@@ -1,0 +1,56 @@
+// Showcase: AsciiDoc — sections, admonitions, and includes.
+= Syntax Highlighter
+Ada Lovelace <ada@example.com>
+v0.4.0, 2026-01-15
+:toc: left
+:icons: font
+:source-highlighter: highlight.js
+
+== Introduction
+
+One *tokenizer* for _browser_ highlights, `HTML`, and #ANSI# output.
+See https://example.com/docs[the docs] and <<api,API>>.
+
+NOTE: Tokens use exclusive `start`/`end` offsets.
+
+WARNING: Unknown languages raise; they never guess.
+
+TIP: Register custom languages without touching the tokenizer.
+
+== Pipeline
+
+. Tokenize with `highlight(source)`.
+. Render with `renderHTML`.
+. Theme with `--sh-*` variables.
+
+[source,typescript]
+----
+const hl = await createHighlighter({ language: "typescript" });
+const tokens = hl.highlight(source);
+----
+
+[source,json]
+----
+{ "tokens": 1106 }
+----
+
+[cols="1,1,1"]
+|===
+| Lang | Files | Tokens
+
+| JavaScript
+| 120
+| 9,800
+
+| Python
+| 85
+| 6,100
+|===
+
+[#api]
+== API details
+
+- [x] Tokenizer done
+- [ ] 1.0 release
+
+include::partials/footer.adoc[]

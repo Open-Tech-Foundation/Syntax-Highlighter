@@ -1,0 +1,55 @@
+#+TITLE: Highlight demo notes
+#+AUTHOR: Ada Lovelace
+#+DATE: [2026-01-15 Thu]
+#+OPTIONS: toc:2 num:t
+#+PROPERTY: header-args :eval no
+
+* Introduction
+One tokenizer for browser highlights, HTML, and ANSI output.
+
+** Why semantic tokens?
+Language definitions produce stable types such as =keyword=,
+~verbatim~, and /italic/ text with +strikethrough+ and _underline_.
+
+* Tasks
+** TODO Write the tokenizer [#A]
+   SCHEDULED: <2026-02-01 Sun> DEADLINE: <2026-02-10 Mon>
+   :PROPERTIES:
+   :Effort:   4:00
+   :END:
+** DONE Add ANSI themes
+   CLOSED: [2026-01-20 Tue 10:00]
+** WAITING Review from grace@example.com
+** TODO [#B] Tables and footnotes           :docs:
+
+* Data
+| Language   | Files | Tokens |
+|------------+-------+--------|
+| JavaScript |   120 |   9800 |
+| Python     |    85 |   6100 |
+#+TBLFM: @3$3=@3$2*80;%.0f
+
+* Code
+#+BEGIN_SRC javascript :results output
+const answer = 40 + 2;
+console.log(`answer: ${answer}`);
+#+END_SRC
+
+#+BEGIN_SRC python :session demo
+def greet(name):
+    return f"hello, {name}!"
+#+END_SRC
+
+#+BEGIN_QUOTE
+Tokens carry meaning beyond color.
+#+END_QUOTE
+
+#+BEGIN_EXAMPLE
+Verbatim lines stay literal: *no* /markup/ here.
+#+END_EXAMPLE
+
+* Links and footnotes
+See [[https://example.com/docs][the docs]] and [[file:notes.org][local notes]].
+A footnote reference[fn:1] lives here.
+
+[fn:1] Footnotes collect details.

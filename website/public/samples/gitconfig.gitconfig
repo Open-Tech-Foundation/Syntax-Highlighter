@@ -1,0 +1,60 @@
+# Showcase: gitconfig — identity, aliases, and repo settings.
+[user]
+	name = Ada Lovelace
+	email = ada@example.com
+	signingkey = ABCDEF12
+
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	editor = vim
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[init]
+	defaultBranch = main
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status --short --branch
+	lg = log --oneline --graph --decorate -20
+	unstage = reset HEAD --
+	amend = commit --amend --no-edit
+	who = shortlog -sne --all
+
+[color]
+	ui = auto
+
+[color "status"]
+	added = green
+	changed = yellow bold
+	untracked = red
+
+[pull]
+	rebase = true
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+	pruneTags = false
+
+[commit]
+	gpgsign = true
+	verbose = true
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+[includeIf "gitdir:~/work/"]
+	path = ~/.gitconfig-work
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true

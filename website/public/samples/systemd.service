@@ -1,0 +1,53 @@
+# Showcase: systemd — units, timers, and overrides.
+[Unit]
+Description=Syntax highlighter demo
+Documentation=https://example.com/docs
+After=network-online.target
+Wants=network-online.target
+Requires=data.mount
+Conflicts=maintenance.service
+
+[Service]
+Type=notify
+User=highlight
+Group=highlight
+WorkingDirectory=/srv/app
+Environment=NODE_ENV=production
+Environment="GREETING=hello, world"
+EnvironmentFile=-/etc/highlight/env
+ExecStartPre=/usr/bin/node --check /srv/app/server.js
+ExecStart=/usr/bin/node /srv/app/server.js --port 5173
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=30
+TimeoutStopSec=10
+LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+MemoryMax=512M
+CPUQuota=150%
+
+[Install]
+WantedBy=multi-user.target
+Also=highlight-timer.timer
+
+# /etc/systemd/system/highlight.service.d/override.conf
+[Service]
+Environment=LOG_LEVEL=debug
+RestartSec=2s
+
+# highlight-timer.timer — run every 5 minutes
+[Unit]
+Description=Refresh highlight cache
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+RandomizedDelaySec=30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

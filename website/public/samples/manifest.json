@@ -1,27 +1,507 @@
 [
-  { "name": "javascript — modern features", "language": "javascript", "file": "javascript.js" },
-  { "name": "typescript — types and generics", "language": "typescript", "file": "typescript.ts" },
-  { "name": "jsx — components and hooks", "language": "jsx", "file": "jsx.jsx" },
-  { "name": "html — document and forms", "language": "html", "file": "html.html" },
-  { "name": "css — layout and animation", "language": "css", "file": "css.css" },
-  { "name": "python — typing and async", "language": "python", "file": "python.py" },
-  { "name": "json — nested config", "language": "json", "file": "json.json" },
-  { "name": "bash — script", "language": "bash", "file": "bash.sh" },
-  { "name": "sql — queries", "language": "sql", "file": "sql.sql" },
-  { "name": "yaml — ci workflow", "language": "yaml", "file": "yaml.yml" },
-  { "name": "markdown — document", "language": "markdown", "file": "markdown.md" },
-  { "name": "java — streams and records", "language": "java", "file": "java.java" },
-  { "name": "go — goroutines and generics", "language": "go", "file": "go.go" },
-  { "name": "rust — traits and errors", "language": "rust", "file": "rust.rs" },
-  { "name": "php — enums and match", "language": "php", "file": "php.php" },
-  { "name": "ruby — blocks and mixins", "language": "ruby", "file": "ruby.rb" },
-  { "name": "c — pointers and structs", "language": "c", "file": "c.c" },
-  { "name": "c++ — templates and stl", "language": "cpp", "file": "cpp.cpp" },
-  { "name": "c# — linq and records", "language": "csharp", "file": "csharp.cs" },
-  { "name": "swift — optionals and actors", "language": "swift", "file": "swift.swift" },
-  { "name": "kotlin — coroutines", "language": "kotlin", "file": "kotlin.kt" },
-  { "name": "toml — config", "language": "toml", "file": "toml.toml" },
-  { "name": "xml — catalog", "language": "xml", "file": "xml.xml" },
-  { "name": "docker — multi-stage build", "language": "dockerfile", "file": "Dockerfile" },
-  { "name": "diff — unified patch", "language": "diff", "file": "diff.diff" }
+  {
+    "name": "javascript — modern features",
+    "language": "javascript",
+    "file": "javascript.js"
+  },
+  {
+    "name": "typescript — types and generics",
+    "language": "typescript",
+    "file": "typescript.ts"
+  },
+  {
+    "name": "jsx — components and hooks",
+    "language": "jsx",
+    "file": "jsx.jsx"
+  },
+  {
+    "name": "html — document and forms",
+    "language": "html",
+    "file": "html.html"
+  },
+  {
+    "name": "css — layout and animation",
+    "language": "css",
+    "file": "css.css"
+  },
+  {
+    "name": "python — typing and async",
+    "language": "python",
+    "file": "python.py"
+  },
+  {
+    "name": "json — nested config",
+    "language": "json",
+    "file": "json.json"
+  },
+  {
+    "name": "bash — script",
+    "language": "bash",
+    "file": "bash.sh"
+  },
+  {
+    "name": "sql — queries",
+    "language": "sql",
+    "file": "sql.sql"
+  },
+  {
+    "name": "yaml — ci workflow",
+    "language": "yaml",
+    "file": "yaml.yml"
+  },
+  {
+    "name": "markdown — document",
+    "language": "markdown",
+    "file": "markdown.md"
+  },
+  {
+    "name": "java — streams and records",
+    "language": "java",
+    "file": "java.java"
+  },
+  {
+    "name": "go — goroutines and generics",
+    "language": "go",
+    "file": "go.go"
+  },
+  {
+    "name": "rust — traits and errors",
+    "language": "rust",
+    "file": "rust.rs"
+  },
+  {
+    "name": "php — enums and match",
+    "language": "php",
+    "file": "php.php"
+  },
+  {
+    "name": "ruby — blocks and mixins",
+    "language": "ruby",
+    "file": "ruby.rb"
+  },
+  {
+    "name": "c — pointers and structs",
+    "language": "c",
+    "file": "c.c"
+  },
+  {
+    "name": "c++ — templates and stl",
+    "language": "cpp",
+    "file": "cpp.cpp"
+  },
+  {
+    "name": "c# — linq and records",
+    "language": "csharp",
+    "file": "csharp.cs"
+  },
+  {
+    "name": "swift — optionals and actors",
+    "language": "swift",
+    "file": "swift.swift"
+  },
+  {
+    "name": "kotlin — coroutines",
+    "language": "kotlin",
+    "file": "kotlin.kt"
+  },
+  {
+    "name": "toml — config",
+    "language": "toml",
+    "file": "toml.toml"
+  },
+  {
+    "name": "xml — catalog",
+    "language": "xml",
+    "file": "xml.xml"
+  },
+  {
+    "name": "docker — multi-stage build",
+    "language": "dockerfile",
+    "file": "Dockerfile"
+  },
+  {
+    "name": "diff — unified patch",
+    "language": "diff",
+    "file": "diff.diff"
+  },
+  {
+    "name": "scss — mixins and nesting",
+    "language": "scss",
+    "file": "scss.scss"
+  },
+  {
+    "name": "vue — single-file component",
+    "language": "vue",
+    "file": "vue.vue"
+  },
+  {
+    "name": "svelte — runes and blocks",
+    "language": "svelte",
+    "file": "svelte.svelte"
+  },
+  {
+    "name": "graphql — schema and ops",
+    "language": "graphql",
+    "file": "graphql.graphql"
+  },
+  {
+    "name": "dart — null safety",
+    "language": "dart",
+    "file": "dart.dart"
+  },
+  {
+    "name": "scala — matching and futures",
+    "language": "scala",
+    "file": "scala.scala"
+  },
+  {
+    "name": "lua — tables and coroutines",
+    "language": "lua",
+    "file": "lua.lua"
+  },
+  {
+    "name": "perl — regex and refs",
+    "language": "perl",
+    "file": "perl.pl"
+  },
+  {
+    "name": "r — frames and vectors",
+    "language": "r",
+    "file": "r.r"
+  },
+  {
+    "name": "powershell — cmdlets",
+    "language": "powershell",
+    "file": "powershell.ps1"
+  },
+  {
+    "name": "objectivec — classes and blocks",
+    "language": "objectivec",
+    "file": "objectivec.m"
+  },
+  {
+    "name": "haskell — ADTs and monads",
+    "language": "haskell",
+    "file": "haskell.hs"
+  },
+  {
+    "name": "elixir — pipes and OTP",
+    "language": "elixir",
+    "file": "elixir.ex"
+  },
+  {
+    "name": "zig — comptime and errors",
+    "language": "zig",
+    "file": "zig.zig"
+  },
+  {
+    "name": "matlab — matrices",
+    "language": "matlab",
+    "file": "matlab.m"
+  },
+  {
+    "name": "clojure — threading data",
+    "language": "clojure",
+    "file": "clojure.clj"
+  },
+  {
+    "name": "fsharp — unions and builders",
+    "language": "fsharp",
+    "file": "fsharp.fs"
+  },
+  {
+    "name": "groovy — closures",
+    "language": "groovy",
+    "file": "groovy.groovy"
+  },
+  {
+    "name": "solidity — ERC-20 token",
+    "language": "solidity",
+    "file": "solidity.sol"
+  },
+  {
+    "name": "nginx — proxy and TLS",
+    "language": "nginx",
+    "file": "nginx.conf"
+  },
+  {
+    "name": "latex — math and floats",
+    "language": "latex",
+    "file": "latex.tex"
+  },
+  {
+    "name": "regex — pattern gallery",
+    "language": "regex",
+    "file": "regex.txt"
+  },
+  {
+    "name": "protobuf — schema",
+    "language": "protobuf",
+    "file": "protobuf.proto"
+  },
+  {
+    "name": "hcl — infra blocks",
+    "language": "hcl",
+    "file": "hcl.hcl"
+  },
+  {
+    "name": "http — requests",
+    "language": "http",
+    "file": "http.http"
+  },
+  {
+    "name": "ocaml — variants",
+    "language": "ocaml",
+    "file": "ocaml.ml"
+  },
+  {
+    "name": "elm — model update view",
+    "language": "elm",
+    "file": "elm.elm"
+  },
+  {
+    "name": "fortran — arrays",
+    "language": "fortran",
+    "file": "fortran.f90"
+  },
+  {
+    "name": "pascal — units and classes",
+    "language": "pascal",
+    "file": "pascal.pas"
+  },
+  {
+    "name": "ada — packages and tasks",
+    "language": "ada",
+    "file": "ada.adb"
+  },
+  {
+    "name": "lisp — macros",
+    "language": "lisp",
+    "file": "lisp.lisp"
+  },
+  {
+    "name": "scheme — closures",
+    "language": "scheme",
+    "file": "scheme.scm"
+  },
+  {
+    "name": "prolog — backtracking",
+    "language": "prolog",
+    "file": "prolog.pl"
+  },
+  {
+    "name": "smalltalk — live objects",
+    "language": "smalltalk",
+    "file": "smalltalk.st"
+  },
+  {
+    "name": "d — templates and ranges",
+    "language": "d",
+    "file": "d.d"
+  },
+  {
+    "name": "v — structs and results",
+    "language": "v",
+    "file": "v.v"
+  },
+  {
+    "name": "odin — SOA and unions",
+    "language": "odin",
+    "file": "odin.odin"
+  },
+  {
+    "name": "gleam — pipes and actors",
+    "language": "gleam",
+    "file": "gleam.gleam"
+  },
+  {
+    "name": "tcl — strings everywhere",
+    "language": "tcl",
+    "file": "tcl.tcl"
+  },
+  {
+    "name": "raku — grammars",
+    "language": "raku",
+    "file": "raku.raku"
+  },
+  {
+    "name": "vb — LINQ and XML",
+    "language": "vb",
+    "file": "vb.vb"
+  },
+  {
+    "name": "coffeescript — whitespace",
+    "language": "coffeescript",
+    "file": "coffeescript.coffee"
+  },
+  {
+    "name": "haml — Ruby templates",
+    "language": "haml",
+    "file": "haml.haml"
+  },
+  {
+    "name": "ejs — embedded JS",
+    "language": "ejs",
+    "file": "ejs.ejs"
+  },
+  {
+    "name": "stylus — minimal CSS",
+    "language": "stylus",
+    "file": "stylus.styl"
+  },
+  {
+    "name": "ini — sections",
+    "language": "ini",
+    "file": "ini.ini"
+  },
+  {
+    "name": "env — twelve-factor env",
+    "language": "env",
+    "file": "env.env"
+  },
+  {
+    "name": "csv — quoting edge cases",
+    "language": "csv",
+    "file": "csv.csv"
+  },
+  {
+    "name": "properties — escapes",
+    "language": "properties",
+    "file": "properties.properties"
+  },
+  {
+    "name": "fish — friendly shell",
+    "language": "fish",
+    "file": "fish.fish"
+  },
+  {
+    "name": "systemd — units",
+    "language": "systemd",
+    "file": "systemd.service"
+  },
+  {
+    "name": "apache — vhosts",
+    "language": "apache",
+    "file": "apache.conf"
+  },
+  {
+    "name": "typst — typesetting",
+    "language": "typst",
+    "file": "typst.typ"
+  },
+  {
+    "name": "org — notes and tasks",
+    "language": "org",
+    "file": "org.org"
+  },
+  {
+    "name": "wasm — module anatomy",
+    "language": "wasm",
+    "file": "wasm.wat"
+  },
+  {
+    "name": "stf — typed config",
+    "language": "stf",
+    "file": "stf.stf"
+  },
+  {
+    "name": "erlang — OTP basics",
+    "language": "erlang",
+    "file": "erlang.erl"
+  },
+  {
+    "name": "julia — dispatch",
+    "language": "julia",
+    "file": "julia.jl"
+  },
+  {
+    "name": "assembly — syscalls",
+    "language": "assembly",
+    "file": "assembly.s"
+  },
+  {
+    "name": "nim — templates",
+    "language": "nim",
+    "file": "nim.nim"
+  },
+  {
+    "name": "crystal — macros",
+    "language": "crystal",
+    "file": "crystal.cr"
+  },
+  {
+    "name": "less — guarded mixins",
+    "language": "less",
+    "file": "less.less"
+  },
+  {
+    "name": "astro — islands",
+    "language": "astro",
+    "file": "astro.astro"
+  },
+  {
+    "name": "pug — indentation templates",
+    "language": "pug",
+    "file": "pug.pug"
+  },
+  {
+    "name": "handlebars — helpers",
+    "language": "handlebars",
+    "file": "handlebars.hbs"
+  },
+  {
+    "name": "jinja — inheritance",
+    "language": "jinja",
+    "file": "jinja.jinja"
+  },
+  {
+    "name": "liquid — drops and filters",
+    "language": "liquid",
+    "file": "liquid.liquid"
+  },
+  {
+    "name": "nix — flakes",
+    "language": "nix",
+    "file": "nix.nix"
+  },
+  {
+    "name": "batch — labels and loops",
+    "language": "batch",
+    "file": "batch.bat"
+  },
+  {
+    "name": "gitconfig — aliases",
+    "language": "gitconfig",
+    "file": "gitconfig.gitconfig"
+  },
+  {
+    "name": "actions — reusable CI",
+    "language": "actions",
+    "file": "actions.yml"
+  },
+  {
+    "name": "kubernetes — manifests",
+    "language": "kubernetes",
+    "file": "kubernetes.yaml"
+  },
+  {
+    "name": "rst — directives",
+    "language": "rst",
+    "file": "rst.rst"
+  },
+  {
+    "name": "asciidoc — admonitions",
+    "language": "asciidoc",
+    "file": "asciidoc.adoc"
+  },
+  {
+    "name": "cmake — targets",
+    "language": "cmake",
+    "file": "CMakeLists.txt"
+  },
+  {
+    "name": "makefile — pattern rules",
+    "language": "makefile",
+    "file": "Makefile"
+  }
 ]

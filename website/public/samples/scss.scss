@@ -1,0 +1,84 @@
+// Showcase: SCSS — variables, mixins, nesting, and functions.
+@use "sass:color";
+@use "sass:math";
+
+$bg: #0b1120;
+$fg: #e2e8f0;
+$accent: #7c6cf0;
+$radius: 0.625rem;
+$breakpoint: 56rem;
+
+@mixin card($pad: 1.5rem) {
+  border: 1px solid #1e293b;
+  border-radius: $radius;
+  padding: $pad;
+  background: rgb(255 255 255 / 0.02);
+}
+
+@function tint($color, $amount) {
+  @return color.mix(white, $color, $amount);
+}
+
+%truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playground {
+  @include card;
+  display: grid;
+  gap: 1rem;
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .badge {
+      @extend %truncate;
+      background: tint($accent, 80%);
+      color: $bg;
+    }
+  }
+
+  textarea {
+    width: 100%;
+    font-family: ui-monospace, monospace;
+
+    &:focus-visible {
+      outline: 2px solid $accent;
+    }
+
+    &::placeholder {
+      color: #5b6a89;
+    }
+  }
+
+  @for $i from 1 through 3 {
+    .col-#{$i} {
+      grid-column: span $i;
+    }
+  }
+
+  @each $mode in light, dark {
+    &.#{$mode} {
+      color-scheme: $mode;
+    }
+  }
+
+  @if $radius > 0.5rem {
+    box-shadow: 0 30px 70px rgb(0 0 0 / 0.35);
+  } @else {
+    box-shadow: none;
+  }
+
+  @media (max-width: $breakpoint) {
+    grid-template-columns: 1fr;
+  }
+}

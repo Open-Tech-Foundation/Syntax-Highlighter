@@ -1,0 +1,43 @@
+{% comment %}Showcase: Liquid — drops, filters, and tags.{% endcomment %}
+---
+layout: default
+title: Highlight demo
+---
+
+<h1>{{ page.title | upcase }}</h1>
+
+{% if user %}
+  <p>Hello, {{ user.name | escape }}!</p>
+{% elsif guest %}
+  <p>Hello, guest.</p>
+{% else %}
+  <p>Hello, stranger.</p>
+{% endif %}
+
+{% assign total = 0 %}
+<ul>
+  {% for todo in todos limit: 10 offset: 2 %}
+    <li class="{% if todo.done %}is-done{% endif %}">
+      {{ forloop.index }}. {{ todo.text | truncate: 40 }}
+      {% assign total = total | plus: 1 %}
+    </li>
+  {% else %}
+    <li>Nothing here yet.</li>
+  {% endfor %}
+</ul>
+
+{% capture greeting %}hello, {{ user.name | default: "world" }}{% endcapture %}
+<p>{{ greeting | strip | append: "!" }}</p>
+
+{% case status %}
+  {% when "loading" %}
+    <p>Loading…</p>
+  {% when "error" %}
+    <p>{{ error.message }}</p>
+  {% else %}
+    <p>Ready ({{ total }} shown).</p>
+{% endcase %}
+
+{% tablerow p in products cols: 3 %}
+  {{ p.title }} — {{ p.price | money }}
+{% endtablerow %}

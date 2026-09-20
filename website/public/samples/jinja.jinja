@@ -1,0 +1,42 @@
+{# Showcase: Jinja — template inheritance, filters, macros. #}
+{% extends "layout.html" %}
+{% from "forms.html" import input as input_field with context %}
+{% set title = "Highlight demo" %}
+
+{% block head %}
+  {{ super() }}
+  <meta name="description" content="Demo page" />
+{% endblock %}
+
+{% block content %}
+  <h1>{{ title|upper }}</h1>
+  {% if user is defined and user.is_admin %}
+    <p>Hello, {{ user.name|e }}!</p>
+  {% elif user is defined %}
+    <p>Hello, {{ user.name|default("stranger", true) }}.</p>
+  {% else %}
+    <p>Hello, stranger.</p>
+  {% endif %}
+
+  <ul>
+    {% for todo in todos recursive %}
+      <li class="{{ "is-done" if todo.done }}">
+        {{ loop.index }}. {{ todo.text }}
+        {% if todo.subtasks %}
+          <ul>{{ loop(todo.subtasks) }}</ul>
+        {% endif %}
+      </li>
+    {% else %}
+      <li>Nothing here yet.</li>
+    {% endfor %}
+  </ul>
+
+  {% macro field(id, label, type="text") %}
+    <label for="{{ id }}">{{ label }}</label>
+    <input id="{{ id }}" name="{{ id }}" type="{{ type }}" required />
+  {% endmacro %}
+  {{ field("email", "Email", type="email") }}
+
+  {% filter upper %}shouted{% endfilter %}
+  {% raw %}Not a tag: {{ literal }}{% endraw %}
+{% endblock %}

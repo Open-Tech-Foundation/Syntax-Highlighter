@@ -1,0 +1,40 @@
+{{! Showcase: Handlebars — helpers, blocks, and partials. }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{title}}</title>
+</head>
+<body>
+  {{#if user}}
+    <p>Hello, {{user.name}}!</p>
+  {{else}}
+    <p>Hello, stranger. <a href="/login">Log in</a></p>
+  {{/if}}
+
+  <ul>
+    {{#each todos as |todo i|}}
+      <li class="{{if todo.done "is-done"}}">
+        {{i}}. {{todo.text}}
+      </li>
+    {{else}}
+      <li>Nothing here yet.</li>
+    {{/each}}
+  </ul>
+
+  {{#unless ready}}
+    <p>Loading…</p>
+  {{/unless}}
+
+  {{#with author}}
+    <p>By {{first}} {{last}}</p>
+  {{/with}}
+
+  {{! Custom helper with hash args }}
+  {{format-date createdAt format="long" tz="UTC"}}
+
+  {{> footer year=2026 }}
+
+  {{!-- Block comment with {{mustache}} inside. --}}
+</body>
+</html>

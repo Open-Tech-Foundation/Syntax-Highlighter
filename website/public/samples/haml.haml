@@ -1,0 +1,49 @@
+-# Showcase: Haml — significant whitespace and Ruby evaluation.
+-# layout.haml
+!!!
+%html{lang: "en"}
+  %head
+    %meta{charset: "UTF-8"}/
+    %title= page_title || "Demo"
+    = stylesheet_link_tag "app"
+  %body
+    = yield
+
+-# index.haml
+- title "Highlight demo"
+%main.playground
+  %h1= title
+  %p.lede One tokenizer, #{langs.size} favorites.
+
+  - if user
+    %p Hello, #{user.name}!
+  - else
+    %p
+      Hello, stranger.
+      %a{href: "/login"} Log in
+
+  %ul.todos
+    - todos.each_with_index do |todo, i|
+      %li{class: ("is-done" if todo.done)} #{i + 1}. #{todo.text}
+    - if todos.empty?
+      %li Nothing here yet.
+
+  - case status
+  - when :loading
+    %p Loading…
+  - when :error
+    %p.error Something broke.
+  - else
+    %p Ready.
+
+  %form{action: "/signup", method: "post", data: {turbo: true}}
+    %label{for: "email"} Email
+    %input#email{name: "email", type: "email", required: true}/
+    %button{type: "submit", disabled: busy} Sign up
+
+  %pre
+    %code.language-js const x = 1;
+
+  / Conditional comment
+  /[if IE 8]
+    %p Please upgrade.

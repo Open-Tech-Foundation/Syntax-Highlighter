@@ -1,0 +1,48 @@
+---
+// Showcase: Astro — frontmatter, islands, and slots.
+import { useState } from "react";
+import Playground from "../components/Playground.astro";
+import Terminal from "../components/Terminal.tsx";
+import "../styles/app.css";
+
+export const prerender = true;
+
+const { language = "typescript" } = Astro.props;
+const samples = await Astro.glob("../samples/*.{js,ts}");
+const theme = Astro.cookies.get("theme")?.value ?? "dark";
+---
+
+<Playground title="Try it live" {language}>
+  <Fragment slot="toolbar">
+    <button id="run">Run</button>
+  </Fragment>
+
+  <section>
+    <h1>Highlight demo</h1>
+    <p>Showing <strong>{samples.length}</strong> samples.</p>
+    <ul>
+      {samples.map((s) => (
+        <li>
+          <a href={s.url}>{s.frontmatter.title ?? s.file}</a>
+        </li>
+      ))}
+    </ul>
+    {theme === "dark" ? <p>Dark side.</p> : <p>Light side.</p>}
+  </section>
+
+  <Terminal client:visible command="highlight demo.ts" />
+  <Counter client:load initial={0} />
+</Playground>
+
+<style>
+  section {
+    display: grid;
+    gap: 1rem;
+  }
+</style>
+
+<script>
+  document.getElementById("run")?.addEventListener("click", () => {
+    console.log("run!");
+  });
+</script>

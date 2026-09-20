@@ -1,0 +1,42 @@
+### Showcase: HTTP — requests and responses.
+
+GET /api/users?role=editor&limit=20 HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Bearer token123
+X-Request-Id: abc-def-123
+
+###
+POST /api/users HTTP/1.1
+Host: example.com
+Content-Type: application/json
+Content-Length: 58
+
+{"email": "ada@example.com", "role": "admin"}
+
+###
+PUT /api/users/42 HTTP/2
+Host: example.com
+Content-Type: application/json
+If-Match: "v3"
+
+{"name": "Ada Lovelace"}
+
+###
+DELETE /api/tokens/old HTTP/1.1
+Host: example.com
+Authorization: Bearer token123
+
+###
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+
+{"id": 42, "email": "ada@example.com"}
+
+###
+HTTP/1.1 404 Not Found
+Content-Type: text/plain
+Content-Length: 9
+
+not found

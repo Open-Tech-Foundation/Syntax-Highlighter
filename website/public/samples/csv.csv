@@ -1,0 +1,32 @@
+id,email,name,age,score,active,notes
+1,ada@example.com,Ada,36,98.5,true,"piper, first of many"
+2,grace@example.com,Grace,85,99.9,true,retired
+3,alan@example.com,Alan,41,87.25,false,"loves ""quoted"" text"
+4,katherine@example.com,Katherine,28,,true,
+5,,,0,0.0,false,empty row above is blank,
+
+"6","dijkstra@example.com","Edsger",,92.0,true,"trailing comma,"
+7,turing@example.com,Alan M.,41,88.0,true,"multi
+line
+field"
+8,hopper@example.com,"Grace, Rear Adm.",85,99.9,true,"comma, in, name"
+9,lovelace@example.com,Ada,36,98.5,true,"tab	separated? no, commas"
+10,empty@example.com,,0,,false,"missing age and score"
+11,"quoted ""id""","x@y.z",1,1.0,true,"id field itself quoted"
+12,nulls@example.com,NULL,-1,-0.5,false,"N postgres-style null"
+13,space@example.com,"  padded  ",7,7.7,true,"surrounding spaces kept"
+14,long@example.com,Long,99,100.0,true,"averyveryveryveryveryveryveryverylongfieldwithoutbreaks"
+15,unicode@example.com,"Café",30,30.0,true,"utf-8 content"
+16,last@example.com,Last,50,50.5,true,"final row, newline terminated"
+17,bom@example.com,BOM,1,1.0,true,"file starts with BOM bytes"
+18,crlf@example.com,CRLF,2,2.0,true,"windows line endings here"
+19,semi@example.com,"a;b",3,3.0,true,"semicolon inside quotes"
+20,tab@example.com,"a	b",4,4.0,true,"literal tab inside quotes"
+21,emoji@example.com,"Hi 👋",5,5.0,true,"emoji content"
+22,leadzero@example.com,007,6,6.0,true,"leading zeros kept as text"
+23,bignum@example.com,Big,7,123456789.123456789,true,"float precision"
+24,neg@example.com,Neg,-8,-8.8,true,"negatives"
+25,dup@example.com,Dup,Dup,9.9,true,"name looks numeric-ish"
+26,onlycommas@example.com,,,,,"all empty after email"
+27 trailing-space@example.com ,Spaced,10,10.0,true,"space before first comma"
+28,case@example.com,UPPER lower MiXeD,11,11.0,TRUE,"case variants"

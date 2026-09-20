@@ -1,0 +1,53 @@
+# Showcase: GitHub Actions — reusable workflow with services.
+name: Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  IMAGE: highlight-demo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: secret
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 5s
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.IMAGE }}
+      - uses: docker/build-push-action@v6
+        with:
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+
+  preview:
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: preview-${{ github.head_ref }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "deploy ${{ needs.build.outputs.image }}"
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Preview ready for ${context.sha}`
+            })

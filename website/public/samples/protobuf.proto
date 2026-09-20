@@ -1,0 +1,50 @@
+// Showcase: Protocol Buffers — messages, services, options.
+syntax = "proto3";
+
+package highlight.v1;
+
+option go_package = "example.com/highlight;highlight";
+option java_package = "org.example.highlight";
+option csharp_namespace = "Highlight.V1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+enum Kind {
+  KIND_UNSPECIFIED = 0;
+  KIND_KEYWORD = 1;
+  KIND_STRING = 2;
+  KIND_NUMBER = 3;
+  KIND_OTHER = 4;
+}
+
+message Span {
+  int32 start = 1;
+  int32 end = 2;
+  Kind kind = 3;
+}
+
+message HighlightRequest {
+  string language = 1;
+  string source = 2;
+  bool debug = 3 [default = false];
+  repeated string tags = 4;
+  map<string, string> meta = 5;
+  google.protobuf.Timestamp at = 6;
+  oneof target {
+    string file = 7;
+    bytes inline = 8;
+  }
+  reserved 9, 10;
+  reserved "legacy", "temp";
+}
+
+message HighlightResponse {
+  repeated Span tokens = 1;
+  int64 elapsed_ms = 2;
+}
+
+service Highlighter {
+  rpc Highlight(HighlightRequest) returns (HighlightResponse);
+  rpc StreamTokens(HighlightRequest) returns (stream Span);
+}

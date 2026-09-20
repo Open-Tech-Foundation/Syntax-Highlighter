@@ -1,0 +1,84 @@
+# Showcase: GraphQL — schema, queries, and mutations.
+scalar DateTime
+scalar JSON
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+interface Node {
+  id: ID!
+}
+
+type User implements Node {
+  id: ID!
+  email: String!
+  name: String
+  age: Int
+  score: Float
+  active: Boolean!
+  role: Role! = VIEWER
+  tags: [String!]!
+  createdAt: DateTime!
+  friends(first: Int = 10, after: String): UserConnection!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+input CreateUserInput {
+  email: String!
+  name: String
+  role: Role = VIEWER
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+}
+
+type Query {
+  user(id: ID!): User
+  users(role: Role, limit: Int = 20): [User!]!
+  node(id: ID!): Node
+}
+
+query GetEditors($limit: Int = 5) {
+  users(role: EDITOR, limit: $limit) {
+    id
+    email
+    ...NameParts
+  }
+}
+
+fragment NameParts on User {
+  name
+}
+
+mutation CreateAda {
+  createUser(input: { email: "ada@example.com", role: ADMIN }) {
+    id
+    email
+  }
+}
+
+subscription OnUserCreated {
+  userCreated {
+    id
+  }
+}

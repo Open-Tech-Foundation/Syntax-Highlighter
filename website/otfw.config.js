@@ -13,7 +13,7 @@ export default defineDocsConfig({
     repoUrl: "https://github.com/Open-Tech-Foundation/Syntax-Highlighter",
     nav: [
       { label: "Home", href: "/" },
-      { label: "Docs", href: "/docs", icon: "book" },
+      { label: "Docs", href: "/docs" },
     ],
   },
 });

@@ -1,0 +1,39 @@
+# Showcase: STF structured config and stream.
+@version("1.2")
+@schema("https://example.com/schemas/app.stf")
+
+# Typed constructors keep config self-describing.
+server = {
+  host: "127.0.0.1",
+  port: 5173,
+  started: TIMESTAMP("2026-01-15T09:30:00Z"),
+  timeout: Duration("30s"),
+  budget: DECIMAL("1048576.00"),
+  workers: BIGINT("4"),
+  key: BINARY("aGVsbG8="),
+  region: Geometry("POINT(1 2)"),
+}
+
+flags = {
+  enabled: T,
+  debug: F,
+  nothing: N,
+}
+
+paths = [
+  `/srv/app`,
+  "C:\\Program Files\\app",
+  "relative/dir",
+]
+
+# Dates, times, and durations as first-class values.
+window = {
+  day: DATE("2026-02-01"),
+  at: Time("09:30:00"),
+  every: Duration("PT5M"),
+}
+
+--- # stream separator: records below form an event stream
+{ "event": "start", "at": TIMESTAMP("2026-01-15T09:30:01Z") }
+{ "event": "tokens", "count": BIGINT("1106") }
+{ "event": "stop", "ok": T }

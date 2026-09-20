@@ -1,0 +1,61 @@
+% Showcase: LaTeX — math, floats, and bibliography.
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, graphicx, hyperref}
+\usepackage[margin=2cm]{geometry}
+
+\title{Syntax Highlighting with Semantic Tokens}
+\author{Ada Lovelace \and Grace Hopper}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+One tokenizer produces \emph{semantic} tokens for browsers,
+HTML, JSON, and ANSI terminals.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+See Figure~\ref{fig:tokens} and Eq.~\eqref{eq:total}.
+
+\subsection{Offsets}
+Tokens use exclusive \texttt{start}/\texttt{end} offsets, so
+$\text{text} = source[start:end]$ always holds.
+
+\begin{equation}
+  \label{eq:total}
+  T = \sum_{i=1}^{n} w_i \quad \text{where } w_i \in \mathbb{N}
+\end{equation}
+
+\begin{figure}[h]
+  \centering
+  \begin{tabular}{lrr}
+    \hline
+    Language & Files & Tokens \\
+    \hline
+    JavaScript & 120 & 9,800 \\
+    Python & 85 & 6,100 \\
+    \hline
+  \end{tabular}
+  \caption{Token counts by language.}
+  \label{fig:tokens}
+\end{figure}
+
+\begin{itemize}
+  \item First item with \textbf{bold} and \textit{italic}.
+  \item Second item\footnote{A footnote with a \url{https://example.com} link.}
+\end{itemize}
+
+\begin{enumerate}
+  \item Tokenize with \verb|highlight(source)|.
+  \item Render with \verb|renderHTML|.
+\end{enumerate}
+
+\begin{quote}
+  Tokens carry meaning beyond color. --- the docs
+\end{quote}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
