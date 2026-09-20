@@ -204,7 +204,7 @@ export default function HeroTabs() {
     if (term || !termRef) return;
     term = new Terminal({
       cols: 56,
-      rows: 16,
+      rows: 20,
       fontSize: 12,
       fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
       cursorBlink: true,

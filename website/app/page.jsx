@@ -31,7 +31,10 @@ export default function Home() {
           <section class="runtime-row" aria-label="Supported environments">
             <span>Browser</span>
             <i /> <span>Node.js</span>
+            <i /> <span>Deno</span>
             <i /> <span>Bun</span>
+            <i /> <span>Next.js</span>
+            <i /> <span>Edge</span>
             <i /> <span>SSR</span>
           </section>
         </div>

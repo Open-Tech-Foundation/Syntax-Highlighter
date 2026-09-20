@@ -7,7 +7,7 @@ export const heroTabsStyles = `
 .marketing .hero-panels{min-height:15rem;display:flex;flex-direction:column}
 .marketing .hero-panels .is-hidden{display:none}
 .marketing .hero-panels .code-sample{flex:1;margin:0}
-.marketing .hero-term{height:15rem;padding:.75rem 1rem;background:#0b1120;overflow:hidden}
+.marketing .hero-term{height:19rem;padding:.75rem 1rem;background:#0b1120;overflow:hidden}
 .marketing .hero-term .xterm{height:100%}
 :root[data-theme="light"] .marketing .hero-tab{color:#5b6a89}
 :root[data-theme="light"] .marketing .hero-tab:hover{color:#28334a;background:#eef1f6}
