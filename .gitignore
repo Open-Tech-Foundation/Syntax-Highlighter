@@ -49,6 +49,7 @@ website/.otfw-ssg/
 
 # Benchmark vendor bundles (regenerate with: node bench/vendor/build.mjs)
 bench/vendor/*.mjs
+bench/vendor/prism-entry.js
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

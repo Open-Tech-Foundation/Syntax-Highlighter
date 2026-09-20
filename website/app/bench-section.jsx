@@ -22,7 +22,7 @@ export default function BenchSection() {
       bar: "is-sugar",
     },
     {
-      name: "This library",
+      name: "@opentf/syntax-highlighter",
       ms: ours.ms,
       mbs: ours.mbs,
       files: ours.files,
