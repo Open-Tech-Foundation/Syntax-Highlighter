@@ -9,6 +9,10 @@ npm install @opentf/syntax-highlighter
 ```
 
 ```ts
+import { createHighlighter, renderHTML } from "@opentf/syntax-highlighter";
+
+const source = `const answer = 42;`;
 const highlighter = await createHighlighter({ language: "typescript" });
 const tokens = highlighter.highlight(source);
+const html = renderHTML(source, tokens);
 ```

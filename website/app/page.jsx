@@ -1,8 +1,8 @@
 import { Navbar } from "@opentf/web-docs";
 import config from "../otfw.config.js";
+import DemoSection from "./demo-section.jsx";
+import HeroTabs from "./hero-tabs.jsx";
 import { landingThemeStyles } from "./landing-theme.js";
-
-const CodeLine = (props) => <div class="code-line">{props.children}</div>;
 
 export default function Home() {
   return (
@@ -12,12 +12,9 @@ export default function Home() {
 
       <section class="hero-grid">
         <div class="hero-copy">
-          <a
-            class="release"
-            href="https://github.com/Open-Tech-Foundation/Syntax-Highlighter/releases"
-          >
-            <span class="release-dot" /> Open source · TypeScript <b>See releases →</b>
-          </a>
+          <span class="release release-alpha">
+            <span class="release-dot" /> Alpha
+          </span>
           <h1>
             Code that looks <em>right</em>
             <br /> wherever it renders.
@@ -30,9 +27,6 @@ export default function Home() {
             <a class="button" href="/docs/getting-started">
               Get started <span>→</span>
             </a>
-            <a class="text-link" href="/docs">
-              Browse documentation
-            </a>
           </div>
           <section class="runtime-row" aria-label="Supported environments">
             <span>Browser</span>
@@ -42,66 +36,10 @@ export default function Home() {
           </section>
         </div>
 
-        <section class="editor-shell" aria-label="Syntax highlighted TypeScript example">
-          <div class="editor-topbar">
-            <div class="window-dots">
-              <i />
-              <i />
-              <i />
-            </div>
-            <span>theme.ts</span>
-            <span class="language-pill">TypeScript</span>
-          </div>
-          <pre class="code-sample">
-            <code>
-              <CodeLine>
-                <span class="ln">1</span>
-                <span class="token keyword">import</span> {"{ highlight }"}{" "}
-                <span class="token keyword">from</span>{" "}
-                <span class="token string">"@opentf/syntax-highlighter"</span>
-                {";"}
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">2</span>
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">3</span>
-                <span class="token keyword">const</span> <span class="token variable">source</span>{" "}
-                <span class="token operator">=</span>{" "}
-                <span class="token string">
-                  {"\u0060"}const answer = 42{"\u0060"}
-                </span>
-                ;
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">4</span>
-                <span class="token keyword">const</span> <span class="token variable">tokens</span>{" "}
-                <span class="token operator">=</span> <span class="token function">highlight</span>
-                (source, <span class="token string">"typescript"</span>);
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">5</span>
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">6</span>
-                <span class="token comment">
-                  {"// Render to any surface without changing the source."}
-                </span>
-              </CodeLine>
-              <CodeLine>
-                <span class="ln">7</span>
-                <span class="token function">renderHTML</span>(source, tokens);
-              </CodeLine>
-            </code>
-          </pre>
-          <div class="editor-footer">
-            <span>
-              <i class="status-dot" /> 7 tokens classified
-            </span>
-            <span>UTF-8</span>
-          </div>
-        </section>
+        <HeroTabs />
       </section>
+
+      <DemoSection />
 
       <section class="proof" aria-label="Library qualities">
         <div>

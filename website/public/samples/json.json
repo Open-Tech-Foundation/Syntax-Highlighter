@@ -1,0 +1,102 @@
+{
+  "$schema": "https://example.com/schemas/app.json",
+  "name": "syntax-highlighter-demo",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Demo configuration exercising JSON token types",
+  "license": "MIT",
+  "enabled": true,
+  "debug": false,
+  "retries": 3,
+  "timeoutMs": 15000,
+  "ratio": 0.975,
+  "threshold": 1e-6,
+  "mask": 255,
+  "ports": [8080, 8081, 8082],
+  "tags": ["demo", "highlight", "tokens"],
+  "emptyList": [],
+  "emptyObject": {},
+  "nothing": null,
+  "server": {
+    "host": "127.0.0.1",
+    "port": 5173,
+    "tls": {
+      "enabled": false,
+      "cert": "/etc/ssl/cert.pem",
+      "key": "/etc/ssl/key.pem"
+    },
+    "limits": {
+      "bodyBytes": 1048576,
+      "ratePerMinute": 600
+    }
+  },
+  "languages": [
+    { "id": "javascript", "aliases": ["js", "mjs"], "default": true },
+    { "id": "typescript", "aliases": ["ts"], "default": false },
+    { "id": "python", "aliases": ["py"], "default": false }
+  ],
+  "themes": {
+    "dark": "one-dark",
+    "light": "github-light",
+    "available": [
+      "default",
+      "dracula",
+      "monokai",
+      "nord",
+      "tokyo-night",
+      "vscode-dark",
+      "vscode-light"
+    ]
+  },
+  "features": {
+    "semanticTokens": true,
+    "codeFences": true,
+    "linePrefixes": false,
+    "interpolation": true
+  },
+  "pipeline": [
+    { "stage": "lex", "workers": 4 },
+    { "stage": "tokenize", "workers": 2 },
+    { "stage": "render", "workers": 1 }
+  ],
+  "matrix": {
+    "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
+    "node": ["20.x", "22.x"]
+  },
+  "nested": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "value": "deep",
+          "count": 7
+        }
+      }
+    }
+  },
+  "strings": {
+    "plain": "hello world",
+    "escaped": "tab\\there \\"quoted\\" \\\\ slash",
+    "unicode": "café \\u00e9 \\u2603",
+    "multiline": "line one\\nline two\\nline three",
+    "empty": ""
+  },
+  "numbers": {
+    "integer": 42,
+    "negative": -17,
+    "float": 3.14159,
+    "exponent": 6.022e23,
+    "negativeExponent": 1.6e-19,
+    "zero": 0
+  },
+  "flags": [true, false, true, true, false],
+  "mixed": [
+    "text",
+    123,
+    4.5,
+    true,
+    false,
+    null,
+    { "key": "value" },
+    [1, 2, 3]
+  ]
+}

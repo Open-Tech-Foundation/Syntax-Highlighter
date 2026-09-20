@@ -12,6 +12,7 @@
       "!**/dist",
       "!**/packages/**/*/dist",
       "!**/demo/dist",
+      "!website/public",
       "!**/pnpm-lock.yaml",
       "!**/coverage",
       "!**/*.d.ts"
@@ -46,6 +47,16 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["website/app/demo-section.jsx", "website/app/hero-tabs.jsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noTemplateCurlyInString": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.mjs", "**/*.js"],
       "linter": {

@@ -7,8 +7,10 @@
     "build": "otfw build --ssg"
   },
   "dependencies": {
+    "@opentf/syntax-highlighter": "workspace:*",
     "@opentf/web": "latest",
-    "@opentf/web-docs": "latest"
+    "@opentf/web-docs": "latest",
+    "@xterm/xterm": "5.5.0"
   },
   "devDependencies": {
     "@opentf/web-cli": "latest"

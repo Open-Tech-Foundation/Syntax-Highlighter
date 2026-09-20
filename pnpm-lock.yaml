@@ -38,7 +38,7 @@ importers:
     devDependencies:
       '@opentf/esrun-types':
         specifier: latest
-        version: 0.4.0
+        version: 0.5.0
       puppeteer-core:
         specifier: 24.15.0
         version: 24.15.0
@@ -50,7 +50,7 @@ importers:
     devDependencies:
       '@opentf/esrun-types':
         specifier: latest
-        version: 0.4.0
+        version: 0.5.0
       '@opentf/std':
         specifier: 0.18.0
         version: 0.18.0
@@ -60,12 +60,18 @@ importers:
 
   website:
     dependencies:
+      '@opentf/syntax-highlighter':
+        specifier: workspace:*
+        version: link:../packages/syntax-highlighter
       '@opentf/web':
         specifier: latest
         version: 0.28.0
       '@opentf/web-docs':
         specifier: latest
         version: 0.26.0(@opentf/web@0.28.0)
+      '@xterm/xterm':
+        specifier: 5.5.0
+        version: 5.5.0
     devDependencies:
       '@opentf/web-cli':
         specifier: latest
@@ -162,8 +168,8 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
-  '@opentf/esrun-types@0.4.0':
-    resolution: {integrity: sha512-MEjKuFur/3zBP8xY05tLD7GKI07NWTMcmbyJjnL8g/Mt5Qu0Beetj+MjMDlog/Lbdr3krziGAQIBbRqtXd60Dg==}
+  '@opentf/esrun-types@0.5.0':
+    resolution: {integrity: sha512-hQiuzDSU34sDUCLEru7ltCkOtKRdMxZiqwFe9/A67oBAZgSaCxRezEET4N9rj1xQTPY7C3cFmDD7M8cOELH8QQ==}
 
   '@opentf/micro-ui@0.11.0':
     resolution: {integrity: sha512-l7jIUNMT/Vw6EAxgJlTJEe0fpw3ZB4BP4jtJ3TLysgQzV9pbV7kpw4oqvbiC3bShanZ7FqmPqQXac/nfsWjWUA==}
@@ -1214,7 +1220,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@opentf/esrun-types@0.4.0': {}
+  '@opentf/esrun-types@0.5.0': {}
 
   '@opentf/micro-ui@0.11.0': {}
 

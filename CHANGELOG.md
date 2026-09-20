@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - **MEDIUM:** Added an OTF Web public-facing `website/` scaffold with a marketing landing page and MDX documentation layout.
+- **MEDIUM:** Added a live playground to the landing page: an editable code panel with line numbers highlighted with the real tokenizer and a sidebar covering all 101 supported languages with a filter. Ships 100+ line showcase samples for the top 25 languages (served from `website/public/samples/` with inline fallbacks) and a theme selector covering all 16 syntax themes with dark/light editor pairing. Replaced the hero release pill with an Alpha badge.
+- **MEDIUM:** Replaced the hero code mock with an auto-rotating renderer showcase (HTML / CSS Highlights / real xterm.js terminal, all driven by the live tokenizer; cycles through code chunks in several languages and syntax themes, manual tabs pause the rotation).
 
 - **HIGH:** Added generic semantic registry (`core/semantics.ts`) for language-agnostic semantic metadata — provides a central namespace for text styles (bold, italic, underline, strikethrough), code styles (inline, block), markup styles (heading, quote, list, link, image), and syntax styles (delimiter, marker, escape). Recursive `Semantic` type supports nested names like `text.bold`.
 

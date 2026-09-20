@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- Showcase: HTML — document structure, forms, tables, and embeds. -->
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Demo page for syntax highlighting" />
+  <meta property="og:title" content="Highlight demo" />
+  <title>Highlight demo</title>
+  <link rel="stylesheet" href="/styles/app.css" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    .hero { color: rebeccapurple; display: grid; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav aria-label="Primary">
+      <a href="/" aria-current="page">Home</a>
+      <a href="/docs" rel="noopener">Docs</a>
+      <a href="https://example.com" target="_blank" rel="noreferrer">External</a>
+    </nav>
+    <button id="theme-toggle" type="button" aria-pressed="false" disabled>
+      Toggle theme
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero" data-accent="violet">
+      <h1>Hello, <em>world</em></h1>
+      <p class="lede">One tokenizer for <strong>browser</strong>, HTML, JSON &amp; ANSI.</p>
+      <img src="/hero.png" alt="Abstract tokens" width="640" height="320" loading="lazy" />
+    </section>
+
+    <section aria-labelledby="features-title">
+      <h2 id="features-title">Features</h2>
+      <ul>
+        <li>Semantic tokens</li>
+        <li>SSR friendly</li>
+        <li>Truecolor ANSI</li>
+      </ul>
+      <ol start="4" reversed>
+        <li>Fourth</li>
+        <li>Fifth</li>
+      </ol>
+      <dl>
+        <dt>Token</dt>
+        <dd>A typed slice of source text.</dd>
+      </dl>
+    </section>
+
+    <article>
+      <h2>Sample table</h2>
+      <table>
+        <caption>Token counts by language</caption>
+        <thead>
+          <tr><th scope="col">Language</th><th scope="col">Tokens</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>JavaScript</td><td>1,204</td></tr>
+          <tr><td>Python</td><td>860</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Total</td><td>2,064</td></tr>
+        </tfoot>
+      </table>
+    </article>
+
+    <section>
+      <h2>Sign up</h2>
+      <form action="/signup" method="post" autocomplete="on">
+        <fieldset>
+          <legend>Account</legend>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="ada@example.com" />
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" minlength="12" required />
+          <label for="role">Role</label>
+          <select id="role" name="role">
+            <option value="">Choose…</option>
+            <optgroup label="Build">
+              <option value="dev" selected>Developer</option>
+              <option value="des">Designer</option>
+            </optgroup>
+          </select>
+        </fieldset>
+        <fieldset>
+          <legend>Preferences</legend>
+          <label><input type="checkbox" name="news" checked /> Newsletter</label>
+          <label><input type="radio" name="theme" value="dark" checked /> Dark</label>
+          <label><input type="radio" name="theme" value="light" /> Light</label>
+          <label for="bio">Bio</label>
+          <textarea id="bio" name="bio" rows="4" cols="40" maxlength="280"></textarea>
+        </fieldset>
+        <button type="submit">Create account</button>
+        <button type="reset">Reset</button>
+        <input type="hidden" name="token" value="abc123" />
+      </form>
+    </section>
+
+    <details>
+      <summary>How does highlighting work?</summary>
+      <p>Source goes in, semantic tokens come out, renderers take it from there.</p>
+    </details>
+
+    <template id="row-template">
+      <tr><td></td><td></td></tr>
+    </template>
+  </main>
+
+  <aside aria-label="Sponsored">
+    <blockquote cite="https://example.com/quote">
+      <p>“The tokens were semantic all along.”</p>
+      <footer>— <cite>An engineer</cite></footer>
+    </blockquote>
+    <pre><code class="language-js">const x = 1;</code></pre>
+    <p>H<sub>2</sub>O and E = mc<sup>2</sup> render inline.</p>
+  </aside>
+
+  <footer>
+    <p>&copy; 2026 Example Corp. All rights reserved. &lt;3</p>
+  </footer>
+
+  <script type="application/json" id="config">
+    {"theme": "dark", "debug": false}
+  </script>
+  <script>
+    const toggle = document.getElementById("theme-toggle");
+    toggle?.addEventListener("click", () => {
+      document.documentElement.dataset.theme = "light";
+    });
+  </script>
+  <script src="/app.js" defer></script>
+</body>
+</html>

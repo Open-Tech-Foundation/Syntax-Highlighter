@@ -1,0 +1,188 @@
+/* Showcase: CSS — variables, layout, animation, and queries. */
+:root {
+  --bg: #0b1120;
+  --fg: #e2e8f0;
+  --accent: #7c6cf0;
+  --radius: 0.625rem;
+  --gap: clamp(0.75rem, 2vw, 1.5rem);
+  color-scheme: dark light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main.marketing > section:first-child {
+  padding-block: calc(var(--gap) * 2);
+}
+
+/* Hero grid: copy plus live editor. */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--gap);
+  align-items: center;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.hero-copy h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.hero-copy h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c6cf0, #4f46e5);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgb(124 108 240 / 0.35);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Editor mock with line numbers. */
+.editor-shell {
+  border: 1px solid #232c44;
+  border-radius: var(--radius);
+  background: #0d1528;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgb(0 0 0 / 0.35);
+}
+
+.code-sample {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: ui-monospace, "JetBrains Mono", Menlo, monospace;
+  font-size: 0.83rem;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.code-line {
+  display: block;
+  min-height: 1.6em;
+}
+
+.token.keyword { color: #c792ea; }
+.token.string { color: #c3e88d; }
+.token.function { color: #82aaff; }
+.token.comment { color: #546179; font-style: italic; }
+.token.variable { color: #f07178; }
+.token.operator { color: #89ddff; }
+
+/* Feature cards with grid and :has(). */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.features article {
+  border: 1px solid #1e293b;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  background: rgb(255 255 255 / 0.02);
+}
+
+.features:has(a:hover) article:not(:hover) {
+  opacity: 0.75;
+}
+
+.features article:nth-child(2n) {
+  border-top: 2px solid var(--accent);
+}
+
+/* Animations and responsive behavior. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-copy {
+  animation: fade-up 600ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 56rem) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@supports (display: grid) {
+  .proof {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f8f9fd;
+    --fg: #182033;
+  }
+}
+
+::selection {
+  background: rgb(124 108 240 / 0.35);
+}

@@ -1,0 +1,120 @@
+--- a/packages/syntax-highlighter/src/core/tokenizer.ts
++++ b/packages/syntax-highlighter/src/core/tokenizer.ts
+@@ -1,12 +1,18 @@
+ // Tokenizer: raw text in, semantic tokens out.
+-import { Lexer } from "./lexer.ts";
+-import type { Token } from "./tokens.ts";
++import { Lexer, type LexDefinition } from "./lexer.ts";
++import { TokenType, type Token } from "./tokens.ts";
+ 
+-export class Tokenizer {
+-  constructor(private language) {}
++export interface TokenizerOptions {
++  language: string;
++  debug?: boolean;
++}
++
++export class Tokenizer {
++  readonly language: string;
++
++  constructor(options: TokenizerOptions) {
++    this.language = options.language;
++  }
+ 
+   tokenize(source: string): Token[] {
+-    return [];
++    const lexer = new Lexer();
++    return lexer.scan(source).map((raw) => ({
++      type: TokenType.OTHER,
++      start: raw.start,
++      end: raw.end,
++    }));
+   }
+ }
+--- a/packages/syntax-highlighter/src/core/renderers.ts
++++ b/packages/syntax-highlighter/src/core/renderers.ts
+@@ -10,6 +10,10 @@ export function renderHTML(source: string, tokens: Token[]): string {
+   return tokens
+     .map((t) => {
+       const text = source.slice(t.start, t.end);
++      if (t.type === "whitespace") {
++        return text;
++      }
+       return `<span class="sh-${t.type}">${text}</span>`;
+     })
+     .join("");
+ }
++
++export function renderJSON(tokens: Token[]): string {
++  return JSON.stringify(tokens);
++}
+--- /dev/null
++++ b/packages/syntax-highlighter/test/tokenizer.test.mjs
+@@ -0,0 +1,25 @@
++import assert from "node:assert/strict";
++import { Tokenizer } from "../src/core/tokenizer.ts";
++
++const tk = new Tokenizer({ language: "javascript" });
++
++assert.equal(tk.language, "javascript");
++assert.deepEqual(tk.tokenize(""), []);
++
++const toks = tk.tokenize("const x = 1;");
++assert.ok(toks.length > 0);
++assert.equal(toks[0].type, "keyword");
++
++// Coverage must be contiguous: end of one token starts the next.
++for (let i = 1; i < toks.length; i++) {
++  assert.equal(toks[i].start, toks[i - 1].end);
++}
+--- a/README.md
++++ b/README.md
+@@ -3,7 +3,7 @@
+ # Syntax Highlighter
+ 
+-*An [Open Tech Foundation](https://opentechf.org/) project*
++*An [Open Tech Foundation](https://opentechf.org/) project — now in Alpha*
+ 
+ *Modern, renderer-agnostic syntax highlighting with one tokenizer*
+ 
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+
+ ## [Unreleased]
+
++### Added
++
++- Added a live playground to the landing page.
+ - Fixed documentation drift in the tokenizer docs.
++
++### Fixed
++
++- Corrected the ANSI theme list in the README.
+diff --git a/old-name.ts b/new-name.ts
+similarity index 92%
+rename from old-name.ts
+rename to new-name.ts
+index 3a4c5e1..9f2b7d0 100644
+--- a/old-name.ts
++++ b/new-name.ts
+@@ -1,4 +1,4 @@
+-export const OLD = 1;
++export const RENAMED = 1;
+ // trailing context stays aligned
+ // so reviewers can follow along
+ // across the rename boundary
+diff --git a/assets/logo.png b/assets/logo.png
+new file mode 100644
+index 0000000..e69de29
+Binary files /dev/null and b/assets/logo.png differ
+diff --git a/scripts/deploy.sh b/scripts/deploy.sh
+old mode 100644
+new mode 100755
+index 1a2b3c4..5d6e7f8 100755
+--- a/scripts/deploy.sh
++++ /dev/null
+@@ -1,3 +0,0 @@
+-#!/usr/bin/env bash
+-echo "retired"
+-rm -rf ./dist

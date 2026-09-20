@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Showcase: XML — namespaces, CDATA, entities, and mixed content. -->
+<catalog xmlns="https://example.com/catalog"
+         xmlns:hl="https://example.com/highlight"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://example.com/catalog catalog.xsd"
+         version="0.4.0"
+         lang="en">
+  <metadata>
+    <title>Highlight demo catalog</title>
+    <generated>2026-01-15T09:30:00Z</generated>
+    <count type="integer">3</count>
+    <enabled>true</enabled>
+    <ratio>0.975</ratio>
+    <description><![CDATA[Raw <markup> & "quotes" stay literal in CDATA.]]></description>
+  </metadata>
+
+  <hl:theme name="one-dark" mode="dark">
+    <hl:background>#0b1120</hl:background>
+    <hl:foreground>#e2e8f0</hl:foreground>
+    <hl:token type="keyword" color="#c792ea" />
+    <hl:token type="string" color="#c3e88d" />
+    <hl:token type="comment" color="#546179" />
+    <hl:token type="function" color="#82aaff" />
+    <hl:token type="number" color="#f78c6c" />
+    <hl:token type="operator" color="#89ddff" />
+  </hl:theme>
+
+  <hl:theme name="github-light" mode="light">
+    <hl:background>#ffffff</hl:background>
+    <hl:foreground>#0f172a</hl:foreground>
+    <hl:token type="keyword" color="#cf222e" />
+    <hl:token type="string" color="#0a3069" />
+  </hl:theme>
+
+  <book id="b1" available="true" pages="320">
+    <title>The Art of Tokens</title>
+    <author>Ada Lovelace</author>
+    <price currency="USD">19.99</price>
+    <tags>
+      <tag>compilers</tag>
+      <tag>highlighting</tag>
+    </tags>
+    <summary>
+      A practical guide to <em>semantic</em> tokenization &amp; rendering.
+      Second line with &lt;escaped&gt; markup.
+    </summary>
+  </book>
+
+  <book id="b2" available="false" pages="0">
+    <title>Empty Pages</title>
+    <author>Anonymous</author>
+    <price currency="EUR">0.00</price>
+    <tags />
+    <summary>No content &mdash; yet.</summary>
+  </book>
+
+  <book id="b3" available="true" pages="412">
+    <title>Grammars in Practice</title>
+    <author>Grace Hopper</author>
+    <author>Alan Turing</author>
+    <price currency="USD">29.50</price>
+    <tags>
+      <tag>parsing</tag>
+      <tag>grammars</tag>
+      <tag>tooling</tag>
+    </tags>
+    <summary>
+      From regular expressions to full parsers, with exercises in every chapter.
+    </summary>
+    <reviews>
+      <review stars="5">Clear and thorough.</review>
+      <review stars="4">Dense but rewarding.</review>
+    </reviews>
+  </book>
+
+  <book id="b4" available="true" pages="128">
+    <title>Terminal Colors</title>
+    <author>Katherine Johnson</author>
+    <price currency="USD">9.99</price>
+    <tags>
+      <tag>ansi</tag>
+      <tag>cli</tag>
+    </tags>
+    <summary>Truecolor escapes, themes, and the NO_COLOR convention.</summary>
+  </book>
+
+  <software name="highlighter" version="0.4.0" license="MIT">
+    <dependency name="runtime" version="&gt;=20" optional="false" />
+    <dependency name="bundler" version="^11.0.0" optional="true" />
+    <changelog>
+      <entry version="0.4.0" date="2026-08-26">Tokenizer refresh</entry>
+      <entry version="0.3.0" date="2026-08-25">ANSI themes</entry>
+    </changelog>
+    <!-- TODO: pin exact versions before release -->
+    <?build-tool mode="strict" cache="warm"?>
+  </software>
+
+  <notes>
+    <note priority="1">Escape &amp; quote "carefully".</note>
+    <note priority="2"><![CDATA[<p>HTML inside CDATA is inert.</p>]]></note>
+    <note priority="3">Attributes serialize in document order.</note>
+    <note priority="4">Prefer <code>utf-8</code> for new documents.</note>
+  </notes>
+
+  <languages>
+    <language id="javascript" aliases="js mjs cjs" />
+    <language id="typescript" aliases="ts mts cts" />
+    <language id="python" aliases="py pyi" />
+    <language id="rust" aliases="rs" />
+    <language id="go" aliases="golang" />
+  </languages>
+</catalog>
