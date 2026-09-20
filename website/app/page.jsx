@@ -1,5 +1,6 @@
 import { Navbar } from "@opentf/web-docs";
 import config from "../otfw.config.js";
+import BenchSection from "./bench-section.jsx";
 import DemoSection from "./demo-section.jsx";
 import HeroTabs from "./hero-tabs.jsx";
 import { landingThemeStyles } from "./landing-theme.js";
@@ -44,6 +45,8 @@ export default function Home() {
         </section>
 
         <DemoSection />
+
+        <BenchSection />
 
         <section class="proof" aria-label="Library qualities">
           <div>

@@ -48,6 +48,12 @@ run = "biome format --write"
 [tasks."fmt:check"]
 run = "biome check"
 
+# ------------------------------------------------------------------ bench
+# Throughput harness on the esdev runtime: ours vs the top highlighters.
+# Emits website/app/bench-data.js for the landing charts (run per release).
+[tasks.bench]
+run = "esdev bench/throughput.ts"
+
 # ------------------------------------------------------------------ ci
 [tasks.check]
 deps = ["typecheck", "lint", "fmt:check", "test"]

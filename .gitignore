@@ -47,6 +47,9 @@ website/.otfw/
 website/dist/
 website/.otfw-ssg/
 
+# Benchmark vendor bundles (regenerate with: node bench/vendor/build.mjs)
+bench/vendor/*.mjs
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

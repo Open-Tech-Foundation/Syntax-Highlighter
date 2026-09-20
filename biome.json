@@ -13,6 +13,8 @@
       "!**/packages/**/*/dist",
       "!**/demo/dist",
       "!website/public",
+      "!website/app/bench-data.js",
+      "!bench/vendor",
       "!**/pnpm-lock.yaml",
       "!**/coverage",
       "!**/*.d.ts"

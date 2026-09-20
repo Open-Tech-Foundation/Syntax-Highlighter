@@ -4,3 +4,4 @@ packages:
   - website
 allowBuilds:
   '@opentf/web-compiler': true
+  esbuild: false
