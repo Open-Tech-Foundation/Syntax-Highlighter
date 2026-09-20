@@ -1,0 +1,46 @@
+---
+title: Quick start
+description: Highlight code in five minutes.
+---
+
+import { Steps } from "@opentf/web-docs";
+
+# Quick start
+
+<Steps>
+
+## Install the package
+
+```sh
+npm install @opentf/syntax-highlighter
+```
+
+## Highlight source to HTML
+
+```ts
+import { createHighlighter, renderHTML } from "@opentf/syntax-highlighter";
+
+const source = `const answer = 42;`;
+const highlighter = await createHighlighter({ language: "typescript" });
+const tokens = highlighter.highlight(source);
+const html = renderHTML(source, tokens);
+// <span class="sh-keyword">const</span> ...
+```
+
+Wrap the result in your own `<pre><code>` and load a [theme](/docs/themes).
+
+## Try the other renderers
+
+```ts
+import { renderANSI, renderJSON } from "@opentf/syntax-highlighter";
+
+console.log(renderANSI(source, tokens)); // truecolor terminal output
+console.log(renderJSON(source, tokens)); // inspectable token stream
+```
+
+## Go further
+
+- [Getting started](/docs/getting-started) explains tokens, languages, and custom definitions.
+- [Renderers](/docs/renderers) covers each output in depth.
+
+</Steps>

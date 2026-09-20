@@ -2,6 +2,73 @@
 title: Renderers
 description: Use one token stream everywhere.
 ---
+
 # Renderers
 
-Use `CSSHighlightRenderer` in the browser, `renderHTML` for SSR, `renderANSI` for terminals, and `renderJSON` for tooling.
+Every renderer takes the same inputs — `source` plus the token array from `highlighter.highlight()`.
+
+## Browser — CSS Custom Highlights
+
+Highlights the element's text natively via `CSS.highlights` — no `<span>` elements are injected. Requires a theme stylesheet that targets the `sh-{type}` classes (see [Themes](/docs/themes)).
+
+```ts
+import { highlightElement } from "@opentf/syntax-highlighter";
+
+// One-shot setup for an editable/live element:
+const handle = await highlightElement(element, source, {
+  language: "javascript",
+  debounceMs: 50, // refresh() coalescing; 0 = synchronous
+});
+handle.refresh(nextSource); // re-highlight new content (debounced)
+handle.dispose(); // release highlights
+```
+
+Or drive the renderer manually:
+
+```ts
+import { CSSHighlightRenderer } from "@opentf/syntax-highlighter";
+
+const renderer = new CSSHighlightRenderer(element);
+renderer.render(source, tokens);
+renderer.clear();
+renderer.dispose();
+```
+
+## HTML / SSR
+
+Emits escaped HTML with semantic `<span class="sh-{type}">` wrappers. Safe for server rendering and static builds — compose your own `<pre><code>` wrapper as needed.
+
+```ts
+import { renderHTML } from "@opentf/syntax-highlighter";
+
+const html = renderHTML(source, tokens, {
+  prefix: "sh-", // CSS class prefix for token spans
+  wrapWhitespace: false, // wrap whitespace tokens too
+});
+```
+
+## ANSI terminal
+
+Truecolor output for CLIs and terminals. Themes are plain hex maps converted to `ESC[38;2;R;G;Bm`; respects `NO_COLOR` unless `color` is explicit.
+
+```ts
+import { renderANSI } from "@opentf/syntax-highlighter";
+import { dracula } from "@opentf/syntax-highlighter/ansi/themes/dracula";
+
+const out = renderANSI(source, tokens, {
+  theme: dracula, // hex colors per token type; defaults to defaultTheme
+  color: true, // force on/off; undefined respects NO_COLOR
+  wrapWhitespace: false,
+});
+console.log(out);
+```
+
+## JSON / tooling
+
+Serializes the token stream — useful for snapshots, tests, and editor integrations.
+
+```ts
+import { renderJSON } from "@opentf/syntax-highlighter";
+
+const json = renderJSON(source, tokens);
+```

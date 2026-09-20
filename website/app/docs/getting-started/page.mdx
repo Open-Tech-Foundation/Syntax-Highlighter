@@ -1,18 +1,54 @@
 ---
 title: Getting started
-description: Install and render your first token stream.
+description: Tokens, languages, and custom definitions.
 ---
+
+import { Callout } from "@opentf/web-docs";
+
 # Getting started
 
-```sh
-npm install @opentf/syntax-highlighter
-```
+## Tokens
+
+Every renderer takes the same inputs — `source` plus the token array from `highlighter.highlight()`:
 
 ```ts
-import { createHighlighter, renderHTML } from "@opentf/syntax-highlighter";
+import { createHighlighter } from "@opentf/syntax-highlighter";
 
-const source = `const answer = 42;`;
-const highlighter = await createHighlighter({ language: "typescript" });
+const highlighter = await createHighlighter({ language: "javascript" });
 const tokens = highlighter.highlight(source);
-const html = renderHTML(source, tokens);
 ```
+
+A token is `{ type, start, end }`: a semantic `type` such as `keyword`, `string`, `function`, `number`, `comment`, or `operator`, plus exclusive UTF-16 offsets into `source`. Tokens always cover the full source with no gaps or overlaps, so renderers recover text via `source.slice(start, end)`.
+
+## Choosing a language
+
+Pass any of the [101 supported languages](/docs/languages) by name or alias:
+
+```ts
+await createHighlighter({ language: "python" });
+await createHighlighter({ language: "ts" }); // alias for typescript
+```
+
+`getRegisteredLanguages()` lists every name up front, and `loadLanguage(name)` loads a definition on demand. Unknown names throw `UnknownLanguageError` (with `code: "UNKNOWN_LANGUAGE"`) instead of failing silently.
+
+## Custom languages
+
+Register additional languages or aliases without touching the tokenizer or renderers:
+
+```ts
+import { registerLanguage, getRegisteredLanguages } from "@opentf/syntax-highlighter";
+
+registerLanguage(definition); // LanguageDefinition
+console.log(getRegisteredLanguages());
+```
+
+A `LanguageDefinition` carries the word lists (`keywords`, `booleans`, `nulls`, `constants`), lexer config (`lex`: strings, comments, operators), markup config, and opt-in `features` (`parameterBindings`, `contextStack`, `declarations`, `retroactiveRewrite`, `typeAnnotationAware`, `propertyKeys`, `classDetection`). `contextStack` and `declarations` default to `true`; the rest default to `false`.
+
+<Callout type="tip" title="Validating tokens">
+`validateTokens(source, tokens)` throws on any contract violation (gaps, overlaps, unknown types, split surrogates) and returns `void` when the stream is valid. Use it in tests and editor integrations.
+</Callout>
+
+## Next steps
+
+- [Renderers](/docs/renderers) — emit the token stream everywhere.
+- [API reference](/docs/api) — the full export list.

@@ -1,0 +1,62 @@
+---
+title: API reference
+description: Every export, option, and type.
+---
+
+# API reference
+
+## Functions
+
+| Export | Description |
+|--------|-------------|
+| `createHighlighter(options?)` | Creates a `Highlighter`. Loads the language definition asynchronously. Returns `Promise<Highlighter>`. |
+| `highlightElement(element, source, options?)` | One-shot browser highlighting. Returns `Promise<HighlightHandle>` with `refresh()` and `dispose()`. |
+| `renderHTML(source, tokens, options?)` | Escaped HTML string with `<span class="sh-{type}">` wrappers. |
+| `renderANSI(source, tokens, options?)` | ANSI truecolor string for terminal output. |
+| `renderJSON(source, tokens)` | JSON string of the token stream. |
+| `validateTokens(source, tokens)` | Throws `TypeError`/`RangeError`/`Error` on invalid tokens; returns `void` when valid. |
+| `hexToAnsi(hex)` | Converts `"#rrggbb"` to an ANSI truecolor SGR sequence. |
+| `registerLanguage(def)` | Registers a `LanguageDefinition`. |
+| `getRegisteredLanguages()` | Array of registered language names. |
+| `loadLanguage(name)` | Loads a definition by name. Throws `UnknownLanguageError` for unknown names. |
+| `createToken(type, start, end)` | Creates a `Token` object. |
+| `isSignificant(token)` | `true` unless the token is whitespace. |
+
+## Classes
+
+- **`Highlighter`** — `highlight(source)` tokenizes; exposes `language` and `tokenizer`. Throws `TypeError` for non-string input.
+- **`CSSHighlightRenderer`** — `render(source, tokens)`, `clear()`, `dispose()`. Merges into the shared `CSS.highlights` registry under `sh-*` names.
+- **`UnifiedTokenizer`** — the core classifier; construct with a `LanguageDefinition` and call `tokenize(source)`.
+- **`UnifiedLexer`** — markup-aware lexer used internally.
+- **`Lexer`** — base character-level lexer.
+
+## Constants
+
+| Export | Description |
+|--------|-------------|
+| `TokenType` | Frozen map of token type names to values (`TokenType.KEYWORD === "keyword"`). |
+| `WHITESPACE` | The `"whitespace"` token type. |
+| `ANSI_THEMES` | All built-in ANSI themes keyed by name (`github` and `solarized` are aliases). |
+| `ANSI_PALETTES` | `{ dark, light }` pair for auto switching. |
+| `ANSI_RESET` | `"\x1b[0m"`. |
+| `defaultTheme` / `defaultLight` | Default dark and light ANSI themes. |
+| `semantics` | The generic semantic registry for `text.*`, `code.*`, `markup.*`, and `syntax.*` metadata. |
+
+## Types
+
+| Export | Description |
+|--------|-------------|
+| `Token` | `{ type; start; end }` with optional `semantic` metadata and UTF-16 offsets. |
+| `TokenType` | Union of token type strings (`"keyword"`, `"string"`, …). |
+| `LanguageDefinition` | `name`, `aliases`, word lists, `lex`, `markup`, `features`, and declaration keyword data. |
+| `TokenizerFeatures` | `parameterBindings`, `contextStack`, `declarations`, `retroactiveRewrite`, `typeAnnotationAware`, `propertyKeys`, `classDetection`, `lineBreakResetsExpectation`. |
+| `AnsiTheme` / `AnsiThemeName` | Hex-color map and its key union. |
+| `AnsiRenderOptions` | `{ theme?, color?, wrapWhitespace? }`. |
+| `HtmlRenderOptions` | `{ prefix?, wrapWhitespace? }`. |
+| `HighlightOptions` | `{ language?, debounceMs? }`. |
+| `HighlightHandle` | `{ highlighter, renderer, refresh(), dispose() }`. |
+
+## Theme subpaths
+
+- `@opentf/syntax-highlighter/themes/*` — CSS themes (`default`, `dark-plus`, `light-plus`, `dracula`, …).
+- `@opentf/syntax-highlighter/ansi/themes/*` — one ANSI theme per module, plus `ANSI_THEMES` from `ansi/themes`.

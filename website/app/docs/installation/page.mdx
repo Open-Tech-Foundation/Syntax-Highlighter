@@ -1,0 +1,39 @@
+---
+title: Installation
+description: Add @opentf/syntax-highlighter with your package manager.
+---
+
+# Installation
+
+The library ships as ESM with TypeScript declarations.
+
+```sh
+npm install @opentf/syntax-highlighter
+```
+
+```sh
+pnpm add @opentf/syntax-highlighter
+```
+
+```sh
+yarn add @opentf/syntax-highlighter
+```
+
+```sh
+bun add @opentf/syntax-highlighter
+```
+
+```sh
+deno add npm:@opentf/syntax-highlighter
+```
+
+## Requirements
+
+- A modern JavaScript runtime: Browser, Node.js, Deno, Bun, Next.js, Edge, or any SSR environment.
+- No native dependencies and no build step — the package runs wherever ESM runs.
+
+## What's included
+
+- The core tokenizer plus [101 language definitions](/docs/languages), loaded lazily per language.
+- Four renderers: browser CSS Highlights, HTML/SSR, JSON, and ANSI.
+- [16 syntax themes](/docs/themes) for HTML/CSS output and matching ANSI palettes.

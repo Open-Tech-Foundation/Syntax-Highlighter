@@ -2,10 +2,40 @@
 title: Introduction
 description: Renderer-agnostic syntax highlighting with semantic tokens.
 ---
+
+import { Callout } from "@opentf/web-docs";
+
 # Syntax Highlighter
 
 One semantic tokenizer for browser-native CSS Highlights, HTML/SSR, JSON, and ANSI output.
 
 ## Why semantic tokens?
 
-Language definitions produce stable types such as `keyword`, `string`, `function`, and `comment`.
+Language definitions produce stable types such as `keyword`, `string`, `function`, and `comment`. Every renderer consumes the same token stream, so a snippet looks identical in a live editor, server-rendered HTML, developer tooling, and the terminal.
+
+```ts
+import { createHighlighter } from "@opentf/syntax-highlighter";
+
+const highlighter = await createHighlighter({ language: "typescript" });
+const tokens = highlighter.highlight(source);
+// tokens: [{ type: "keyword", start: 0, end: 5 }, ...]
+```
+
+Tokens use exclusive UTF-16 `start`/`end` offsets, so any renderer recovers text with `source.slice(start, end)` — no text is ever stored inside a token.
+
+<Callout type="info" title="Alpha">
+The library is in Alpha. The tokenizer, the four renderers, and 101 language definitions are usable today; expect refinements before 1.0.
+</Callout>
+
+## The pipeline
+
+1. **Tokenize** — `createHighlighter({ language })` loads the language definition, `highlight(source)` returns `Token[]`.
+2. **Render** — pick one output per surface: `CSSHighlightRenderer` in the browser, `renderHTML` for SSR, `renderANSI` for terminals, `renderJSON` for tooling.
+3. **Theme** — shared semantic themes work across the browser and HTML renderers; ANSI themes ship as hex maps.
+
+## Next steps
+
+- [Installation](/docs/installation) — add the package with your manager.
+- [Quick start](/docs/quick-start) — highlight code in five minutes.
+- [Renderers](/docs/renderers) — one token stream, every surface.
+- [API reference](/docs/api) — every export, option, and type.

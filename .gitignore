@@ -43,6 +43,7 @@ jspm_packages/
 
 # OTF Web generated development and production output
 website/.dev/
+website/.otfw/
 website/dist/
 website/.otfw-ssg/
 

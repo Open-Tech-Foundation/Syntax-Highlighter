@@ -1,0 +1,27 @@
+---
+title: Themes
+description: Semantic themes for HTML/CSS and ANSI terminals.
+---
+
+# Themes
+
+One semantic palette drives both screen renderers; terminals get matching hex maps.
+
+## CSS themes (browser + HTML)
+
+```css
+@import "@opentf/syntax-highlighter/themes/default.css";
+```
+
+Available themes: `default`, `dark-plus`, `light-plus`, `dracula`, `github-dark`, `github-light`, `gruvbox-dark`, `monokai`, `nord`, `one-dark`, `solarized-dark`, `solarized-light`, `tokyo-night`, `vscode-dark`, `vscode-light`.
+
+Themes define `--sh-*` variables consumed by the shared selectors (`::highlight(sh-*)` for the CSS API, `.sh-*` for HTML output). The `default` theme follows `prefers-color-scheme`, overridable with `data-sh-theme="light"` or `"dark"` on `<html>`. Token types without an explicit color fall back sensibly (`tag` → `keyword`, `attribute` → `property`).
+
+## ANSI themes (terminal)
+
+```ts
+import { dracula } from "@opentf/syntax-highlighter/ansi/themes/dracula";
+import { ANSI_THEMES, ANSI_PALETTES } from "@opentf/syntax-highlighter";
+```
+
+The same 16 names are importable per-module or as a map from `ANSI_THEMES` (`github` → `github-dark` and `solarized` → `solarized-dark` are aliases). `ANSI_PALETTES` gives the `{ dark, light }` pair for automatic switching, and every theme pairs a dark background expectation except `default-light`, `github-light`, `light-plus`, `solarized-light`, and `vscode-light`.
