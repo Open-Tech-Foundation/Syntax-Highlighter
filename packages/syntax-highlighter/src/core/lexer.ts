@@ -162,8 +162,9 @@ export interface LanguageDefinition {
    */
   declarationKeywords?: Record<string, string>;
   /**
-   * Opt-in semantic features for the unified tokenizer. All features
-   * default to `false` unless explicitly set by the language definition.
+   * Opt-in semantic features for the unified tokenizer. `contextStack` and
+   * `declarations` default to `true`; all other features default to `false`
+   * unless explicitly set by the language definition.
    */
   features?: TokenizerFeatures;
 }

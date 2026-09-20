@@ -46,8 +46,9 @@ const CONTROL_KEYWORDS = new Set([
 ]);
 
 /**
- * Resolve feature flags. All features default to `false` unless explicitly
- * set in the language definition's `features` field.
+ * Resolve feature flags. `contextStack` and `declarations` default to `true`;
+ * all other features default to `false` unless explicitly set in the language
+ * definition's `features` field.
  */
 function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> {
   const f = lang.features ?? {};

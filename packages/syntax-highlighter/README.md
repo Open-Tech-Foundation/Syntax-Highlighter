@@ -112,7 +112,7 @@ const out = renderANSI(source, tokens, {
 console.log(out);
 ```
 
-Available ANSI themes: `default`, `default-light`, `dracula`, `github-dark`, `github-light`, `gruvbox-dark`, `monokai`, `nord`, `one-dark`, `solarized-dark`, `solarized-light`, `tokyo-night`, `vscode-dark`, `vscode-light` — importable via `@opentf/syntax-highlighter/ansi/themes/{name}` or as a map from `ANSI_THEMES`.
+Available ANSI themes: `dark-plus`, `default`, `default-light`, `dracula`, `github-dark`, `github-light`, `gruvbox-dark`, `light-plus`, `monokai`, `nord`, `one-dark`, `solarized-dark`, `solarized-light`, `tokyo-night`, `vscode-dark`, `vscode-light` — importable via `@opentf/syntax-highlighter/ansi/themes/{name}` or as a map from `ANSI_THEMES`.
 
 Aliases: `github` (→ `github-dark`), `solarized` (→ `solarized-dark`).
 
@@ -148,7 +148,7 @@ console.log(getRegisteredLanguages()); // ["javascript", "typescript", ...]
 | `renderHTML(source, tokens, options?)` | Returns escaped HTML string with `<span class="sh-{type}">` wrappers. |
 | `renderANSI(source, tokens, options?)` | Returns ANSI truecolor string for terminal output. |
 | `renderJSON(source, tokens)` | Returns JSON string of the token stream. |
-| `validateTokens(source, tokens)` | Validates token offsets against source length. Returns `{ valid: boolean; errors: string[] }`. |
+| `validateTokens(source, tokens)` | Validates token offsets against the source. Throws `TypeError`/`RangeError`/`Error` on invalid tokens; returns `void` when valid. |
 | `hexToAnsi(hex)` | Converts `"#rrggbb"` hex color to ANSI truecolor SGR escape sequence. |
 | `registerLanguage(def)` | Registers a `LanguageDefinition` for use with `createHighlighter`. |
 | `getRegisteredLanguages()` | Returns array of registered language names. |
@@ -254,16 +254,18 @@ interface LanguageDefinition {
 
 ### `TokenizerFeatures`
 
-Opt-in semantic features for the unified tokenizer. When `semantic` is `"javascript"`, all features default to `true`. Otherwise all default to `false`.
+Opt-in semantic features for the unified tokenizer. `contextStack` and `declarations` default to `true`; all other flags default to `false` unless set in the language definition's `features` field.
 
 ```ts
 interface TokenizerFeatures {
-  parameterBindings?: boolean;   // Track parameter bindings
-  contextStack?: boolean;        // Track scopes (blocks, functions, classes)
-  declarations?: boolean;        // Register declarations for hoisted lookup
-  retroactiveRewrite?: boolean;  // Retroactive token rewriting for arrows
-  typeAnnotationAware?: boolean; // Skip type annotations in parameter analysis
-  propertyKeys?: boolean;        // Detect string keys before `:` as `property`
+  parameterBindings?: boolean;          // Track parameter bindings
+  contextStack?: boolean;               // Track scopes (blocks, functions, classes)
+  declarations?: boolean;               // Register declarations for hoisted lookup
+  retroactiveRewrite?: boolean;         // Retroactive token rewriting for arrows
+  typeAnnotationAware?: boolean;        // Skip type annotations in parameter analysis
+  propertyKeys?: boolean;               // Detect string keys before `:` as `property`
+  classDetection?: boolean;             // Detect class/type names from keyword patterns
+  lineBreakResetsExpectation?: boolean; // Clear pending property expectation at line end
 }
 ```
 

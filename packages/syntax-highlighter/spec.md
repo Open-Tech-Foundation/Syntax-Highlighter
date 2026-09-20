@@ -56,8 +56,9 @@ branches exist in the core.
 
 ## Feature flags
 
-Feature flags gate subsystems that may not apply to all languages. They default to
-`false` and are set per-language in the language definition.
+Feature flags gate subsystems that may not apply to all languages. They are
+set per-language in the language definition. `contextStack` and `declarations`
+default to `true`; all other flags default to `false`.
 
 | Flag | Purpose | Default |
 |------|---------|---------|
@@ -68,3 +69,4 @@ Feature flags gate subsystems that may not apply to all languages. They default 
 | `retroactiveRewrite` | Rewrite tokens after `=>` is seen | `false` |
 | `typeAnnotationAware` | Skip type annotations in binding analysis | `false` |
 | `propertyKeys` | Detect string keys before `:` as property | `false` |
+| `lineBreakResetsExpectation` | Clear a pending property expectation at line end | `false` |

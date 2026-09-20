@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **HIGH:** Fixed Markdown line tokenization: ordered and indented unordered list markers now highlight correctly, paragraph text no longer inherits property state after headings, paired emphasis cannot consume later lines, and `***…***`/`___…___` render as combined bold-italic semantic text.
 - **HIGH:** Restored semantic token rendering end-to-end: HTML and CSS Custom Highlight renderers now use semantic identities (for example, `text.bold` → `sh-text-bold`), ANSI renders supported text styles, the tokenizer preserves semantic metadata on punctuation and operators, and JSON rendering accepts validated semantic metadata.
 - **HIGH:** Fixed Markdown emphasis at the start of a line being consumed as a list marker before paired-delimiter parsing.
+- **LOW:** Fixed documentation drift: `validateTokens` is documented as throwing on invalid tokens (returns `void`), the README lists the `dark-plus`/`light-plus` ANSI themes, and the `TokenizerFeatures` defaults (`contextStack`/`declarations` default to `true`, plus the missing `classDetection`/`lineBreakResetsExpectation` flags) are documented accurately in the README, `spec.md`, and code comments.
 
 ### Changed
 
