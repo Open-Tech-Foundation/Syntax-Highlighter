@@ -1,4 +1,7 @@
+import { Navbar } from "@opentf/afw-docs";
+import config from "../afw.config.js";
 import { globalStyles } from "./global.js";
+import SiteFooter from "./site-footer.jsx";
 
 // Site-wide SEO defaults, merged under every route's own `metadata`: the
 // template brands each page title, and the description stands in for a page
@@ -11,13 +14,22 @@ export const metadata = {
   meta: [{ property: "og:locale", content: "en_US" }],
 };
 
-// The afw-docs theme is loaded once from app/global.css (index.html); this adds
-// the site's own base styles.
-export default function Layout(props) {
+// Keep navbar action tooltips inside the viewport at the right edge.
+const navbarTooltipFix =
+  ".afwd-navbar-actions .afwd-tooltip-bubble{left:auto;right:0;transform:translateY(3px)}.afwd-navbar-actions .afwd-tooltip:hover .afwd-tooltip-bubble,.afwd-navbar-actions .afwd-tooltip:focus-within .afwd-tooltip-bubble{transform:translateY(0)}";
+
+// Site-wide shell: the afw-docs Navbar and the organization footer wrap every
+// route (landing and docs). The docs section renders `DocsLayout` with
+// `frame={false}` so its sidebar · content · TOC grid slots inside this chrome.
+// The afw-docs theme loads once from app/global.css (index.html).
+export default function RootLayout(props) {
   return (
-    <>
+    <div class="afwd-shell">
       <style>{globalStyles}</style>
-      {props.children}
-    </>
+      <style>{navbarTooltipFix}</style>
+      <Navbar config={config.docs} />
+      <div class="afwd-shell-body">{props.children}</div>
+      <SiteFooter />
+    </div>
   );
 }

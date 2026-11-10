@@ -1,16 +1,12 @@
-import { Navbar } from "@opentf/afw-docs";
-import config from "../afw.config.js";
 import BenchSection from "./bench-section.jsx";
 import DemoSection from "./demo-section.jsx";
 import HeroTabs from "./hero-tabs.jsx";
 import { landingThemeStyles } from "./landing-theme.js";
-import SiteFooter from "./site-footer.jsx";
 
 export default function Home() {
   return (
     <>
       <style>{landingThemeStyles}</style>
-      <Navbar config={config.docs} />
       <main class="marketing">
         <section class="hero-grid">
           <div class="hero-copy">
@@ -98,7 +94,6 @@ export default function Home() {
           </a>
         </section>
       </main>
-      <SiteFooter />
     </>
   );
 }

@@ -1,45 +1,46 @@
-// Shared org footer: OTF logo, copyright, license, and builder badge.
-// Used by the landing page and the docs layout so both stay identical.
+import BuiltWithBadge from "./built-with-badge.jsx";
+
+const OTF_ORG = "https://opentechf.org";
+const OTF_POLICIES = `${OTF_ORG}/policies`;
+
+// The organization footer shared with the other OTF sites (ES-Runtime, AFW).
+// The centered policy link is positioned independently of the footer contents.
 export default function SiteFooter() {
   return (
-    <footer class="site-footer">
-      <div class="site-footer-inner">
-        <div class="site-footer-org">
+    <footer className="afwd-footer border-t border-zinc-800 bg-zinc-950 text-zinc-400">
+      <div className="afwd-footer-inner site-footer-inner">
+        <div className="site-footer-org">
           <a
-            class="site-footer-org-link"
-            href="https://opentechf.org/"
+            href={OTF_ORG}
             target="_blank"
             rel="noreferrer"
+            className="site-footer-org-link text-zinc-400 hover:text-zinc-200"
           >
             <img
-              class="site-footer-logo"
               src="/img/otf-logo.svg"
-              alt="Open Tech Foundation"
-              width="25"
-              height="25"
+              alt=""
+              width="24"
+              height="24"
+              className="site-footer-org-logo"
             />
             <span>© Open Tech Foundation</span>
           </a>
-          <span class="site-footer-license">— MIT</span>
+          <span className="site-footer-license">· MIT</span>
         </div>
-        <a
-          class="site-footer-badge"
-          href="https://afw.opentechf.org/"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Built with AFW"
-        >
-          <span class="site-footer-badge-mark" aria-hidden="true">
-            ▦
-          </span>
-          <span class="site-footer-badge-copy">
-            <span class="site-footer-badge-muted">Built with</span>
-            <span class="site-footer-badge-brand">
-              <b>AFW</b>
-            </span>
-          </span>
-        </a>
+        <div className="site-footer-center">
+          <a
+            href={OTF_POLICIES}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="site-footer-policy-link"
+            aria-label="Open organization policies in a new tab"
+          >
+            Organization policies ↗
+          </a>
+        </div>
+        <BuiltWithBadge />
       </div>
+      <div className="site-footer-bottomline">No trackers, no analytics.</div>
     </footer>
   );
 }

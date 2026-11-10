@@ -1,16 +1,12 @@
 import { DocsLayout } from "@opentf/afw-docs";
 import config from "../../afw.config.js";
-import SiteFooter from "../site-footer.jsx";
 
-const docsStyleAdjustments =
-  ".afwd-navbar-actions .afwd-tooltip-bubble{left:auto;right:0;transform:translateY(3px)}.afwd-navbar-actions .afwd-tooltip:hover .afwd-tooltip-bubble,.afwd-navbar-actions .afwd-tooltip:focus-within .afwd-tooltip-bubble{transform:translateY(0)}.afwd-footer{display:none}";
-
+// The root layout provides the navbar and footer; `frame={false}` renders only
+// the docs sidebar · content · TOC grid inside that shared shell.
 export default function Layout(props) {
   return (
-    <>
-      <style>{docsStyleAdjustments}</style>
-      <DocsLayout config={config.docs}>{props.children}</DocsLayout>
-      <SiteFooter />
-    </>
+    <DocsLayout config={config.docs} frame={false}>
+      {props.children}
+    </DocsLayout>
   );
 }

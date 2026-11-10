@@ -6,6 +6,8 @@
 
 *Modern, renderer-agnostic syntax highlighting with one tokenizer*
 
+[Website](https://syntax-highlighter.opentechf.org) | [Docs](https://syntax-highlighter.opentechf.org/docs) | [npm](https://www.npmjs.com/package/@opentf/syntax-highlighter)
+
 </div>
 
 >  A fast, renderer-agnostic syntax highlighting library with semantic tokenization and support for CSS Custom Highlights, HTML/SSR, JSON, and ANSI terminal output.
