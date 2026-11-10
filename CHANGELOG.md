@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **LOW:** README: added an Accuracy section with the current per-language scores against Shiki (tier-1 table, totals, how to read them, and how to reproduce or investigate), listed the new features (102 languages, structure-aware CSS/YAML/Bash/JSX/Markdown, `highlightAll`), documented the `yamlStructure`/`shellStructure` tokenizer features, and listed the bench tasks under Development.
 - **LOW:** Applied the shared dark Open Tech Foundation footer to the landing page and documentation layout.
 - **MEDIUM:** Restored the default OTF Web Docs navbar behavior on the landing page, refined light-theme code token colors, and adopted the organization footer pattern used by the Micro-UI site.
 - **MEDIUM:** Added a responsive light theme for the public landing page and loaded the official Docs navbar stylesheet there so both theme modes share the same navigation behavior.

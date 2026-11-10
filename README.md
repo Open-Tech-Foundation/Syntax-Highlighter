@@ -17,6 +17,9 @@
 * **SSR & static HTML** — render highlighted code to HTML for Next.js, Nextra, documentation sites, and static builds.
 * **ANSI terminal output** — generate syntax-highlighted output for terminals and CLI tooling.
 * **JSON token output** — inspect, test, serialize, and consume the semantic token stream.
+* **102 built-in languages** — loaded lazily, so only the languages you highlight are bundled and parsed.
+* **Structure-aware highlighting** — CSS (selectors, properties, at-rules), YAML (keys, scalars, anchors), Bash (commands, arguments, expansions), JSX/TSX (tags, components, attributes), and Markdown (CommonMark emphasis, headings, links) are classified by structure, not word lists.
+* **Drop-in page highlighting** — `highlightAll()` finds Prism-style `language-*` code blocks and highlights them with the CSS Highlight API or `<span>` markup; unknown languages are skipped, never thrown.
 * **Extensible language support** — register languages and aliases without coupling them to renderers.
 * **Semantic tokens** — tokens use stable semantic types such as `keyword`, `string`, `function`, `number`, `comment`, and `operator`.
 * **UTF-16 range-based tokens** — precise `start`/`end` offsets make tokens directly consumable by different renderers.
@@ -169,6 +172,58 @@ registerLanguage(definition); // LanguageDefinition
 console.log(getRegisteredLanguages()); // ["javascript", "typescript", ...]
 ```
 
+## Accuracy
+
+Highlighting is measured against [Shiki](https://shiki.style)'s TextMate grammars — the grammars VS Code uses — with `bench/accuracy.ts`. Every non-whitespace character is compared after both sides are mapped to the color classes themes render consistently (comment, string, number, keyword, function, type, constant, tag, attribute, property, plus diff and markup classes); identifiers, parameters, operators, and punctuation count as plain. Because characters are compared rather than tokens, differing token boundaries cannot hide a mismatch.
+
+Two numbers are reported per language:
+
+- **Highlighted** — agreement on characters either side colors. This is the strict figure and the target metric.
+- **Overall** — agreement on all non-whitespace characters, including text both sides leave plain.
+
+Two corpora are scored separately: **real-world** — pinned, unmodified files from well-known open-source projects ([`bench/corpus/real-world`](https://github.com/Open-Tech-Foundation/Syntax-Highlighter/blob/main/bench/corpus/real-world/README.md)) — and **showcase**, the samples in `website/public/samples` written for this project.
+
+Tier-1 languages are the 18 most common in docs, server rendering, and terminals; the target is 90% highlighted on the real-world corpus. Scores as of 2026-11-10 (Shiki 4.4.3, theme `github-dark`) — the baseline file below is authoritative:
+
+| Language | Real-world highlighted | Real-world overall | Showcase highlighted |
+|----------|-----------------------:|-------------------:|---------------------:|
+| css | 100.0% | 100.0% | 97.9% |
+| json | 100.0% | 100.0% | 99.9% |
+| yaml | 100.0% | 100.0% | 100.0% |
+| python | 97.0% | 97.9% | 80.3% |
+| jsx | 95.2% | 96.6% | 94.4% |
+| bash | 94.7% | 96.0% | 90.5% |
+| javascript | 94.0% | 95.3% | 90.2% |
+| html | 92.2% | 95.6% | 98.0% |
+| java | 89.3% | 90.4% | 62.0% |
+| typescript | 88.4% | 92.2% | 72.7% |
+| c | 87.0% | 90.6% | 61.4% |
+| go | 86.6% | 89.0% | 70.2% |
+| rust | 84.0% | 88.8% | 69.2% |
+| cpp | 82.4% | 88.4% | 62.0% |
+| diff | 72.4% | 81.1% | 81.0% |
+| csharp | 66.6% | 78.3% | 74.4% |
+| markdown | 66.6% | 81.4% | 52.2% |
+| sql | 61.5% | 69.5% | 74.2% |
+
+Totals: tier-1 real-world **83.6%** highlighted / 87.7% overall; tier-1 showcase 79.1% / 86.1%; all 99 scorable showcase languages 58.7% / 73.3% (`ejs` and `stf` have no Shiki grammar, and `tsx` has no showcase sample yet).
+
+Reading the numbers:
+
+- Shiki is a reference, not ground truth. Where the two disagree on purpose, ours is kept — for example YAML `on:` is a key (Shiki scores it a boolean) and CSS media features such as `prefers-reduced-motion` are properties.
+- Markdown's gap is mostly representational: Shiki colors a link's text, brackets, and URL separately, while one link color is used for the whole `[text](url)` here.
+- The weakest tier-1 languages today are SQL, C#, and Diff; non-tier-1 languages are best effort.
+
+Reproduce or investigate:
+
+```sh
+tsr bench:accuracy                          # print the per-language table; rewrite bench/accuracy-baseline.json
+tsr accuracy:check                          # fail if any language drops below the baseline (part of tsr ci)
+esdev bench/accuracy.ts --explain=markdown  # list each mismatch with Shiki's scope chain and our token type
+```
+
+The committed [`bench/accuracy-baseline.json`](https://github.com/Open-Tech-Foundation/Syntax-Highlighter/blob/main/bench/accuracy-baseline.json) holds the current per-language scores; CI fails if any language regresses, so improvements are kept.
+
 ## API Reference
 
 ### Functions
@@ -303,6 +358,8 @@ interface TokenizerFeatures {
   classDetection?: boolean;             // Detect class/type names from keyword patterns
   lineBreakResetsExpectation?: boolean; // Clear pending property expectation at line end
   styleSheet?: boolean;                 // CSS structure: selectors, declarations, at-rules
+  yamlStructure?: boolean;              // YAML structure: keys, scalars, anchors, block scalars
+  shellStructure?: boolean;             // Shell structure: commands, arguments, options, expansions
 }
 ```
 
@@ -325,6 +382,9 @@ tsr fmt            # biome format --write
 tsr build          # library → packages/syntax-highlighter/dist/
 tsr bench:accuracy # accuracy vs Shiki per language; rewrites bench/accuracy-baseline.json
 tsr accuracy:check # fail if any language drops below the committed baseline
+tsr test:bench     # unit tests for the accuracy scorer
+tsr typecheck:bench # tsc --noEmit for the accuracy harness
+tsr bench          # throughput vs other highlighters → website/app/bench-data.js
 tsr ci             # typecheck + lint + fmt:check + tests + accuracy:check + build
 tsr clean          # rm -rf dist/
 
