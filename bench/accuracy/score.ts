@@ -15,6 +15,7 @@
  *   and `text.*` are structural and skipped.
  * - Everything inside a comment is `comment`, including doc tags such as
  *   `@param`: themes disagree on tinting them.
+ * - A unit belongs to its number (`1rem` is all `number`).
  * - Delimiters belong to what they delimit (quotes are `string`, a JSON key's
  *   quotes are `property`), so generic punctuation defers to the enclosing
  *   scope; escapes inside strings stay `string`. Interpolation delimiters
@@ -98,7 +99,8 @@ export function classifyScope(scope: string, text: string): ColorClass | null {
     has("markup.fenced_code")
   )
     return "string";
-  if (has("constant.numeric")) return "number";
+  // A unit belongs to its number (`1rem`, `50%`); themes color them alike.
+  if (has("constant.numeric") || has("keyword.other.unit")) return "number";
   if (has("constant.language")) return "constant";
   if (has("variable.other.constant") || has("variable.other.enummember")) {
     return ALL_CAPS.test(text.trim()) ? "constant" : "plain";
@@ -124,7 +126,7 @@ export function classifyScope(scope: string, text: string): ColorClass | null {
   )
     return "function";
   if (
-    has("support.type.property-name") ||
+    /(^|\.)property-name(\.|$)/.test(s) ||
     has("variable.other.property") ||
     has("variable.other.object.property") ||
     has("meta.object-literal.key") ||

@@ -89,6 +89,17 @@ test("calls, types, properties, and markup map to their classes", () => {
   assertEquals(classifyScopes(["text.html.markdown", "markup.heading.markdown"], "# H"), "heading");
 });
 
+test("units count as their number; vendored property names are properties", () => {
+  assertEquals(
+    classifyScopes(["source.css", "constant.numeric.css", "keyword.other.unit.rem.css"], "rem"),
+    "number",
+  );
+  assertEquals(
+    classifyScopes(["source.css", "support.type.vendored.property-name.css"], "-webkit-appearance"),
+    "property",
+  );
+});
+
 test("structural and unknown scopes defer to plain", () => {
   assertEquals(classifyScopes(js("meta.var.expr.js"), "x"), "plain");
   assertEquals(classifyScopes(js("punctuation.terminator.statement.js"), ";"), "plain");

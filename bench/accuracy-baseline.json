@@ -11,7 +11,7 @@
       "c": {
         "chars": 3556,
         "overall": 76.8,
-        "highlighted": 61.3
+        "highlighted": 61.4
       },
       "cpp": {
         "chars": 3974,
@@ -35,8 +35,8 @@
       },
       "go": {
         "chars": 3104,
-        "overall": 82.3,
-        "highlighted": 70.1
+        "overall": 82.4,
+        "highlighted": 70.2
       },
       "html": {
         "chars": 3582,
@@ -507,13 +507,13 @@
       },
       "c": {
         "chars": 6333,
-        "overall": 90.1,
-        "highlighted": 86.3
+        "overall": 90.6,
+        "highlighted": 87
       },
       "cpp": {
         "chars": 3880,
-        "overall": 88.3,
-        "highlighted": 82.3
+        "overall": 88.4,
+        "highlighted": 82.4
       },
       "csharp": {
         "chars": 7242,

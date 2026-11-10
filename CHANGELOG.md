@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** The accuracy scorer counts a CSS unit as part of its number (`1rem`, `50%`) and treats vendor-prefixed property names (`-webkit-appearance`) as properties, matching how themes color them.
 - **LOW:** `esdev bench/accuracy.ts --explain=<language>` lists every mismatched span with Shiki's scope chain and our token type, to diagnose accuracy gaps.
 - **MEDIUM:** Replaced the internal Shiki fidelity script with a character-level accuracy benchmark (`tsr bench:accuracy`). Every non-whitespace character is compared against Shiki's TextMate grammars after mapping both sides to the color classes themes render consistently, so differing token boundaries can no longer hide mismatches. It reports per-language overall and highlighted-character agreement, plus the top mismatches, separately for the showcase samples and the real-world corpus. `tsr accuracy:check` (now part of `tsr ci`) fails if any language drops below the committed `bench/accuracy-baseline.json`. Baseline for the 18 tier-1 languages: 78.4% overall / 67.8% highlighted (showcase), 81.3% / 75.8% (real-world).
 - **LOW:** Added a pinned real-world accuracy corpus (`bench/corpus/real-world`): 20 unmodified, permissively licensed files from well-known projects covering the 18 tier-1 languages, with per-file provenance and licenses, as the basis for the upcoming Shiki accuracy benchmark.
