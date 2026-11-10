@@ -82,3 +82,16 @@ test("plain JavaScript still highlights through the TS definition", () => {
   assert(k.includes("variable:x"));
   assert(k.includes("number:42"));
 });
+
+test("a regex after an expression keyword is a regex, not division", () => {
+  // TypeScript once had no regexKeywords, so `return /x+/g` lexed as `/ x + / g`.
+  for (const [src, re] of [
+    ["function f(a) { return /x+/g.test(a); }", "/x+/g"],
+    ["const ok = typeof /a/ === 'object';", "/a/"],
+    ["throw /bad/;", "/bad/"],
+  ]) {
+    assert(kinds(src).includes(`regex:${re}`), `${src}: ${JSON.stringify(kinds(src))}`);
+  }
+  // Division after a value stays division.
+  assert(kinds("const half = total / 2;").includes("operator:/"));
+});

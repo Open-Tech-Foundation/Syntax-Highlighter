@@ -59,7 +59,8 @@ const constants = [
   "Symbol",
 ];
 
-const regexKeywords = [
+/** Keywords after which `/` starts a regex rather than dividing. */
+export const regexKeywords: string[] = [
   "return",
   "typeof",
   "instanceof",

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **MEDIUM:** TypeScript now recognizes a regex literal after expression keywords (`return /x+/g.test(s)`, `typeof /a/`, `throw /bad/`); it had no `regexKeywords`, so these lexed as division.
 - **HIGH:** CSS is now highlighted by structure instead of as generic identifiers: element selectors (`div`, `*`, `&`) are `tag`; classes, ids, pseudo-classes/elements, and attribute selectors are `attribute`; declaration names are `property` (custom properties stay `variable`); hex colors are `constant`; `!important` and at-rules (`@media`, previously `decorator`) are `keyword`; media features are `property`. Numbers keep their unit (`1rem`, `50%`) and negative numbers (`-0.5`) are no longer identifiers. Embedded `<style>` blocks in HTML get the same treatment. Real-world CSS accuracy (highlighted characters vs Shiki) rose from 74.9% to 100%.
 - **LOW:** The accuracy scorer counts a CSS unit as part of its number (`1rem`, `50%`) and treats vendor-prefixed property names (`-webkit-appearance`) as properties, matching how themes color them.
 - **LOW:** `esdev bench/accuracy.ts --explain=<language>` lists every mismatched span with Shiki's scope chain and our token type, to diagnose accuracy gaps.

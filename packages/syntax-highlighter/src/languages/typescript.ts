@@ -1,4 +1,5 @@
 import type { LanguageDefinition } from "../core/lexer.ts";
+import { regexKeywords } from "./javascript.ts";
 
 const typescript: LanguageDefinition = {
   name: "typescript",
@@ -149,6 +150,8 @@ const typescript: LanguageDefinition = {
     "?",
   ],
   punctuation: ["(", ")", "{", "}", "[", "]", ";", ",", ":", "."],
+  // Same expression-position keywords as JavaScript: `return /re/` is a regex.
+  regexKeywords,
   lex: {
     strings: [
       { open: "'", close: "'", escape: "\\", multiline: false },
