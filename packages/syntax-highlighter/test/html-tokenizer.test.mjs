@@ -98,3 +98,29 @@ test("xml uses the same tokenizer", () => {
   assert(k.includes("attribute:attr"), k);
   renderJSON(src, toks);
 });
+
+test("every script and style block is embedded, not only the first", () => {
+  const src = [
+    "<script>let a = 1</script>",
+    "<script>let b = 2</script>",
+    "<style>.x { color: red }</style>",
+    "<style>.y { color: blue }</style>",
+  ].join("\n");
+  const toks = highlighter.highlight(src);
+  // A later block used to match the first block's close tag, so its body
+  // fell through as plain text.
+  const text = toks
+    .filter((t) => t.type === "text")
+    .map((t) => src.slice(t.start, t.end))
+    .filter((s) => s.trim() !== "");
+  assertEquals(text, []);
+  assertEquals(typeAt(src, "b"), "variable");
+  assertEquals(typeAt(src, "blue"), typeAt(src, "red"));
+  renderJSON(src, toks);
+});
+
+test("a block's body ends at its own close tag", () => {
+  const src = "<script>x</script><p>mid</p><script>let y = 2</script>";
+  assertEquals(typeAt(src, "mid"), "text");
+  assertEquals(typeAt(src, "let"), "keyword");
+});

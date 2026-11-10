@@ -276,7 +276,9 @@ export class UnifiedLexer extends Lexer {
     const embedDef = this.embed[tagName];
     if (!embedDef) return start;
 
-    const closeRe = new RegExp(`</${tagName}(?=[\\s/>]|$)`, "i");
+    // `g` is required for `lastIndex` to take effect — without it exec()
+    // searches from 0 and a later block matches an earlier block's close tag.
+    const closeRe = new RegExp(`</${tagName}(?=[\\s/>]|$)`, "gi");
     closeRe.lastIndex = start;
     const hit = closeRe.exec(source);
     const bodyEnd = hit ? hit.index : source.length;
