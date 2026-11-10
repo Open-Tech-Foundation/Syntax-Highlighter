@@ -72,6 +72,11 @@ export interface LexDefinition {
   regex?: boolean;
   regexAfterParenKeywords?: string[];
   shebang?: boolean;
+  /**
+   * Scan JSX elements where an expression may start (`return <div>`, `= <A/>`):
+   * tag names, attributes, text children, and `{…}` expression containers.
+   */
+  jsx?: boolean;
   scanNumber?: ScanNumberFn;
   scanString?: (def: StringDef, source: string, pos: number) => number;
   /**
@@ -227,6 +232,8 @@ export interface RawTokenDetail {
   templateClose?: boolean;
   controlClose?: boolean;
   unknown?: boolean;
+  /** A JSX tag name that refers to a component (`Card`, `ui.Button`). */
+  component?: boolean;
   /** Semantic identity from the central registry (e.g., "text.bold", "markup.link") */
   semantic?: string;
 }
@@ -257,6 +264,15 @@ function isHexDigit(ch: string): boolean {
 function isAlpha(ch: string): boolean {
   return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
 }
+
+/** JSX element / attribute names: `div`, `Card`, `ui.Button`, `svg:rect`, `my-el`. */
+const JSX_NAME = /[A-Za-z_$][\w$]*(?:[.:-][\w$]+)*/y;
+const JSX_ATTRIBUTE = /[A-Za-z_$][\w$]*(?:[:-][\w$]+)*/y;
+/**
+ * Nesting bound for JSX elements and expression containers: deeper input is
+ * scanned as ordinary code, so hostile nesting cannot overflow the stack.
+ */
+const MAX_JSX_DEPTH = 128;
 
 /** Whitespace exactly as `String.prototype.trim()` defines it. */
 function isTrimWhitespace(ch: string): boolean {
@@ -400,6 +416,8 @@ export class Lexer {
    */
   private lineScanPos = 0;
   private lineScanBlank = true;
+  private jsxEnabled: boolean;
+  private jsxDepth = 0;
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
@@ -420,6 +438,7 @@ export class Lexer {
     this.linePrefixPatterns = lex.linePrefixPatterns ?? [];
     this.inlinePatterns = lex.inlinePatterns ?? [];
     this.codeFences = lex.codeFences ?? [];
+    this.jsxEnabled = lex.jsx === true;
 
     this.stringOpeners = new Map();
     for (const def of this.strings) {
@@ -603,6 +622,140 @@ export class Lexer {
       i += 1;
     }
     return false;
+  }
+
+  /**
+   * Scan a JSX element at `<` when it is one: `<` in expression position
+   * followed by a name or `>` (fragment). TypeScript generic arrows (`<T,>`,
+   * `<T extends U>`) are left to the code scanner.
+   */
+  tryScanJsx(): boolean {
+    const s = this.source;
+    const lt = this.pos;
+    if (this.jsxDepth >= MAX_JSX_DEPTH) return false;
+    if (s[lt + 1] !== ">") {
+      JSX_NAME.lastIndex = lt + 1;
+      const name = JSX_NAME.exec(s);
+      if (!name) return false;
+      let j = lt + 1 + name[0].length;
+      while (s[j] === " " || s[j] === "\t") j++;
+      if (s[j] === "," || (s.startsWith("extends", j) && !/[\w$]/.test(s[j + 7] ?? ""))) {
+        return false;
+      }
+    }
+    this.scanJsxElement();
+    return true;
+  }
+
+  private scanJsxElement(): void {
+    const s = this.source;
+    this.jsxDepth++;
+    try {
+      this.emit("punctuation", this.pos, this.pos + 1);
+      this.pos += 1;
+      if (s[this.pos] !== ">") this.scanJsxName();
+
+      // Attributes, up to `>` or `/>`.
+      while (this.pos < this.length) {
+        if (this.scanJsxWhitespace()) continue;
+        const start = this.pos;
+        const c = s[start];
+        if (s.startsWith("/>", start)) {
+          this.pos += 2;
+          this.emit("punctuation", start, this.pos);
+          return;
+        }
+        if (c === ">") {
+          this.pos += 1;
+          this.emit("punctuation", start, this.pos);
+          break;
+        }
+        if (c === "{") {
+          this.scanJsxExpression();
+          continue;
+        }
+        if (c === '"' || c === "'") {
+          // JSX attribute strings have no escapes and may span lines.
+          const close = s.indexOf(c, start + 1);
+          this.pos = close === -1 ? this.length : close + 1;
+          this.emit("string", start, this.pos, { quote: c });
+          continue;
+        }
+        if (c === "=") {
+          this.pos += 1;
+          this.emit("operator", start, this.pos);
+          continue;
+        }
+        if (c === "<" && this.tryScanJsx()) continue;
+        JSX_ATTRIBUTE.lastIndex = start;
+        const attr = JSX_ATTRIBUTE.exec(s);
+        if (attr) {
+          this.pos += attr[0].length;
+          this.emit("attribute", start, this.pos);
+          continue;
+        }
+        this.pos += codePointWidthAt(s, start);
+        this.emit("punctuation", start, this.pos, { unknown: true });
+      }
+
+      // Children, up to the closing tag.
+      while (this.pos < this.length) {
+        const start = this.pos;
+        if (s.startsWith("</", start)) {
+          this.pos += 2;
+          this.emit("punctuation", start, this.pos);
+          this.scanJsxWhitespace();
+          if (s[this.pos] !== ">") this.scanJsxName();
+          this.scanJsxWhitespace();
+          if (s[this.pos] === ">") {
+            this.pos += 1;
+            this.emit("punctuation", this.pos - 1, this.pos);
+          }
+          return;
+        }
+        const c = s[start];
+        if (c === "<" && this.tryScanJsx()) continue;
+        if (c === "{") {
+          this.scanJsxExpression();
+          continue;
+        }
+        let end = start + 1;
+        while (end < this.length && s[end] !== "<" && s[end] !== "{") end++;
+        this.emit(s.slice(start, end).trim() ? "text" : "whitespace", start, end);
+        this.pos = end;
+      }
+    } finally {
+      this.jsxDepth--;
+    }
+  }
+
+  /** Tag name at the current position; components are flagged for `class`. */
+  private scanJsxName(): void {
+    const start = this.pos;
+    JSX_NAME.lastIndex = start;
+    const name = JSX_NAME.exec(this.source);
+    if (!name) return;
+    this.pos += name[0].length;
+    const component = /^[A-Z_$]/.test(name[0]) || name[0].includes(".");
+    this.emit("tag", start, this.pos, component ? { component: true } : undefined);
+  }
+
+  private scanJsxWhitespace(): boolean {
+    const start = this.pos;
+    let end = start;
+    while (end < this.length && isWhitespaceChar(this.source[end])) end++;
+    if (end === start) return false;
+    this.emit("whitespace", start, end);
+    this.pos = end;
+    return true;
+  }
+
+  /** `{…}` container: code up to the matching `}`, which closes it. */
+  private scanJsxExpression(): void {
+    const open = this.pos;
+    this.pos += 1;
+    this.emit("punctuation", open, this.pos, { templateOpen: true });
+    this.scanCode(true);
   }
 
   scanString(def: StringDef): void {
@@ -942,6 +1095,10 @@ export class Lexer {
       }
 
       if (this.regexEnabled && ch === "/" && this.regexAllowed() && this.tryScanRegex()) {
+        continue;
+      }
+
+      if (this.jsxEnabled && ch === "<" && this.regexAllowed() && this.tryScanJsx()) {
         continue;
       }
 

@@ -219,7 +219,12 @@ export class UnifiedTokenizer {
     const semantic = raw.detail?.semantic;
 
     // ---- Markup types: pass through directly (produced by UnifiedLexer) ----
-    if (raw.type === "tag") return createToken(TokenType.TAG, raw.start, raw.end, semantic);
+    if (raw.type === "tag") {
+      // JSX component names (`Card`, `ui.Button`) read as types, like Shiki's
+      // support.class.component.
+      const type = raw.detail?.component ? TokenType.CLASS : TokenType.TAG;
+      return createToken(type, raw.start, raw.end, semantic);
+    }
     if (raw.type === "attribute")
       return createToken(TokenType.ATTRIBUTE, raw.start, raw.end, semantic);
     if (raw.type === "text") return createToken(TokenType.TEXT, raw.start, raw.end, semantic);
@@ -535,6 +540,12 @@ export class UnifiedTokenizer {
         ctx.expectation = Expectation.NONE;
         break;
       case "{": {
+        // A JSX expression container opens a template-expression context
+        // (pushed below), not a block or object.
+        if (raw.detail?.templateOpen) {
+          ctx.expectation = Expectation.NONE;
+          break;
+        }
         const kind = braceKind(ctx, ctx.previousToken, ctx.previousValue);
         pushCtx(ctx, createContext(kind));
         if (ctx.pendingParams) {

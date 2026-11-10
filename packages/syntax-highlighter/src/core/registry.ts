@@ -14,6 +14,7 @@ const builtinLoaders: Record<string, () => Promise<LanguageDefinition>> = {
   javascript: () => import("../languages/javascript.ts").then((m) => m.default),
   typescript: () => import("../languages/typescript.ts").then((m) => m.default),
   jsx: () => import("../languages/jsx.ts").then((m) => m.default),
+  tsx: () => import("../languages/tsx.ts").then((m) => m.default),
   html: () => import("../languages/html.ts").then((m) => m.default),
   css: () => import("../languages/css.ts").then((m) => m.default),
   python: () => import("../languages/python.ts").then((m) => m.default),
@@ -119,7 +120,6 @@ const aliasToCanonical: Record<string, string> = {
   mjs: "javascript",
   cjs: "javascript",
   ts: "typescript",
-  tsx: "typescript",
   mts: "typescript",
   cts: "typescript",
   jsonc: "json",
@@ -365,7 +365,7 @@ function validateLanguageDefinition(value: unknown): asserts value is LanguageDe
     }
   }
 
-  for (const field of ["regex", "shebang"]) {
+  for (const field of ["regex", "shebang", "jsx"]) {
     if (value.lex[field] !== undefined && typeof value.lex[field] !== "boolean") {
       throw new Error(`Language definition lex.${field} must be boolean`);
     }

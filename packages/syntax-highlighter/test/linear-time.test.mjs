@@ -40,6 +40,9 @@ const CASES = [
   ["markdown", "[a][", 10000, "unclosed reference links"],
   ["javascript", "(a ", 10000, "unclosed parentheses"],
   ["python", "(a ", 10000, "unclosed parentheses"],
+  // JSX nesting beyond the depth bound is scanned as code, not recursively.
+  ["jsx", "<a>", 10000, "unclosed JSX elements"],
+  ["jsx", "<a>{", 10000, "unclosed JSX expression containers"],
 ];
 
 for (const [language, unit, n, label] of CASES) {

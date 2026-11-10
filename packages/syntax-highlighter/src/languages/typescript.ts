@@ -3,7 +3,7 @@ import { regexKeywords } from "./javascript.ts";
 
 const typescript: LanguageDefinition = {
   name: "typescript",
-  aliases: ["ts", "tsx", "mts", "cts"],
+  aliases: ["ts", "mts", "cts"],
   semantic: "javascript",
   keywords: [
     "abstract",
