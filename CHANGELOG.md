@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **HIGH:** Fixed zero-length string tokens around template interpolations: back-to-back interpolations (`` `${a}${b}` ``, Ruby `"#{a}#{b}"`) and an interpolation left open at end of input (`` `${ ``) produced an empty token, so `validateTokens`/`renderJSON` threw on valid JavaScript, TypeScript, JSX, and Ruby. Added a token-contract test that runs edge-case inputs through all 101 languages.
 - **LOW:** Prevented the Docs theme-control tooltip from creating horizontal overflow on documentation pages.
 - **MEDIUM:** Loaded the official OTF Web Docs theme so documentation navigation, sidebar, typography, and theme controls render correctly.
 - **MEDIUM:** Added Markdown semantics for reference links, autolinks, bare HTTP(S) URLs, and footnote definitions.

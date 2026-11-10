@@ -676,7 +676,11 @@ export class Lexer {
           continue;
         }
         if (this.pos >= this.length) {
-          this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+          // A template resumed at EOF (e.g. `${` left open) has no text left —
+          // emitting it would produce a zero-length token.
+          if (this.pos > start) {
+            this.emit("string", start, this.pos, { quote: def.open, unterminated: true });
+          }
           frames.pop();
           continue;
         }
@@ -699,7 +703,9 @@ export class Lexer {
         let matched = false;
         for (const prefix of prefixes) {
           if (s.startsWith(prefix, this.pos) && s[this.pos + prefix.length] === "{") {
-            this.emit("string", start, this.pos, { quote: def.open });
+            // Back-to-back interpolations (`${a}${b}`) leave no string text
+            // between `}` and `${`; skip the empty segment.
+            if (this.pos > start) this.emit("string", start, this.pos, { quote: def.open });
             const open = this.pos;
             this.pos += prefix.length + 1; // skip prefix + "{"
             this.emit("punctuation", open, this.pos, { templateOpen: true });
