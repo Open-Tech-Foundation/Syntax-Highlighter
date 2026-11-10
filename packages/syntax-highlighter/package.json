@@ -10,14 +10,18 @@
       "default": "./dist/index.js"
     },
     "./themes/*": "./src/themes/*",
-    "./ansi/themes/*": "./src/ansi/themes/*",
-    "./ansi/*": "./src/ansi/*"
+    "./ansi/themes": {
+      "types": "./dist/ansi/themes/index.d.ts",
+      "default": "./dist/ansi/themes/index.js"
+    },
+    "./ansi/themes/*": {
+      "types": "./dist/ansi/themes/*.d.ts",
+      "default": "./dist/ansi/themes/*.js"
+    }
   },
   "files": [
     "dist",
-    "src/themes",
-    "src/ansi/themes",
-    "src/ansi"
+    "src/themes"
   ],
   "devDependencies": {
     "@opentf/esrun-types": "latest",

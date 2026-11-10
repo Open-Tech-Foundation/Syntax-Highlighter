@@ -18,7 +18,7 @@ dir = "website"
 
 # ------------------------------------------------------------------ build
 [tasks.build]
-run = "esdev build --lib src --dts-bundle && cp ../../README.md README.md"
+run = "esdev build --lib src && cp ../../README.md README.md"
 dir = "packages/syntax-highlighter"
 
 # ------------------------------------------------------------------ typecheck / test
