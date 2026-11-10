@@ -83,6 +83,28 @@ renderer.clear();
 renderer.dispose();
 ```
 
+### Page highlighting (Prism-style)
+
+`highlightAll` finds every `<code class="language-*">` (or a `language-*` class on an ancestor such as the `<pre>`, as Prism does), loads each language once, and highlights the blocks. You choose how blocks are painted — `mode` is required:
+
+- `"highlight"` — CSS Custom Highlight API; the DOM is left untouched. Paints nothing where the API is unsupported.
+- `"html"` — replaces each block's content with escaped `<span class="sh-*">` markup; works in every browser.
+
+```ts
+import { highlightAll, supportsHighlightAPI } from "@opentf/syntax-highlighter";
+import "@opentf/syntax-highlighter/themes/default.css";
+
+const result = await highlightAll({
+  mode: supportsHighlightAPI() ? "highlight" : "html", // your call
+  root: document, // optional; where to look
+  // selector, defaultLanguage, prefix are optional too
+});
+result.skipped; // blocks with no or an unknown language, left as they were
+result.dispose(); // release "highlight"-mode ranges (e.g. on navigation)
+```
+
+Unknown languages are skipped rather than thrown, and re-running on the same blocks replaces their highlighting instead of stacking it.
+
 ### HTML / SSR
 
 Emits escaped HTML with semantic `<span class="sh-{type}">` wrappers. Safe for server rendering and static builds — compose your own `<pre><code>` wrapper as needed.
@@ -94,6 +116,15 @@ const html = renderHTML(source, tokens, {
   prefix: "sh-", // CSS class prefix for token spans
   wrapWhitespace: false, // wrap whitespace tokens too
 });
+```
+
+For build steps and server rendering, `highlightCode` resolves the language for you and never throws on an unknown one — it returns the escaped code with `language: null`, so the block still renders as plain text:
+
+```ts
+import { highlightCode } from "@opentf/syntax-highlighter";
+
+const { html, language } = await highlightCode(code, { language: "tsx" });
+const block = `<pre><code class="language-${language ?? "text"}">${html}</code></pre>`;
 ```
 
 ### ANSI terminal
@@ -146,6 +177,10 @@ console.log(getRegisteredLanguages()); // ["javascript", "typescript", ...]
 |--------|-------------|
 | `createHighlighter(options?)` | Creates a `Highlighter` instance. Loads the language definition asynchronously. Returns `Promise<Highlighter>`. |
 | `highlightElement(element, source, options?)` | One-shot setup for browser highlighting. Returns `Promise<HighlightHandle>` with `refresh()` and `dispose()`. |
+| `highlightAll({ mode, root?, selector?, defaultLanguage?, prefix? })` | Highlights every matching code block. `mode` (`"highlight"` or `"html"`) is required. Returns `Promise<HighlightAllResult>` with `highlighted`, `skipped`, and `dispose()`. |
+| `highlightCode(code, { language?, prefix? })` | Code string → escaped span HTML. Unknown or missing language → escaped plain text with `language: null`. Returns `Promise<HighlightCodeResult>`. |
+| `supportsHighlightAPI()` | Whether the CSS Custom Highlight API is available. |
+| `languageOf(element)` | The `language-*`/`lang-*` class on an element or its nearest ancestor, or `null`. |
 | `renderHTML(source, tokens, options?)` | Returns escaped HTML string with `<span class="sh-{type}">` wrappers. |
 | `renderANSI(source, tokens, options?)` | Returns ANSI truecolor string for terminal output. |
 | `renderJSON(source, tokens)` | Returns JSON string of the token stream. |
@@ -267,6 +302,7 @@ interface TokenizerFeatures {
   propertyKeys?: boolean;               // Detect string keys before `:` as `property`
   classDetection?: boolean;             // Detect class/type names from keyword patterns
   lineBreakResetsExpectation?: boolean; // Clear pending property expectation at line end
+  styleSheet?: boolean;                 // CSS structure: selectors, declarations, at-rules
 }
 ```
 

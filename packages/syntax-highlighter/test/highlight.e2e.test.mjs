@@ -258,4 +258,109 @@ if (!browserPath) {
       return true;
     `);
   });
+
+  // ---- highlightAll: Prism-style page highlighting ----
+
+  async function mountBlocks() {
+    await page.evaluate(`
+      document.getElementById("auto")?.remove();
+      const auto = document.createElement("div");
+      auto.id = "auto";
+      auto.innerHTML =
+        '<pre><code id="auto-js" class="language-js">const a = 1;</code></pre>' +
+        '<pre class="language-ts"><code id="auto-ts">let b = 2;</code></pre>' +
+        '<pre><code id="auto-unknown" class="language-nope">&lt;x&gt;</code></pre>';
+      document.body.append(auto);
+      return true;
+    `);
+  }
+
+  /** Client rects of the first `.sh-<type>` span inside `#id`. */
+  const spanRects = (id, type) =>
+    `[...document.querySelector("#${id} .sh-${type}").getClientRects()]`;
+
+  test('highlightAll({ mode: "html" }) inserts spans that the theme paints', async () => {
+    await mountBlocks();
+    const result = await page.evaluate(`
+      const r = await window.sh.highlightAll({ mode: "html", root: document.getElementById("auto") });
+      return {
+        highlighted: r.highlighted.map((e) => e.id),
+        skipped: r.skipped.map((s) => [s.language, s.reason]),
+        keyword: document.querySelector("#auto-js .sh-keyword")?.textContent,
+        tsKeyword: document.querySelector("#auto-ts .sh-keyword")?.textContent,
+        unknown: document.getElementById("auto-unknown").innerHTML,
+      };
+    `);
+    assertEquals(result.highlighted, ["auto-js", "auto-ts"]);
+    assertEquals(result.skipped, [["nope", "unknown-language"]]);
+    assertEquals(result.keyword, "const");
+    assertEquals(result.tsKeyword, "let", "the language may be declared on the <pre>");
+    assertEquals(result.unknown, "&lt;x&gt;", "a skipped block is left untouched");
+
+    const colors = await page.colorsIn(spanRects("auto-js", "keyword"));
+    const { color, distance } = nearestColor(colors, theme.keyword);
+    assert(
+      distance <= COLOR_TOLERANCE,
+      `span keyword painted ${color}, expected ~${theme.keyword}`,
+    );
+  });
+
+  test('highlightAll({ mode: "highlight" }) paints without touching the DOM', async () => {
+    await mountBlocks();
+    const state = await page.evaluate(`
+      const total = () =>
+        [...CSS.highlights].reduce((n, [name, h]) => n + (name.startsWith("sh-") ? h.size : 0), 0);
+      window.rangeTotal = total;
+      window.rangesBefore = total();
+      window.autoResult = await window.sh.highlightAll({
+        mode: "highlight",
+        root: document.getElementById("auto"),
+      });
+      const code = document.getElementById("auto-js");
+      return {
+        elements: code.getElementsByTagName("*").length,
+        text: code.textContent,
+        keywords: CSS.highlights.get("sh-keyword")?.size ?? 0,
+      };
+    `);
+    assertEquals(state.elements, 0, "no markup is injected");
+    assertEquals(state.text, "const a = 1;");
+    assert(state.keywords >= 2, "both blocks' keywords are registered");
+
+    const colors = await page.colorsIn(rangeRects("auto-js", 0, 5));
+    const { color, distance } = nearestColor(colors, theme.keyword);
+    assert(distance <= COLOR_TOLERANCE, `keyword painted ${color}, expected ~${theme.keyword}`);
+
+    // Re-running replaces this page's ranges instead of stacking them.
+    const again = await page.evaluate(`
+      const before = CSS.highlights.get("sh-keyword").size;
+      await window.sh.highlightAll({ mode: "highlight", root: document.getElementById("auto") });
+      return { before, after: CSS.highlights.get("sh-keyword").size };
+    `);
+    assertEquals(again.after, again.before);
+
+    // Other tests' blocks stay highlighted; dispose must return to that count.
+    const released = await page.evaluate(`
+      window.autoResult.dispose();
+      document.getElementById("auto").remove();
+      return { before: window.rangesBefore, after: window.rangeTotal() };
+    `);
+    assertEquals(
+      released.after,
+      released.before,
+      "dispose releases every range highlightAll added",
+    );
+  });
+
+  test("highlightAll without a mode is rejected", async () => {
+    const message = await page.evaluate(`
+      try {
+        await window.sh.highlightAll({});
+        return "resolved";
+      } catch (error) {
+        return error.constructor.name + ": " + error.message;
+      }
+    `);
+    assert(message.startsWith("TypeError"), message);
+  });
 }

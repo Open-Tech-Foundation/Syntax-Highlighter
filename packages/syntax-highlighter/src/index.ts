@@ -14,6 +14,21 @@ export {
   hexToAnsi,
   renderANSI,
 } from "./core/ansi-renderer.ts";
+export type {
+  HighlightAllOptions,
+  HighlightAllResult,
+  HighlightCodeOptions,
+  HighlightCodeResult,
+  HighlightMode,
+  SkippedBlock,
+} from "./core/auto.ts";
+export {
+  DEFAULT_SELECTOR,
+  highlightAll,
+  highlightCode,
+  languageOf,
+  supportsHighlightAPI,
+} from "./core/auto.ts";
 export { CSSHighlightRenderer } from "./core/css-renderer.ts";
 export { Highlighter } from "./core/highlighter.ts";
 export type { HtmlRenderOptions } from "./core/html-renderer.ts";
