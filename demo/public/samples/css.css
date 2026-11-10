@@ -1,0 +1,16 @@
+/* layout */
+.container {
+  display: flex;
+  --gap: 1rem;
+}
+
+#title,
+a:hover {
+  color: rebeccapurple;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}

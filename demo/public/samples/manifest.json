@@ -53,5 +53,10 @@
     "name": "rust — fn",
     "language": "rust",
     "file": "rust.rs"
+  },
+  {
+    "name": "css — selectors & queries",
+    "language": "css",
+    "file": "css.css"
   }
 ]
