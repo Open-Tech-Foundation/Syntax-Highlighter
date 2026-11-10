@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** The "Try it live" editor shows scrollbars again (vertical and, for wide lines, horizontal): the editable textarea now carries thin themed scrollbars, and the painted code and line numbers reserve the same space with invisible ones, so all three layers keep one size and scroll range. The language list's scrollbar matches.
 - **MEDIUM:** Website "Try it live" editor: selecting text hid the selected code, the selection and caret drifted further from the visible code the further down the file they were (about one line per 22 lines), and the last lines could not be scrolled into view. The painted code's `<code>` used a different monospace font from the editable textarea (the Tailwind preflight stack the AFW theme brought in), so line boxes were ~1px taller per line; the painted layer also had its own height limit and scrollbar, and omitted the trailing empty line the textarea shows. The layers now share one font, one fixed height, and one scroll range, and the selection is translucent so the code stays visible.
 
 ### Changed
