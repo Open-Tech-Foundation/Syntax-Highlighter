@@ -3,29 +3,21 @@ title: Installation
 description: Add @opentf/syntax-highlighter with your package manager.
 ---
 
+import { CodeBlock, Tabs } from "@opentf/afw-docs";
+
+export const installTabs = [
+  { label: "npm", content: <CodeBlock lang="Shell" code="npm install @opentf/syntax-highlighter" /> },
+  { label: "pnpm", content: <CodeBlock lang="Shell" code="pnpm add @opentf/syntax-highlighter" /> },
+  { label: "yarn", content: <CodeBlock lang="Shell" code="yarn add @opentf/syntax-highlighter" /> },
+  { label: "bun", content: <CodeBlock lang="Shell" code="bun add @opentf/syntax-highlighter" /> },
+  { label: "deno", content: <CodeBlock lang="Shell" code="deno add npm:@opentf/syntax-highlighter" /> },
+];
+
 # Installation
 
 The library ships as ESM with TypeScript declarations.
 
-```sh
-npm install @opentf/syntax-highlighter
-```
-
-```sh
-pnpm add @opentf/syntax-highlighter
-```
-
-```sh
-yarn add @opentf/syntax-highlighter
-```
-
-```sh
-bun add @opentf/syntax-highlighter
-```
-
-```sh
-deno add npm:@opentf/syntax-highlighter
-```
+<Tabs label="Package manager" tabs={installTabs} />
 
 ## Requirements
 
@@ -36,4 +28,4 @@ deno add npm:@opentf/syntax-highlighter
 
 - The core tokenizer plus [102 language definitions](/docs/languages), loaded lazily per language.
 - Four renderers: browser CSS Highlights, HTML/SSR, JSON, and ANSI.
-- [16 syntax themes](/docs/themes) for HTML/CSS output and matching ANSI palettes.
+- [15 CSS themes](/docs/themes) for browser and HTML output, and 16 ANSI themes for terminals.

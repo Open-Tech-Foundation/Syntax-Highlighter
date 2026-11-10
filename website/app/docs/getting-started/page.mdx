@@ -42,7 +42,7 @@ registerLanguage(definition); // LanguageDefinition
 console.log(getRegisteredLanguages());
 ```
 
-A `LanguageDefinition` carries the word lists (`keywords`, `booleans`, `nulls`, `constants`), lexer config (`lex`: strings, comments, operators), markup config, and opt-in `features` (`parameterBindings`, `contextStack`, `declarations`, `retroactiveRewrite`, `typeAnnotationAware`, `propertyKeys`, `classDetection`). `contextStack` and `declarations` default to `true`; the rest default to `false`.
+A `LanguageDefinition` carries the word lists (`keywords`, `booleans`, `nulls`, `constants`), lexer config (`lex`: strings, comments, operators), markup config, and opt-in `features` (`parameterBindings`, `contextStack`, `declarations`, `retroactiveRewrite`, `typeAnnotationAware`, `propertyKeys`, `classDetection`, `lineBreakResetsExpectation`, and the structure passes `styleSheet`, `yamlStructure`, and `shellStructure`). `contextStack` and `declarations` default to `true`; the rest default to `false`.
 
 <Callout type="tip" title="Validating tokens">
 `validateTokens(source, tokens)` throws on any contract violation (gaps, overlaps, unknown types, split surrogates) and returns `void` when the stream is valid. Use it in tests and editor integrations.

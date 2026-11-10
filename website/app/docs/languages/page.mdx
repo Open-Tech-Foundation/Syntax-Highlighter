@@ -17,7 +17,7 @@ description: 102 built-in languages and aliases.
 
 ## Aliases
 
-Common aliases resolve automatically (`ts` → `typescript`, `py` → `python`, `rs` → `rust`, `sh` → `bash`, `md` → `markdown`, `github` → `github-dark` theme-style aliasing aside). Cyclic aliases are detected instead of looping forever.
+Common aliases and file extensions resolve automatically, case-insensitively: `js` → `javascript`, `ts` → `typescript`, `py` → `python`, `rb` → `ruby`, `rs` → `rust`, `cs` → `csharp`, `yml` → `yaml`, `md` → `markdown`, and `sh`, `shell`, `zsh`, `console`, and `shellscript` → `bash`. An unknown name throws `UnknownLanguageError`; `highlightAll` and `highlightCode` treat it as plain text instead.
 
 ## Custom languages
 

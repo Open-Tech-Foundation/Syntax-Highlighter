@@ -3,7 +3,15 @@ title: Quick start
 description: Highlight code in five minutes.
 ---
 
-import { Steps } from "@opentf/afw-docs";
+import { CodeBlock, Steps, Tabs } from "@opentf/afw-docs";
+
+export const installTabs = [
+  { label: "npm", content: <CodeBlock lang="Shell" code="npm install @opentf/syntax-highlighter" /> },
+  { label: "pnpm", content: <CodeBlock lang="Shell" code="pnpm add @opentf/syntax-highlighter" /> },
+  { label: "yarn", content: <CodeBlock lang="Shell" code="yarn add @opentf/syntax-highlighter" /> },
+  { label: "bun", content: <CodeBlock lang="Shell" code="bun add @opentf/syntax-highlighter" /> },
+  { label: "deno", content: <CodeBlock lang="Shell" code="deno add npm:@opentf/syntax-highlighter" /> },
+];
 
 # Quick start
 
@@ -11,9 +19,7 @@ import { Steps } from "@opentf/afw-docs";
 
 ### Install the package
 
-```sh
-npm install @opentf/syntax-highlighter
-```
+<Tabs label="Package manager" tabs={installTabs} />
 
 ### Highlight source to HTML
 
