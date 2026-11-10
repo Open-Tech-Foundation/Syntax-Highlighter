@@ -794,9 +794,9 @@ const yamlTok = new UnifiedTokenizer(yamlLang);
 
 test("YAML: mapping", () => {
   const src = "name: John\nage: 30";
-  assertEquals(findToken(yamlTok, src, "name").type, "variable");
-  assertEquals(findToken(yamlTok, src, "John").type, "variable");
-  assertEquals(findToken(yamlTok, src, "age").type, "variable");
+  assertEquals(findToken(yamlTok, src, "name").type, "property");
+  assertEquals(findToken(yamlTok, src, "John").type, "string");
+  assertEquals(findToken(yamlTok, src, "age").type, "property");
   assertEquals(findToken(yamlTok, src, "30").type, "number");
 });
 
@@ -806,8 +806,8 @@ test("YAML: booleans", () => {
 
 test("YAML: list items", () => {
   const src = "items:\n  - item1\n  - item2";
-  assertEquals(findToken(yamlTok, src, "items").type, "variable");
-  assertEquals(findToken(yamlTok, src, "item1").type, "variable");
+  assertEquals(findToken(yamlTok, src, "items").type, "property");
+  assertEquals(findToken(yamlTok, src, "item1").type, "string");
 });
 
 // ================================================================

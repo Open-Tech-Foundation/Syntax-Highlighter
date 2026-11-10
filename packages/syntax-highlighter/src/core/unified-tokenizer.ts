@@ -24,6 +24,7 @@ import {
 import { applyStyleRules } from "./style-rules.ts";
 import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 import { UnifiedLexer } from "./unified-lexer.ts";
+import { applyYamlStructure } from "./yaml-structure.ts";
 
 const CONSTANT_RE = /^[A-Z][A-Z0-9_$]*$/;
 
@@ -64,6 +65,7 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
     classDetection: f.classDetection ?? false,
     lineBreakResetsExpectation: f.lineBreakResetsExpectation ?? false,
     styleSheet: f.styleSheet ?? false,
+    yamlStructure: f.yamlStructure ?? false,
   };
 }
 
@@ -141,6 +143,7 @@ export class UnifiedTokenizer {
       out.push(this.classify(raws[i], i, raws, ctx, out, source, parens, parameterBindings));
     }
     if (this.features.styleSheet) applyStyleRules(out, source);
+    if (this.features.yamlStructure) applyYamlStructure(out, source);
 
     return out;
   }
@@ -181,6 +184,7 @@ export class UnifiedTokenizer {
     }
 
     if (this.features.styleSheet) applyStyleRules(out, source);
+    if (this.features.yamlStructure) applyYamlStructure(out, source);
 
     // Delegate embedded regions to sub-tokenizers
     const cache = new Map<LanguageDefinition, UnifiedTokenizer>();

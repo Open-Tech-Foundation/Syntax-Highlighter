@@ -196,6 +196,12 @@ export interface TokenizerFeatures {
    * `tag`/`attribute`, declaration names `property`, at-rules `keyword`.
    */
   styleSheet?: boolean;
+  /**
+   * Classify YAML line structure: mapping keys become `property`, plain
+   * scalars `string`/`number`/`boolean`/`null`, plus anchors, tags, and
+   * block scalars.
+   */
+  yamlStructure?: boolean;
 }
 
 export interface MarkupConfig {

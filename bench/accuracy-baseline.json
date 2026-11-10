@@ -90,8 +90,8 @@
       },
       "yaml": {
         "chars": 1931,
-        "overall": 20.6,
-        "highlighted": 14.2
+        "overall": 100,
+        "highlighted": 100
       },
       "actions": {
         "chars": 894,
@@ -587,8 +587,8 @@
       },
       "yaml": {
         "chars": 9899,
-        "overall": 71.5,
-        "highlighted": 70.9
+        "overall": 100,
+        "highlighted": 100
       }
     }
   }

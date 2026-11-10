@@ -5,10 +5,12 @@ const yaml: LanguageDefinition = {
   aliases: ["yml"],
   semantic: "generic",
   keywords: [],
-  booleans: ["true", "false", "yes", "no", "on", "off"],
+  // YAML 1.2: yes/no/on/off are plain strings (and `on:` is a key).
+  booleans: ["true", "false"],
   nulls: ["null", "~"],
   operators: [":", "-", "|", ">", "?", "*", "&", "!", "%", "@", "`"],
   punctuation: ["{", "}", "[", "]", ",", "."],
+  features: { yamlStructure: true },
   lex: {
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },
