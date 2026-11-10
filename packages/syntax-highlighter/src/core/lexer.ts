@@ -186,6 +186,11 @@ export interface TokenizerFeatures {
   classDetection?: boolean;
   /** Clear a pending property expectation when a line ends. Useful for markup languages. */
   lineBreakResetsExpectation?: boolean;
+  /**
+   * Classify style-sheet structure (CSS-like languages): selectors become
+   * `tag`/`attribute`, declaration names `property`, at-rules `keyword`.
+   */
+  styleSheet?: boolean;
 }
 
 export interface MarkupConfig {

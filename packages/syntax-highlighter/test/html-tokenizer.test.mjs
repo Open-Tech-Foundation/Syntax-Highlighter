@@ -61,8 +61,9 @@ test("script bodies are tokenized as JavaScript", () => {
 
 test("style bodies are tokenized as CSS", () => {
   const src = "<style>p { color: red; }</style>";
-  // css is generic-mode today: selectors/identifiers are variables
-  assertEquals(typeAt(src, "p"), "variable");
+  // The style-sheet pass applies to embedded CSS too.
+  assertEquals(typeAt(src, "p"), "tag");
+  assertEquals(typeAt(src, "color"), "property");
   assertEquals(typeAt(src, "red"), "variable");
 });
 

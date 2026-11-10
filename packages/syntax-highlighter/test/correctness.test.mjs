@@ -350,8 +350,8 @@ const cssTok = new UnifiedTokenizer(css);
 
 test("CSS: class selector", () => {
   assertEquals(kinds(cssTok, ".app { }"), [
-    "punctuation:.",
-    "property:app",
+    "attribute:.",
+    "attribute:app",
     "punctuation:{",
     "punctuation:}",
   ]);
@@ -359,8 +359,8 @@ test("CSS: class selector", () => {
 
 test("CSS: id selector", () => {
   assertEquals(kinds(cssTok, "#title { }"), [
-    "punctuation:#",
-    "property:title",
+    "attribute:#",
+    "attribute:title",
     "punctuation:{",
     "punctuation:}",
   ]);
@@ -368,20 +368,21 @@ test("CSS: id selector", () => {
 
 test("CSS: properties", () => {
   const src = "body { color: red; }";
-  assertEquals(findToken(cssTok, src, "body").type, "variable");
-  assertEquals(findToken(cssTok, src, "color").type, "variable");
+  assertEquals(findToken(cssTok, src, "body").type, "tag");
+  assertEquals(findToken(cssTok, src, "color").type, "property");
   assertEquals(findToken(cssTok, src, "red").type, "variable");
 });
 
 test("CSS: numbers", () => {
   const src = "font-size: 16px;";
-  assertEquals(findToken(cssTok, src, "16").type, "number");
+  // A unit belongs to its number.
+  assertEquals(findToken(cssTok, src, "16px").type, "number");
 });
 
-test("CSS: at-rules use decorator", () => {
+test("CSS: at-rules are keywords", () => {
   assertEquals(
     kinds(cssTok, "@media (max-width: 768px) { .app { display: none; } }")[0],
-    "decorator:@media",
+    "keyword:@media",
   );
 });
 
@@ -967,30 +968,29 @@ test("advanced: <style> basic CSS", () => {
   const src = "<style>.app { color: red; }</style>";
   const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "style").type, "tag");
-  assertEquals(findToken(htmlTok, src, ".").type, "punctuation");
-  assertEquals(findToken(htmlTok, src, "app").type, "property");
-  assertEquals(findToken(htmlTok, src, "color").type, "variable");
+  assertEquals(findToken(htmlTok, src, ".").type, "attribute");
+  assertEquals(findToken(htmlTok, src, "app").type, "attribute");
+  assertEquals(findToken(htmlTok, src, "color").type, "property");
   assertEquals(findToken(htmlTok, src, "red").type, "variable");
 });
 
 test("advanced: <style> ID and class selectors", () => {
   const src = "<style>#title { font-size: 24px; } .active { display: flex; }</style>";
   const _tokens = whitespaceless(htmlTok, src);
-  assertEquals(findToken(htmlTok, src, "#").type, "punctuation");
-  assertEquals(findToken(htmlTok, src, "title").type, "property");
-  assertEquals(findToken(htmlTok, src, "24").type, "number");
-  assertEquals(findToken(htmlTok, src, "px").type, "variable");
-  assertEquals(findToken(htmlTok, src, "display").type, "variable");
+  assertEquals(findToken(htmlTok, src, "#").type, "attribute");
+  assertEquals(findToken(htmlTok, src, "title").type, "attribute");
+  assertEquals(findToken(htmlTok, src, "24px").type, "number");
+  assertEquals(findToken(htmlTok, src, "display").type, "property");
   assertEquals(findToken(htmlTok, src, "flex").type, "variable");
 });
 
 test("advanced: <style> with @media", () => {
   const src = "<style>@media (max-width: 768px) { .app { display: none; } }</style>";
   const _tokens = whitespaceless(htmlTok, src);
-  assertEquals(findToken(htmlTok, src, "@media").type, "decorator");
-  assertEquals(findToken(htmlTok, src, "max-width").type, "variable");
-  assertEquals(findToken(htmlTok, src, "768").type, "number");
-  assertEquals(findToken(htmlTok, src, "px").type, "variable");
+  assertEquals(findToken(htmlTok, src, "@media").type, "keyword");
+  assertEquals(findToken(htmlTok, src, "max-width").type, "property");
+  assertEquals(findToken(htmlTok, src, "768px").type, "number");
+  assertEquals(findToken(htmlTok, src, "display").type, "property");
   assertEquals(findToken(htmlTok, src, "none").type, "variable");
 });
 
@@ -1000,7 +1000,7 @@ test("advanced: mixed <style> and <script>", () => {
   const _tokens = whitespaceless(htmlTok, src);
   assertEquals(findToken(htmlTok, src, "html").type, "tag");
   assertEquals(findToken(htmlTok, src, "style").type, "tag");
-  assertEquals(findToken(htmlTok, src, "color").type, "variable");
+  assertEquals(findToken(htmlTok, src, "color").type, "property");
   assertEquals(findToken(htmlTok, src, "red").type, "variable");
   assertEquals(findToken(htmlTok, src, "script").type, "tag");
   assertEquals(findToken(htmlTok, src, "var").type, "keyword");

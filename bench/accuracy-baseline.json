@@ -25,8 +25,8 @@
       },
       "css": {
         "chars": 2719,
-        "overall": 45.7,
-        "highlighted": 24.8
+        "overall": 98.5,
+        "highlighted": 97.9
       },
       "diff": {
         "chars": 2808,
@@ -40,8 +40,8 @@
       },
       "html": {
         "chars": 3582,
-        "overall": 98.2,
-        "highlighted": 97.3
+        "overall": 98.7,
+        "highlighted": 98
       },
       "java": {
         "chars": 4117,
@@ -522,8 +522,8 @@
       },
       "css": {
         "chars": 4929,
-        "overall": 77.6,
-        "highlighted": 74.9
+        "overall": 100,
+        "highlighted": 100
       },
       "diff": {
         "chars": 1231,
@@ -537,8 +537,8 @@
       },
       "html": {
         "chars": 12626,
-        "overall": 95.4,
-        "highlighted": 91.9
+        "overall": 95.6,
+        "highlighted": 92.2
       },
       "java": {
         "chars": 6964,

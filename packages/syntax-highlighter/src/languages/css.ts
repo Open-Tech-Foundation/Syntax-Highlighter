@@ -18,7 +18,15 @@ const css: LanguageDefinition = {
   ],
   operators: [":", "::", "=", ">", "+", "~", "*", "|", "^", "$", "!"],
   punctuation: ["{", "}", "(", ")", "[", "]", ";", ",", ".", "#", "/", "%"],
+  features: { styleSheet: true },
   lex: {
+    // Before identifiers: `-0.5` would otherwise lex as an identifier (`-`
+    // can start one), and a unit belongs to its number (`1rem`, `50%`).
+    inlinePatterns: [
+      { pattern: /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?(?:%|[a-zA-Z]+)?/, type: "number" },
+      // Hex color or `#id`; the style-sheet pass decides which from context.
+      { pattern: /^#[0-9a-fA-F]{3,8}(?![\w-])/, type: "number" },
+    ],
     strings: [
       { open: '"', close: '"', escape: "\\", multiline: false },
       { open: "'", close: "'", escape: "\\", multiline: false },

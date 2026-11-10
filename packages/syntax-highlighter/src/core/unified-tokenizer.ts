@@ -21,6 +21,7 @@ import {
   popCtx,
   pushCtx,
 } from "./state.ts";
+import { applyStyleRules } from "./style-rules.ts";
 import { createToken, type Token, TokenType, WHITESPACE } from "./tokens.ts";
 import { UnifiedLexer } from "./unified-lexer.ts";
 
@@ -62,6 +63,7 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
     propertyKeys: f.propertyKeys ?? false,
     classDetection: f.classDetection ?? false,
     lineBreakResetsExpectation: f.lineBreakResetsExpectation ?? false,
+    styleSheet: f.styleSheet ?? false,
   };
 }
 
@@ -138,6 +140,7 @@ export class UnifiedTokenizer {
     for (let i = 0; i < raws.length; i++) {
       out.push(this.classify(raws[i], i, raws, ctx, out, source, parens, parameterBindings));
     }
+    if (this.features.styleSheet) applyStyleRules(out, source);
 
     return out;
   }
@@ -176,6 +179,8 @@ export class UnifiedTokenizer {
         out.push(this.classify(raws[i], i, raws, ctx, out, source, parens, parameterBindings));
       }
     }
+
+    if (this.features.styleSheet) applyStyleRules(out, source);
 
     // Delegate embedded regions to sub-tokenizers
     const cache = new Map<LanguageDefinition, UnifiedTokenizer>();
