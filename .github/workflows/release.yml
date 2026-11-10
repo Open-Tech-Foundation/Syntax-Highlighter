@@ -1,3 +1,4 @@
+# Generated from release.toml by `release` · sha256:33ab365c68859aea504bbcba250fc57bf48830bbb6bf16772caf8b6660da05ca
 name: Release
 
 on:
@@ -22,15 +23,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install otf-release
+      - name: Install release
         shell: bash
         env:
-          OTF_RELEASE_VERSION: v0.38.0
-        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.38.0/install.sh | bash
+          OTF_RELEASE_VERSION: v0.42.0
+        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.42.0/install.sh | bash
+      - name: Expose release command
+        shell: bash
+        run: |
+          if ! command -v release >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/release-cli"
+            cp "$(command -v otf-release)" "$RUNNER_TEMP/release-cli/release"
+            echo "$RUNNER_TEMP/release-cli" >> "$GITHUB_PATH"
+          fi
       - id: check
         run: |
-          echo "should_release=$(otf-release check --exclude-package @opentf/syntax-highlighter)" >> "$GITHUB_OUTPUT"
-          echo "release_opentf_syntax_highlighter=$(otf-release check --package @opentf/syntax-highlighter)" >> "$GITHUB_OUTPUT"
+          echo "should_release=$(release check --exclude-package @opentf/syntax-highlighter)" >> "$GITHUB_OUTPUT"
+          echo "release_opentf_syntax_highlighter=$(release check --package @opentf/syntax-highlighter)" >> "$GITHUB_OUTPUT"
 
   publish-opentf-syntax-highlighter:
     needs: [check-release]
@@ -49,15 +58,23 @@ jobs:
       - uses: Open-Tech-Foundation/ES-Runtime/.github/actions/setup-esdev@main
       - uses: Open-Tech-Foundation/ES-Runtime/.github/actions/setup-tsr@main
       - name: Build @opentf/syntax-highlighter
-        run: tsr build
+        run: tsr build && cp ../../README.md README.md
         working-directory: packages/syntax-highlighter
-      - name: Install otf-release
+      - name: Install release
         shell: bash
         env:
-          OTF_RELEASE_VERSION: v0.38.0
-        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.38.0/install.sh | bash
+          OTF_RELEASE_VERSION: v0.42.0
+        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.42.0/install.sh | bash
+      - name: Expose release command
+        shell: bash
+        run: |
+          if ! command -v release >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/release-cli"
+            cp "$(command -v otf-release)" "$RUNNER_TEMP/release-cli/release"
+            echo "$RUNNER_TEMP/release-cli" >> "$GITHUB_PATH"
+          fi
       - name: Publish
-        run: otf-release publish --package @opentf/syntax-highlighter
+        run: release publish --package @opentf/syntax-highlighter
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,13 +97,21 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
-      - name: Install otf-release
+      - name: Install release
         shell: bash
         env:
-          OTF_RELEASE_VERSION: v0.38.0
-        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.38.0/install.sh | bash
+          OTF_RELEASE_VERSION: v0.42.0
+        run: curl -fsSL https://raw.githubusercontent.com/Open-Tech-Foundation/release/v0.42.0/install.sh | bash
+      - name: Expose release command
+        shell: bash
+        run: |
+          if ! command -v release >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/release-cli"
+            cp "$(command -v otf-release)" "$RUNNER_TEMP/release-cli/release"
+            echo "$RUNNER_TEMP/release-cli" >> "$GITHUB_PATH"
+          fi
       - name: Publish
-        run: otf-release publish --exclude-package @opentf/syntax-highlighter
+        run: release publish --exclude-package @opentf/syntax-highlighter
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
