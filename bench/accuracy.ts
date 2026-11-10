@@ -9,6 +9,9 @@
 //   esdev bench/accuracy.ts            report
 //   esdev bench/accuracy.ts --update   report and rewrite the baseline
 //   esdev bench/accuracy.ts --check    fail if any language regressed
+//   esdev bench/accuracy.ts --explain=css
+//                                      list every CSS mismatch with Shiki's
+//                                      scope chain and our token type
 import { file, write } from "runtime:fs";
 import { dirname, fromFileURL, join } from "runtime:path";
 import { args, exit } from "runtime:process";
@@ -105,9 +108,31 @@ function topConfusions(score: Score, n: number): string {
     .join("; ");
 }
 
+/** Print each mismatched reference span with its scopes and our token. */
+function explainMismatches(
+  f: CorpusFile,
+  spans: ReturnType<typeof spansFromShiki>,
+  tokens: ReturnType<Highlighter["highlight"]>,
+  refClasses: string[],
+  ourClasses: string[],
+): void {
+  console.log(`\n--- ${f.corpus}/${f.file}`);
+  for (const span of spans) {
+    const i = span.start;
+    if (!span.text.trim() || refClasses[i] === ourClasses[i]) continue;
+    const ours = tokens.find((t) => t.start <= i && i < t.end);
+    const line = f.source.slice(0, i).split("\n").length;
+    const inner = span.scopes.slice(-2).join(" > ");
+    console.log(
+      `${String(line).padStart(5)}  ${JSON.stringify(span.text).padEnd(28)} ${refClasses[i]}→${ourClasses[i]}  [${inner}]  ours=${ours?.type ?? "-"}`,
+    );
+  }
+}
+
 async function main() {
   const update = args.includes("--update");
   const check = args.includes("--check");
+  const explain = args.find((a) => a.startsWith("--explain="))?.slice("--explain=".length);
   const files = await loadCorpora();
 
   const bundled = new Set(Object.keys(bundledLanguages));
@@ -148,11 +173,11 @@ async function main() {
       skipped.push(`${f.corpus}/${f.file} (reference offsets misaligned at ${misaligned.start})`);
       continue;
     }
-    const score = compare(
-      f.source,
-      classesFromSpans(f.source.length, spans),
-      classesFromTokens(f.source.length, h.highlight(f.source)),
-    );
+    const tokens = h.highlight(f.source);
+    const refClasses = classesFromSpans(f.source.length, spans);
+    const ourClasses = classesFromTokens(f.source.length, tokens);
+    const score = compare(f.source, refClasses, ourClasses);
+    if (explain === f.language) explainMismatches(f, spans, tokens, refClasses, ourClasses);
     const byLang = scores.get(f.corpus) ?? new Map<string, Score>();
     byLang.set(f.language, addScore(byLang.get(f.language) ?? emptyScore(), score));
     scores.set(f.corpus, byLang);
