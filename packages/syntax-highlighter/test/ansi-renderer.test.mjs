@@ -266,3 +266,20 @@ test("renderANSI passes control characters through with allowControlChars", () =
 test("escapeControlChars uses cat -v notation", () => {
   assertEquals(escapeControlChars("\x1b\x07\x7f\x9b\x80ok\t\n\r"), "^[^G^?M-^[M-^@ok\t\n\r");
 });
+
+test("renderANSI ignores theme values that are neither hex nor SGR", () => {
+  const src = "let x";
+  const toks = highlighter.highlight(src);
+  for (const bad of ["red", "#zzz", "ff79c6x", ""]) {
+    const out = renderANSI(src, toks, { theme: { keyword: bad }, color: true });
+    assert(
+      out.startsWith("let"),
+      `theme value ${JSON.stringify(bad)} leaked: ${JSON.stringify(out)}`,
+    );
+  }
+  // Valid hex and raw SGR still apply.
+  const hex = renderANSI(src, toks, { theme: { keyword: "#ff0000" }, color: true });
+  assert(hex.startsWith(`${hexToAnsi("#ff0000")}let${ANSI_RESET}`));
+  const sgr = renderANSI(src, toks, { theme: { keyword: "\x1b[31m" }, color: true });
+  assert(sgr.startsWith(`\x1b[31mlet${ANSI_RESET}`));
+});

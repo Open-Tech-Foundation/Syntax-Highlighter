@@ -33,11 +33,15 @@ export function hexToAnsi(hex: string): string {
   return `\x1b[38;2;${r};${g};${b}m`;
 }
 
+/**
+ * Theme values are either raw SGR sequences (`"\x1b[90m"`) or hex colors.
+ * Anything else (`"red"`, `"#zzz"`) yields no color rather than being
+ * written to the terminal as literal text.
+ */
 function themeValueToAnsi(value: string | undefined): string | undefined {
-  if (value == null) return undefined;
+  if (typeof value !== "string") return undefined;
   if (value.startsWith("\x1b[")) return value;
-  if (value.startsWith("#")) return hexToAnsi(value);
-  return value;
+  return hexToAnsi(value) || undefined;
 }
 
 // C0 controls except tab, LF, and CR; DEL; and the C1 range (8-bit CSI etc.).

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** ANSI theme values that are neither hex colors nor SGR sequences (for example `"red"` or `"#zzz"`) now apply no color instead of being printed into the output as literal text.
 - **HIGH:** `renderANSI` now prints control characters from the source in `cat -v` caret notation (`ESC` → `^[`, `BEL` → `^G`), so highlighting untrusted input can no longer clear the screen, retitle the window, or inject escape sequences. Tab, LF, and CR are kept. Pass `allowControlChars: true` to restore raw passthrough for trusted source; the escaping is also exported as `escapeControlChars`.
 - **HIGH:** Highlighting stays linear under deep or unclosed bracket nesting in every language (40 000 unclosed `(a` went from 2.1 s to ~50 ms). Parameter lookup walked the entire context stack for each identifier; it now checks only contexts that own parameters. Token output is unchanged.
 - **HIGH:** Markdown and Diff now tokenize long lines in linear time (an 80 KB line went from 4.4 s to ~50 ms; a 300 KB line previously took about a minute). The line-start check rescanned the line for every token, and Markdown's link, image, footnote, autolink, and inline-HTML patterns scanned to end of line at each unclosed opener. Trade-off: a link destination containing `[` (such as an IPv6 host) is no longer highlighted as a link.
