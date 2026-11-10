@@ -2,7 +2,13 @@ import { assert, assertEquals, assertThrows, test } from "runtime:test";
 import { dracula } from "../src/ansi/themes/dracula.ts";
 import { monokai } from "../src/ansi/themes/monokai.ts";
 import { nord } from "../src/ansi/themes/nord.ts";
-import { ANSI_RESET, defaultTheme, hexToAnsi, renderANSI } from "../src/core/ansi-renderer.ts";
+import {
+  ANSI_RESET,
+  defaultTheme,
+  escapeControlChars,
+  hexToAnsi,
+  renderANSI,
+} from "../src/core/ansi-renderer.ts";
 import { Highlighter } from "../src/core/highlighter.ts";
 import javascript from "../src/languages/javascript.ts";
 import { stripAnsi } from "./helpers/wcag.mjs";
@@ -229,4 +235,34 @@ test("Themes are tree-shakeable separate modules", () => {
   assert(monokai.keyword === "#f92672");
   assert(nord.keyword === "#81a1c1");
   assert(defaultTheme.keyword === "#c678dd");
+});
+
+test("renderANSI shows control characters in caret notation by default", () => {
+  // Untrusted source must not be able to drive the terminal: OSC retitle,
+  // screen clear, bell, and 8-bit CSI all become visible text.
+  const src = "// \x1b]0;pwned\x07 \x1b[2J \x9b31m \x7f\x00";
+  for (const color of [true, false]) {
+    const out = renderANSI(src, highlighter.highlight(src), { color });
+    const body = color ? stripAnsi(out) : out;
+    assertEquals(body, "// ^[]0;pwned^G ^[[2J M-^[31m ^?^@");
+    assert(!out.includes("\x07") && !out.includes("\x9b") && !out.includes("\x00"));
+  }
+});
+
+test("renderANSI keeps tab, LF, and CR", () => {
+  const src = "a\tb\r\nc";
+  assertEquals(render(src, { color: false }), src);
+});
+
+test("renderANSI passes control characters through with allowControlChars", () => {
+  const src = "// \x1b[2J";
+  const out = renderANSI(src, highlighter.highlight(src), {
+    color: false,
+    allowControlChars: true,
+  });
+  assertEquals(out, src);
+});
+
+test("escapeControlChars uses cat -v notation", () => {
+  assertEquals(escapeControlChars("\x1b\x07\x7f\x9b\x80ok\t\n\r"), "^[^G^?M-^[M-^@ok\t\n\r");
 });

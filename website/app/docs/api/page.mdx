@@ -16,6 +16,7 @@ description: Every export, option, and type.
 | `renderJSON(source, tokens)` | JSON string of the token stream. |
 | `validateTokens(source, tokens)` | Throws `TypeError`/`RangeError`/`Error` on invalid tokens; returns `void` when valid. |
 | `hexToAnsi(hex)` | Converts `"#rrggbb"` to an ANSI truecolor SGR sequence. |
+| `escapeControlChars(text)` | Rewrites terminal control characters in caret notation (`ESC` → `^[`), keeping tab, LF, and CR. `renderANSI` applies it by default. |
 | `registerLanguage(def)` | Registers a `LanguageDefinition`. |
 | `getRegisteredLanguages()` | Array of registered language names. |
 | `loadLanguage(name)` | Loads a definition by name. Throws `UnknownLanguageError` for unknown names. |
@@ -51,7 +52,7 @@ description: Every export, option, and type.
 | `LanguageDefinition` | `name`, `aliases`, word lists, `lex`, `markup`, `features`, and declaration keyword data. |
 | `TokenizerFeatures` | `parameterBindings`, `contextStack`, `declarations`, `retroactiveRewrite`, `typeAnnotationAware`, `propertyKeys`, `classDetection`, `lineBreakResetsExpectation`. |
 | `AnsiTheme` / `AnsiThemeName` | Hex-color map and its key union. |
-| `AnsiRenderOptions` | `{ theme?, color?, wrapWhitespace? }`. |
+| `AnsiRenderOptions` | `{ theme?, color?, wrapWhitespace?, allowControlChars? }`. |
 | `HtmlRenderOptions` | `{ prefix?, wrapWhitespace? }`. |
 | `HighlightOptions` | `{ language?, debounceMs? }`. |
 | `HighlightHandle` | `{ highlighter, renderer, refresh(), dispose() }`. |

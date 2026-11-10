@@ -98,7 +98,7 @@ const html = renderHTML(source, tokens, {
 
 ### ANSI terminal
 
-Truecolor output for CLIs and terminals. Themes are plain RGB objects converted to `ESC[38;2;R;G;Bm`; respects `NO_COLOR` unless `color` is explicit.
+Truecolor output for CLIs and terminals. Themes are plain RGB objects converted to `ESC[38;2;R;G;Bm`; respects `NO_COLOR` unless `color` is explicit. Control characters in the source (ESC, BEL, …) are printed in caret notation (`^[`, `^G`) so untrusted input cannot drive the terminal; pass `allowControlChars: true` for trusted source.
 
 ```ts
 import { renderANSI } from "@opentf/syntax-highlighter";
@@ -108,6 +108,7 @@ const out = renderANSI(source, tokens, {
   theme: dracula, // hex colors per token type; defaults to defaultTheme
   color: true, // force on/off; undefined respects NO_COLOR
   wrapWhitespace: false,
+  allowControlChars: false, // true writes control characters through (trusted source only)
 });
 console.log(out);
 ```

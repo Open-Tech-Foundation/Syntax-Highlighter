@@ -10,6 +10,7 @@ export {
   ANSI_THEMES,
   defaultLight,
   defaultTheme,
+  escapeControlChars,
   hexToAnsi,
   renderANSI,
 } from "./core/ansi-renderer.ts";

@@ -40,6 +40,27 @@ function themeValueToAnsi(value: string | undefined): string | undefined {
   return value;
 }
 
+// C0 controls except tab, LF, and CR; DEL; and the C1 range (8-bit CSI etc.).
+// biome-ignore lint/suspicious/noControlCharactersInRegex: matching control characters is the purpose of this pattern.
+const CONTROL_CHARS = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]/g;
+
+function caretNotation(ch: string): string {
+  const code = ch.charCodeAt(0);
+  if (code === 0x7f) return "^?";
+  if (code < 0x20) return `^${String.fromCharCode(code + 0x40)}`;
+  return `M-^${String.fromCharCode(code - 0x80 + 0x40)}`;
+}
+
+/**
+ * Make terminal control characters visible using `cat -v` caret notation
+ * (ESC → `^[`, BEL → `^G`, DEL → `^?`, 0x9B → `M-^[`), so highlighted
+ * untrusted source cannot clear the screen, retitle the window, or emit its
+ * own escape sequences. Tab, LF, and CR are kept.
+ */
+export function escapeControlChars(text: string): string {
+  return text.replace(CONTROL_CHARS, caretNotation);
+}
+
 function shouldUseColor(explicit: boolean | undefined): boolean {
   if (explicit === false) return false;
   if (explicit === true) return true;
@@ -59,6 +80,12 @@ export interface AnsiRenderOptions {
   color?: boolean;
   /** Whether to wrap whitespace tokens with ANSI codes. Defaults to false. */
   wrapWhitespace?: boolean;
+  /**
+   * Write control characters from `source` to the output unchanged. Defaults
+   * to false: they are shown in caret notation (ESC → `^[`) so untrusted input
+   * cannot inject terminal escape sequences. Enable only for trusted source.
+   */
+  allowControlChars?: boolean;
 }
 
 /**
@@ -79,10 +106,12 @@ export function renderANSI(
   if (typeof source !== "string") throw new TypeError("source must be a string");
   if (!Array.isArray(tokens)) throw new TypeError("tokens must be an array");
 
+  const safe = options.allowControlChars === true ? (t: string) => t : escapeControlChars;
+
   const useColor = shouldUseColor(options.color);
   if (!useColor) {
     let plain = "";
-    for (const item of iterateTokens(source, tokens)) plain += item.text;
+    for (const item of iterateTokens(source, tokens)) plain += safe(item.text);
     return plain;
   }
 
@@ -105,10 +134,10 @@ export function renderANSI(
   let out = "";
   for (const item of iterateTokens(source, tokens)) {
     if (item.kind === "gap") {
-      out += item.text;
+      out += safe(item.text);
     } else {
       const token = item.token;
-      const text = item.text;
+      const text = safe(item.text);
       if (token.type === WHITESPACE) {
         if (wrapWhitespace && colors[WHITESPACE]) {
           out += `${colors[WHITESPACE]}${text}${ANSI_RESET}`;
