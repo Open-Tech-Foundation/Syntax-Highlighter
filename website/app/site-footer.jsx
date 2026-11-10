@@ -24,10 +24,10 @@ export default function SiteFooter() {
         </div>
         <a
           class="site-footer-badge"
-          href="https://web.opentechf.org/"
+          href="https://afw.opentechf.org/"
           target="_blank"
           rel="noreferrer"
-          aria-label="Built with OTF Web"
+          aria-label="Built with AFW"
         >
           <span class="site-footer-badge-mark" aria-hidden="true">
             ▦
@@ -35,7 +35,7 @@ export default function SiteFooter() {
           <span class="site-footer-badge-copy">
             <span class="site-footer-badge-muted">Built with</span>
             <span class="site-footer-badge-brand">
-              <b>OTF</b> Web
+              <b>AFW</b>
             </span>
           </span>
         </a>

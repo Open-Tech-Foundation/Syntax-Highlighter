@@ -2,6 +2,8 @@
 // Terminal) cycling through code chunks and syntax themes, all powered by
 // the real tokenizer. Manual selection restarts the rotation; hovering
 // pauses it.
+
+import { onMount, RawHtml } from "@opentf/afw";
 import {
   ANSI_THEMES,
   createHighlighter,
@@ -9,7 +11,6 @@ import {
   renderANSI,
   renderHTML,
 } from "@opentf/syntax-highlighter";
-import { onMount, RawHtml } from "@opentf/web";
 
 import { heroTabsStyles } from "./hero-tabs-styles.js";
 import { FALLBACKS, FONT_STYLES, isDarkTheme, themeForeground, tokenRules } from "./theme-css.js";

@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **MEDIUM:** The website moved from the retired otfw CLI (`@opentf/web`, `@opentf/web-docs`, not available from npm) to AFW: an esdev project on `@opentf/afw`, `@opentf/afw-docs`, `@opentf/esdev-plugin-afw`, and `@opentf/afw-cli`, prerendered to static HTML with search, sitemap, per-page SEO metadata, and LLM context files. It is now a standalone pnpm project (removed from the root workspace) that installs the library from this checkout, loads the official `afw-docs` theme instead of an inlined copy of the old one, and deploys to Cloudflare Workers Builds via `scripts/build-site.sh`. New tasks: `tsr dev:website` (esdev start) and `tsr build:website`.
 - **LOW:** README: added an Accuracy section with the current per-language scores against Shiki (tier-1 table, totals, how to read them, and how to reproduce or investigate), listed the new features (102 languages, structure-aware CSS/YAML/Bash/JSX/Markdown, `highlightAll`), documented the `yamlStructure`/`shellStructure` tokenizer features, and listed the bench tasks under Development.
 - **LOW:** Applied the shared dark Open Tech Foundation footer to the landing page and documentation layout.
 - **MEDIUM:** Restored the default OTF Web Docs navbar behavior on the landing page, refined light-theme code token colors, and adopted the organization footer pattern used by the Micro-UI site.

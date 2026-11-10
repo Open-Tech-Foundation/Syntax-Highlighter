@@ -11,10 +11,17 @@ members = ["packages/*"]
 run = "esdev start"
 dir = "demo"
 
-# Public marketing site and MDX documentation
+# Public marketing site and MDX documentation, on AFW. The site is its own pnpm
+# project (website/pnpm-workspace.yaml) and installs the library from this
+# checkout, so build the library before the site's first `pnpm install`.
 [tasks."dev:website"]
-run = "otfw dev"
+run = "esdev start"
 dir = "website"
+
+# The deploy build (library, then site) — what Cloudflare runs.
+[tasks."build:website"]
+run = "esdev build --lib src && cd ../../website && pnpm install --frozen-lockfile && pnpm run build"
+dir = "packages/syntax-highlighter"
 
 # ------------------------------------------------------------------ build
 [tasks.build]

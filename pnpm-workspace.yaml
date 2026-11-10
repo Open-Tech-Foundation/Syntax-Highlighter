@@ -1,7 +1,8 @@
+# The website is its own pnpm project (website/pnpm-workspace.yaml): esdev
+# loads plugins only from inside a project root, so it installs separately.
 packages:
   - packages/*
   - demo
-  - website
 allowBuilds:
-  '@opentf/web-compiler': true
+  '@opentf/web-compiler': set this to true or false
   esbuild: false

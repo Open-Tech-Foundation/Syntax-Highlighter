@@ -1,0 +1,8 @@
+/* Single stylesheet entry for the site (linked from index.html).
+ *
+ * `@import "tailwindcss"` provides the CSS engine that resolves package imports
+ * (as in the afw-docs starter); `@opentf/afw-docs/theme` supplies the docs
+ * shell (navbar, sidebar, TOC, callouts, code blocks, light/dark). Site styles
+ * live beside the components that use them (global.js, landing-theme.js, …). */
+@import "tailwindcss";
+@import "@opentf/afw-docs/theme";

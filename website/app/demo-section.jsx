@@ -3,14 +3,15 @@
 //
 // SSR-safe: the first paint is plain escaped text; highlighting happens in
 // `onMount` and on user input. Uses the same `$state`/`$ref`/`onclick`
-// idioms as the `ThemeToggle` component from `@opentf/web-docs`.
+// idioms as the `ThemeToggle` component from `@opentf/afw-docs`.
+
+import { onMount, RawHtml } from "@opentf/afw";
 import {
   createHighlighter,
   getRegisteredLanguages,
   renderHTML,
   WHITESPACE,
 } from "@opentf/syntax-highlighter";
-import { onMount, RawHtml } from "@opentf/web";
 
 import { demoStyles } from "./demo-styles.js";
 import { editorChrome, THEME_ORDER, tokenRules } from "./theme-css.js";

@@ -1,1 +1,35 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><script>try{const key="theme";const mode=localStorage.getItem(key)||"dark";if(!localStorage.getItem(key))localStorage.setItem(key,mode);document.documentElement.dataset.theme=mode==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):mode}catch{document.documentElement.dataset.theme="dark"}</script><title>Syntax Highlighter</title><link rel="icon" type="image/svg+xml" href="/img/otf-logo.svg" /><link rel="stylesheet" href="/xterm.css" /></head><body><div id="app"></div></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Syntax Highlighter</title>
+    <!-- Description, canonical, and Open Graph tags are per page: the prerender
+         writes them from each route's `metadata` (site defaults in
+         app/layout.jsx). A copy here would repeat on every page. -->
+    <link rel="icon" type="image/svg+xml" href="/img/otf-logo.svg" />
+    <link rel="stylesheet" href="/xterm.css" />
+    <link rel="stylesheet" href="./app/global.css" />
+    <!-- Apply the saved theme before first paint to avoid a flash (the afw-docs
+         theme keys dark mode off `data-theme` on <html>). Dark is the default. -->
+    <script>
+      try {
+        const key = "theme";
+        const mode = localStorage.getItem(key) || "dark";
+        if (!localStorage.getItem(key)) localStorage.setItem(key, mode);
+        document.documentElement.dataset.theme =
+          mode === "system"
+            ? matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : mode;
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./entry.js"></script>
+  </body>
+</html>

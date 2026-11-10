@@ -374,6 +374,8 @@ pnpm install
 
 # via tsr (recommended) — run from anywhere in the repo
 tsr demo           # demo workbench (esdev start in demo/)
+tsr dev:website    # documentation site on AFW (esdev start in website/)
+tsr build:website  # library + site production build → website/dist/
 tsr test           # library unit tests
 tsr test:all       # all workspaces
 tsr typecheck      # tsc --noEmit across workspaces
@@ -393,6 +395,13 @@ tsr clean          # rm -rf dist/
 
 `@opentf/esrun-types` is a development dependency in each TypeScript workspace
 that uses `runtime:*` modules or the DOM/runtime declarations.
+
+The website (`website/`) is built with [AFW](https://afw.opentechf.org) and is its
+own pnpm project rather than a workspace member, because esdev loads plugins only
+from inside a project root. It installs the library from this checkout
+(`file:../packages/syntax-highlighter`), so build the library first. Cloudflare
+Workers Builds deploys it with `scripts/build-site.sh` (root directory `website`,
+deploy command `npx wrangler deploy`).
 
 ## License
 

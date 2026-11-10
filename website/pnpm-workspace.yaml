@@ -1,0 +1,16 @@
+# The site is its own pnpm project, not a member of the repository workspace:
+# esdev loads plugins only from inside the project root, and a workspace
+# install keeps them in the repository's node_modules/.pnpm, outside website/.
+# It also lets a deploy install the site alone (scripts/build-site.sh).
+#
+# The library comes from this checkout (`file:../packages/syntax-highlighter`),
+# copied into website/node_modules at install time, so build it first
+# (`tsr build`) — the site always shows the current library.
+packages:
+  - "."
+
+# wrangler's local runtime and its bundler ship platform binaries; pnpm declines
+# lifecycle scripts until each is named here.
+allowBuilds:
+  esbuild: true
+  workerd: true
