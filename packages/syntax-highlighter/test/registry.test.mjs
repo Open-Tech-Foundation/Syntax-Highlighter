@@ -61,3 +61,9 @@ test("an alias cannot take over another language's name", () => {
 test("built-in languages are listed before they are loaded", () => {
   assert(getRegisteredLanguages().includes("javascript"));
 });
+
+test("shell fence names used by docs sites resolve to bash", async () => {
+  for (const alias of ["console", "shellscript", "shell-session"]) {
+    assertEquals((await loadLanguage(alias)).name, "bash");
+  }
+});
