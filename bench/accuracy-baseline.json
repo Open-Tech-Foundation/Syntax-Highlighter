@@ -463,6 +463,11 @@
         "overall": 87.9,
         "highlighted": 79.7
       },
+      "tsx": {
+        "chars": 3752,
+        "overall": 85.7,
+        "highlighted": 76.7
+      },
       "typst": {
         "chars": 848,
         "overall": 77.9,

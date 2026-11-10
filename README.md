@@ -208,7 +208,7 @@ Tier-1 languages are the 18 most common in docs, server rendering, and terminals
 | markdown | 66.6% | 81.4% | 52.2% |
 | sql | 61.5% | 69.5% | 74.2% |
 
-Totals: tier-1 real-world **83.6%** highlighted / 87.7% overall; tier-1 showcase 79.1% / 86.1%; all 99 scorable showcase languages 58.7% / 73.3% (`ejs` and `stf` have no Shiki grammar, and `tsx` has no showcase sample yet).
+Totals: tier-1 real-world **83.6%** highlighted / 87.7% overall; tier-1 showcase 79.1% / 86.1%; all 100 scorable showcase languages 59.1% / 73.5% (`ejs` and `stf` have no Shiki grammar).
 
 Reading the numbers:
 

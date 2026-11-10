@@ -21,6 +21,7 @@ const DEFAULT_LANGUAGE = "javascript";
 const SNIPPETS = {
   javascript: 'const greet = (name) => `hello, ${name}!`;\n\nexport default greet("world");\n',
   typescript: "function add(a: number, b: number): number {\n  return a + b;\n}\n",
+  tsx: 'export function Greeting({ name }: { name: string }) {\n  return <h1 className="title">Hello, {name}!</h1>;\n}\n',
   python: 'def greet(name):\n    return f"hello, {name}!"\n\nprint(greet("world"))\n',
   json: '{\n  "name": "demo",\n  "enabled": true,\n  "count": 3\n}\n',
   bash: '#!/usr/bin/env bash\nname="${1:-world}"\necho "hello, $name!"\n',

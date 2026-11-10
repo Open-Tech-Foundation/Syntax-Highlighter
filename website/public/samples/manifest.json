@@ -15,6 +15,11 @@
     "file": "jsx.jsx"
   },
   {
+    "name": "tsx — typed components and generics",
+    "language": "tsx",
+    "file": "tsx.tsx"
+  },
+  {
     "name": "html — document and forms",
     "language": "html",
     "file": "html.html"
