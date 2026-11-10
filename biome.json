@@ -15,6 +15,7 @@
       "!website/public",
       "!website/app/bench-data.js",
       "!bench/vendor",
+      "!bench/corpus",
       "!**/pnpm-lock.yaml",
       "!**/coverage",
       "!**/*.d.ts"

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** Added a pinned real-world accuracy corpus (`bench/corpus/real-world`): 20 unmodified, permissively licensed files from well-known projects covering the 18 tier-1 languages, with per-file provenance and licenses, as the basis for the upcoming Shiki accuracy benchmark.
 - **LOW:** The homepage "Get started" and "Read the quickstart" buttons now open the Quick start page; they pointed at Getting started, which is the tokens-and-languages guide rather than the quickstart.
 - **MEDIUM:** The documented `@opentf/syntax-highlighter/ansi/themes/{name}` imports now resolve. They mapped to extensionless TypeScript sources and failed with `ERR_MODULE_NOT_FOUND`; they now point to built modules with per-file type declarations (the build no longer bundles declarations into a single file). `@opentf/syntax-highlighter/ansi/themes` exposes the theme index, and the raw `src/ansi` sources are no longer published.
 - **LOW:** ANSI theme values that are neither hex colors nor SGR sequences (for example `"red"` or `"#zzz"`) now apply no color instead of being printed into the output as literal text.
