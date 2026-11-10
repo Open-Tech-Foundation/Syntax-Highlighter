@@ -11,6 +11,7 @@ import {
 } from "./context-helpers.ts";
 import type { LanguageDefinition, RawToken, TokenizerFeatures } from "./lexer.ts";
 import { retroParams } from "./retroactive-params.ts";
+import { applyShellStructure } from "./shell-structure.ts";
 import {
   ContextKind,
   contextParams,
@@ -66,6 +67,7 @@ function resolveFeatures(lang: LanguageDefinition): Required<TokenizerFeatures> 
     lineBreakResetsExpectation: f.lineBreakResetsExpectation ?? false,
     styleSheet: f.styleSheet ?? false,
     yamlStructure: f.yamlStructure ?? false,
+    shellStructure: f.shellStructure ?? false,
   };
 }
 
@@ -137,13 +139,14 @@ export class UnifiedTokenizer {
     }
 
     const ctx = createState();
-    const out: Token[] = [];
+    let out: Token[] = [];
 
     for (let i = 0; i < raws.length; i++) {
       out.push(this.classify(raws[i], i, raws, ctx, out, source, parens, parameterBindings));
     }
     if (this.features.styleSheet) applyStyleRules(out, source);
     if (this.features.yamlStructure) applyYamlStructure(out, source);
+    if (this.features.shellStructure) out = applyShellStructure(out, source);
 
     return out;
   }

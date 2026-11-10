@@ -5,8 +5,8 @@
     "showcase": {
       "bash": {
         "chars": 2419,
-        "overall": 56,
-        "highlighted": 48.7
+        "overall": 93.1,
+        "highlighted": 90.5
       },
       "c": {
         "chars": 3556,
@@ -502,8 +502,8 @@
     "real-world": {
       "bash": {
         "chars": 13021,
-        "overall": 55.1,
-        "highlighted": 52.8
+        "overall": 96.1,
+        "highlighted": 94.8
       },
       "c": {
         "chars": 6333,

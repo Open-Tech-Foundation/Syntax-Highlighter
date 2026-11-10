@@ -43,6 +43,9 @@ const CASES = [
   // JSX nesting beyond the depth bound is scanned as code, not recursively.
   ["jsx", "<a>", 10000, "unclosed JSX elements"],
   ["jsx", "<a>{", 10000, "unclosed JSX expression containers"],
+  // Shell structure walks words and splits interpolated strings.
+  ["bash", 'echo "$x ${y}" a ', 5000, "commands with interpolated strings"],
+  ["bash", "a ", 20000, "one long command line"],
 ];
 
 for (const [language, unit, n, label] of CASES) {

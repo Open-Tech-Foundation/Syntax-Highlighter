@@ -202,6 +202,12 @@ export interface TokenizerFeatures {
    * block scalars.
    */
   yamlStructure?: boolean;
+  /**
+   * Classify shell command structure: command names `function`, arguments
+   * `string`, options `constant`, and `$VAR` expansions (also inside
+   * double-quoted strings, which are split around them) `variable`.
+   */
+  shellStructure?: boolean;
 }
 
 export interface MarkupConfig {

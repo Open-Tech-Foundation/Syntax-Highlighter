@@ -763,9 +763,9 @@ test("Bash: shebang is comment", () => {
   assertEquals(findToken(bashTok, "#!/bin/bash", "#!/bin/bash").type, "comment");
 });
 
-test("Bash: constants", () => {
+test("Bash: assignment names are variables", () => {
   const src = 'NAME="world"';
-  assertEquals(findToken(bashTok, src, "NAME").type, "constant");
+  assertEquals(findToken(bashTok, src, "NAME").type, "variable");
 });
 
 test("Bash: keywords", () => {
@@ -774,8 +774,8 @@ test("Bash: keywords", () => {
     "boolean:true",
     "operator:;",
     "keyword:then",
-    "keyword:echo",
-    "variable:x",
+    "function:echo",
+    "string:x",
     "operator:;",
     "keyword:fi",
   ]);
