@@ -26,7 +26,7 @@ export default function Home() {
               terminals.
             </p>
             <div class="actions">
-              <a class="button" href="/docs/getting-started">
+              <a class="button" href="/docs/quick-start">
                 Get started <span>→</span>
               </a>
             </div>
@@ -93,7 +93,7 @@ export default function Home() {
 
         <section class="bottom-cta">
           <p>Bring your code to every surface.</p>
-          <a class="button" href="/docs/getting-started">
+          <a class="button" href="/docs/quick-start">
             Read the quickstart <span>→</span>
           </a>
         </section>

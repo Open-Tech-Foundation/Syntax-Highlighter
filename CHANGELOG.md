@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **LOW:** The homepage "Get started" and "Read the quickstart" buttons now open the Quick start page; they pointed at Getting started, which is the tokens-and-languages guide rather than the quickstart.
 - **MEDIUM:** The documented `@opentf/syntax-highlighter/ansi/themes/{name}` imports now resolve. They mapped to extensionless TypeScript sources and failed with `ERR_MODULE_NOT_FOUND`; they now point to built modules with per-file type declarations (the build no longer bundles declarations into a single file). `@opentf/syntax-highlighter/ansi/themes` exposes the theme index, and the raw `src/ansi` sources are no longer published.
 - **LOW:** ANSI theme values that are neither hex colors nor SGR sequences (for example `"red"` or `"#zzz"`) now apply no color instead of being printed into the output as literal text.
 - **HIGH:** `renderANSI` now prints control characters from the source in `cat -v` caret notation (`ESC` → `^[`, `BEL` → `^G`), so highlighting untrusted input can no longer clear the screen, retitle the window, or inject escape sequences. Tab, LF, and CR are kept. Pass `allowControlChars: true` to restore raw passthrough for trusted source; the escaping is also exported as `escapeControlChars`.
