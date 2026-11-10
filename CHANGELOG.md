@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-10
+
 ### Fixed
 
 - **LOW:** The website's "Try it live" demo has a full TSX showcase sample (typed components, a generic `<T,>` component, typed hooks and events, discriminated unions, `as const`, `satisfies`); picking `tsx` previously showed a three-line placeholder. The sample is also scored in the accuracy benchmark's showcase corpus (100 scorable languages).
