@@ -51,9 +51,8 @@ const markdown: LanguageDefinition = {
   ],
   lex: {
     strings: [
+      // Prose has no string syntax: quotes and apostrophes (`don't`) are text.
       { open: "`", close: "`", escape: "\\", multiline: false, semantic: semantics.code.inline },
-      { open: '"', close: '"', escape: "\\", multiline: false },
-      { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     inlinePatterns: [
       // Every inner class stops at a fresh opener (`[` or `<`): an unclosed
@@ -61,6 +60,12 @@ const markdown: LanguageDefinition = {
       // start instead of scanning to end of line — otherwise long lines of
       // `[`, `![`, `[a](`, or `<a` are quadratic. Trade-off: a destination
       // containing `[` (e.g. an IPv6 host) is not highlighted as a link.
+      // A linked image (README badges): `[![alt](src)](href)`.
+      {
+        pattern: /^\[!\[[^[\]\n]*\]\([^[)\n]*\)\]\([^[)\n]*\)/,
+        type: "text",
+        semantic: semantics.markup.link,
+      },
       { pattern: /^!\[[^[\]\n]*\]\([^[)\n]*\)/, type: "text", semantic: semantics.markup.image },
       { pattern: /^\[\^[^[\]\n]+\]/, type: "text", semantic: semantics.markup.footnote },
       { pattern: /^\[[xX]\]/, type: "text", semantic: semantics.markup.taskChecked },
@@ -74,13 +79,13 @@ const markdown: LanguageDefinition = {
     ],
     comments: [{ open: "<!--", close: "-->" }],
     delimiters: [
-      { open: "***", close: "***", semantic: semantics.text.boldItalic },
-      { open: "___", close: "___", semantic: semantics.text.boldItalic },
-      { open: "**", close: "**", semantic: semantics.text.bold },
-      { open: "__", close: "__", semantic: semantics.text.bold },
-      { open: "*", close: "*", semantic: semantics.text.italic },
-      { open: "_", close: "_", semantic: semantics.text.italic },
-      { open: "~~", close: "~~", semantic: semantics.text.strikethrough },
+      { open: "***", close: "***", semantic: semantics.text.boldItalic, flanking: true },
+      { open: "___", close: "___", semantic: semantics.text.boldItalic, flanking: true },
+      { open: "**", close: "**", semantic: semantics.text.bold, flanking: true },
+      { open: "__", close: "__", semantic: semantics.text.bold, flanking: true },
+      { open: "*", close: "*", semantic: semantics.text.italic, flanking: true },
+      { open: "_", close: "_", semantic: semantics.text.italic, flanking: true },
+      { open: "~~", close: "~~", semantic: semantics.text.strikethrough, flanking: true },
     ],
     regex: false,
     linePrefixes: {
@@ -96,7 +101,7 @@ const markdown: LanguageDefinition = {
       "+": "operator",
     },
     linePrefixPatterns: [
-      { pattern: /^#{1,6}\s+/, type: "keyword", semantic: semantics.markup.heading },
+      { pattern: /^#{1,6}\s+/, type: "keyword", semantic: semantics.markup.heading, inline: true },
       { pattern: /^\[\^[^\]\n]+\]:/, type: "text", semantic: semantics.markup.footnote },
       { pattern: /^\[[^\]\n]+\]:\s+https?:\/\//, type: "text", semantic: semantics.markup.link },
       { pattern: /^>\s?/, type: "comment", semantic: semantics.markup.quote, wholeLine: false },

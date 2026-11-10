@@ -33,9 +33,12 @@ test("markdown: headings use linePrefixes", () => {
   const src = "# Heading 1\n## Heading 2\n### Heading 3";
   const tokenizer = new UnifiedTokenizer(markdown);
   const k = kinds(tokenizer, src);
-  assert(k.includes("keyword:# Heading 1"), `expected keyword for h1, got ${k}`);
-  assert(k.includes("keyword:## Heading 2"), `expected keyword for h2, got ${k}`);
-  assert(k.includes("keyword:### Heading 3"), `expected keyword for h3, got ${k}`);
+  // The marker and each word of the heading text are heading tokens, so
+  // inline constructs inside a heading can keep their own types.
+  for (const marker of ["keyword:# ", "keyword:## ", "keyword:### "]) {
+    assert(k.includes(marker), `expected ${marker}, got ${k}`);
+  }
+  assert(k.includes("keyword:Heading"), `expected heading text, got ${k}`);
   assert(
     tokenizer
       .tokenize(src)

@@ -34,6 +34,9 @@ const CASES = [
   ["markdown", "[", 10000, "unclosed link brackets"],
   ["markdown", "![", 10000, "unclosed image brackets"],
   ["markdown", "<a", 10000, "unclosed inline HTML"],
+  // Flanking emphasis searches for a closer; the search is bounded.
+  ["markdown", "_a ", 10000, "unmatched underscores"],
+  ["markdown", "*a ", 10000, "unmatched asterisks"],
   // Parameter lookup walked the whole context stack per identifier, so any
   // unclosed bracket nesting was quadratic — in Markdown too.
   ["markdown", "[a](", 10000, "unclosed link destinations"],

@@ -39,6 +39,12 @@ export interface DelimiterDef {
   semantic?: string;
   /** Whether a matching close delimiter may occur on a later line. Defaults to false. */
   multiline?: boolean;
+  /**
+   * CommonMark-style flanking: the opener must be followed and the closer
+   * preceded by non-whitespace, `_` never opens or closes inside a word, and
+   * an opener without a valid closer is literal text. Defaults to false.
+   */
+  flanking?: boolean;
 }
 
 export interface LinePrefixPattern {
@@ -50,6 +56,12 @@ export interface LinePrefixPattern {
   semantic?: string;
   /** Whether to emit the full line. Defaults to true; false emits only the matched marker. */
   wholeLine?: boolean;
+  /**
+   * Emit the marker, then give the rest of the line's plain tokens this type
+   * and semantic while inline constructs (links, code, emphasis) keep their
+   * own — e.g. a Markdown heading containing a link. Implies `wholeLine: false`.
+   */
+  inline?: boolean;
 }
 
 export interface InlinePattern {
@@ -430,6 +442,8 @@ export class Lexer {
   private lineScanBlank = true;
   private jsxEnabled: boolean;
   private jsxDepth = 0;
+  /** Active `inline` line-prefix: plain tokens before `end` take this type. */
+  private lineOverride: { end: number; type: RawTokenType; semantic?: string } | null = null;
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
@@ -503,6 +517,8 @@ export class Lexer {
     this.lastClosedControlParen = false;
     this.lineScanPos = 0;
     this.lineScanBlank = true;
+    const savedOverride = this.lineOverride;
+    this.lineOverride = null;
 
     try {
       if (this.shebang && source.startsWith("#!")) {
@@ -524,6 +540,7 @@ export class Lexer {
       this.lastClosedControlParen = saved.lastClosedControlParen;
       this.lineScanPos = saved.lineScanPos;
       this.lineScanBlank = saved.lineScanBlank;
+      this.lineOverride = savedOverride;
     }
   }
 
@@ -553,6 +570,22 @@ export class Lexer {
   }
 
   emit(type: RawTokenType, start: number, end: number, detail?: RawTokenDetail): void {
+    const override = this.lineOverride;
+    if (override) {
+      if (start >= override.end) {
+        this.lineOverride = null;
+      } else if (
+        detail?.semantic === undefined &&
+        (type === "identifier" ||
+          type === "text" ||
+          type === "punctuation" ||
+          type === "operator" ||
+          type === "number")
+      ) {
+        type = override.type;
+        detail = { ...detail, semantic: override.semantic };
+      }
+    }
     const token: RawToken = {
       type,
       start,
@@ -820,12 +853,60 @@ export class Lexer {
    * Unlike strings, delimiters emit the open/content/close as separate tokens
    * with semantic metadata attached.
    */
-  scanDelimiter(def: DelimiterDef): void {
+  /**
+   * Where the delimiter opened at `at` closes, or -1 when `at` does not open
+   * one. Flanking delimiters need non-empty content and a valid closer; the
+   * search is bounded so long lines of unmatched openers stay linear.
+   */
+  delimiterClose(def: DelimiterDef, at: number): number {
+    const s = this.source;
+    if (!s.startsWith(def.open, at)) return -1;
+    const after = at + def.open.length;
+    let limit = this.length;
+    if (!def.multiline) {
+      const lineEnd = s.indexOf("\n", after);
+      if (lineEnd !== -1) limit = lineEnd;
+    }
+    if (!def.flanking) {
+      const close = s.indexOf(def.close, after);
+      return close !== -1 && close < limit ? close : -1;
+    }
+    // Judge the whole delimiter run (`**` in `a ** b`), never its middle.
+    const runChar = def.open[0];
+    if (at > 0 && s[at - 1] === runChar) return -1;
+    let runEnd = at;
+    while (s[runEnd] === runChar) runEnd++;
+    const next = s[runEnd];
+    if (next === undefined || isWhitespaceChar(next)) return -1;
+    if (runChar === "_" && at > 0 && /[A-Za-z0-9]/.test(s[at - 1])) return -1;
+    limit = Math.min(limit, after + 4096);
+    let close = s.indexOf(def.close, after + 1);
+    while (close !== -1 && close < limit) {
+      const before = s[close - 1];
+      const following = s[close + def.close.length];
+      const closesWord =
+        def.close[0] === "_" && following !== undefined && /[A-Za-z0-9]/.test(following);
+      if (!isWhitespaceChar(before) && !closesWord) return close;
+      close = s.indexOf(def.close, close + 1);
+    }
+    return -1;
+  }
+
+  scanDelimiter(def: DelimiterDef, knownClose?: number): void {
     const s = this.source;
     const start = this.pos;
     // Emit the opening delimiter
     this.emit("punctuation", start, start + def.open.length, { semantic: def.semantic });
     this.pos += def.open.length;
+    if (knownClose !== undefined && knownClose >= this.pos) {
+      if (knownClose > this.pos)
+        this.emit("text", this.pos, knownClose, { semantic: def.semantic });
+      this.emit("punctuation", knownClose, knownClose + def.close.length, {
+        semantic: def.semantic,
+      });
+      this.pos = knownClose + def.close.length;
+      return;
+    }
     // Scan content until closing delimiter
     const contentStart = this.pos;
     while (this.pos < this.length) {
@@ -1001,19 +1082,27 @@ export class Lexer {
           // over a single-character line marker such as Markdown's `*` list
           // prefix. Unterminated delimiters still fall through to the prefix.
           const lineEnd = s.indexOf("\n", this.pos);
-          const hasCompleteDelimiter = this.delimiterOpeners.get(ch)?.some((def) => {
-            if (!s.startsWith(def.open, this.pos)) return false;
-            const close = s.indexOf(def.close, this.pos + def.open.length);
-            return (
-              close !== -1 && (def.multiline || close < (lineEnd === -1 ? this.length : lineEnd))
-            );
-          });
+          const hasCompleteDelimiter = this.delimiterOpeners
+            .get(ch)
+            ?.some((def) => this.delimiterClose(def, this.pos) !== -1);
           // Check for multi-char prefixes first (longest match)
           if (!hasCompleteDelimiter) {
-            for (const { pattern, type, semantic, wholeLine = true } of this.linePrefixPatterns) {
+            for (const { pattern, type, semantic, wholeLine = true, inline = false } of this
+              .linePrefixPatterns) {
               pattern.lastIndex = 0;
               const match = pattern.exec(s.slice(this.pos));
               if (!match?.[0] || match.index !== 0) continue;
+              if (inline) {
+                const markerEnd = this.pos + match[0].length;
+                this.emit(type as RawTokenType, start, markerEnd, { semantic });
+                this.lineOverride = {
+                  end: lineEnd === -1 ? this.length : lineEnd,
+                  type: type as RawTokenType,
+                  semantic,
+                };
+                this.pos = markerEnd;
+                break;
+              }
               const end = wholeLine
                 ? lineEnd === -1
                   ? this.length
@@ -1075,9 +1164,15 @@ export class Lexer {
 
       // Delimiters (paired semantic constructs like **bold**, _italic_)
       const delimDefs = this.delimiterOpeners.get(ch);
-      const delimDef = delimDefs?.find((def) => s.startsWith(def.open, this.pos));
+      let delimClose = -1;
+      const delimDef = delimDefs?.find((def) => {
+        if (!s.startsWith(def.open, this.pos)) return false;
+        if (!def.flanking) return true;
+        delimClose = this.delimiterClose(def, this.pos);
+        return delimClose !== -1;
+      });
       if (delimDef) {
-        this.scanDelimiter(delimDef);
+        this.scanDelimiter(delimDef, delimDef.flanking ? delimClose : undefined);
         continue;
       }
 
