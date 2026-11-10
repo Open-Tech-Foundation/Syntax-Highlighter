@@ -100,6 +100,37 @@ test("units count as their number; vendored property names are properties", () =
   );
 });
 
+test("escapes: part of a string inside one, a constant on their own", () => {
+  assertEquals(
+    classifyScopes(js("string.quoted.double.js", "constant.character.escape.js"), "\\n"),
+    "string",
+  );
+  assertEquals(
+    classifyScopes(
+      ["text.html.markdown", "meta.paragraph.markdown", "constant.character.escape.markdown"],
+      "\\*",
+    ),
+    "constant",
+  );
+  assertEquals(classifyToken({ type: "text", semantic: "syntax.escape" }), "constant");
+});
+
+test("fenced code is judged by the embedded scopes; fence markers are plain", () => {
+  const fence = ["text.html.markdown", "markup.fenced_code.block.markdown"];
+  assertEquals(classifyScopes([...fence, "punctuation.definition.markdown"], "```"), "plain");
+  assertEquals(
+    classifyScopes(
+      [...fence, "meta.embedded.block.javascript", "punctuation.terminator.statement.js"],
+      ";",
+    ),
+    "plain",
+  );
+  assertEquals(
+    classifyScopes([...fence, "meta.embedded.block.javascript", "string.quoted.double.js"], '"a"'),
+    "string",
+  );
+});
+
 test("structural and unknown scopes defer to plain", () => {
   assertEquals(classifyScopes(js("meta.var.expr.js"), "x"), "plain");
   assertEquals(classifyScopes(js("punctuation.terminator.statement.js"), ";"), "plain");

@@ -16,6 +16,8 @@
  * - Everything inside a comment is `comment`, including doc tags such as
  *   `@param`: themes disagree on tinting them.
  * - A unit belongs to its number (`1rem` is all `number`).
+ * - Fenced code is judged by the embedded language's own scopes; the fence
+ *   markers themselves are plain.
  * - Delimiters belong to what they delimit (quotes are `string`, a JSON key's
  *   quotes are `property`), so generic punctuation defers to the enclosing
  *   scope; escapes inside strings stay `string`. Interpolation delimiters
@@ -95,8 +97,7 @@ export function classifyScope(scope: string, text: string): ColorClass | null {
     has("string") ||
     has("punctuation.definition.string") ||
     has("markup.inline.raw") ||
-    has("markup.raw") ||
-    has("markup.fenced_code")
+    has("markup.raw")
   )
     return "string";
   // A unit belongs to its number (`1rem`, `50%`); themes color them alike.
@@ -155,6 +156,13 @@ export function classifyScope(scope: string, text: string): ColorClass | null {
 /** Class for a reference span: innermost decisive scope wins. */
 export function classifyScopes(scopes: string[], text: string): ColorClass {
   if (scopes.some((scope) => /^comment(\.|$)/i.test(scope))) return "comment";
+  // An escape belongs to its string; standalone (`\*` in prose) it is a constant.
+  const inner = scopes[scopes.length - 1] ?? "";
+  if (/^constant\.character\.escape(\.|$)/i.test(inner)) {
+    return scopes.some((scope) => /^(string|markup\.inline\.raw)(\.|$)/i.test(scope))
+      ? "string"
+      : "constant";
+  }
   for (let i = scopes.length - 1; i >= 0; i--) {
     const c = classifyScope(scopes[i], text);
     if (c) return c;
@@ -196,6 +204,7 @@ const SEMANTIC_CLASS: Record<string, ColorClass> = {
   "markup.image": "link",
   "markup.quote": "quote",
   "code.inline": "string",
+  "syntax.escape": "constant",
   "code.block": "string",
 };
 
