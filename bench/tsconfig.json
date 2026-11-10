@@ -1,0 +1,8 @@
+{
+  "extends": "../packages/syntax-highlighter/tsconfig.json",
+  "compilerOptions": {
+    // The runtime declarations are installed in the library workspace.
+    "types": ["../packages/syntax-highlighter/node_modules/@opentf/esrun-types"]
+  },
+  "include": ["accuracy.ts", "accuracy/*.ts"]
+}

@@ -287,7 +287,9 @@ tsr typecheck      # tsc --noEmit across workspaces
 tsr lint           # biome lint (fix: tsr lint -- --write)
 tsr fmt            # biome format --write
 tsr build          # library → packages/syntax-highlighter/dist/
-tsr ci             # typecheck + lint + fmt:check + test:all + build
+tsr bench:accuracy # accuracy vs Shiki per language; rewrites bench/accuracy-baseline.json
+tsr accuracy:check # fail if any language drops below the committed baseline
+tsr ci             # typecheck + lint + fmt:check + tests + accuracy:check + build
 tsr clean          # rm -rf dist/
 
 # no package.json scripts — tsr is the entry point

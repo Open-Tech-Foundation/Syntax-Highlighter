@@ -1,0 +1,595 @@
+{
+  "shiki": "4.4.3",
+  "theme": "github-dark",
+  "corpora": {
+    "showcase": {
+      "bash": {
+        "chars": 2419,
+        "overall": 56,
+        "highlighted": 48.7
+      },
+      "c": {
+        "chars": 3556,
+        "overall": 76.8,
+        "highlighted": 61.3
+      },
+      "cpp": {
+        "chars": 3974,
+        "overall": 79.3,
+        "highlighted": 62
+      },
+      "csharp": {
+        "chars": 4064,
+        "overall": 83.9,
+        "highlighted": 74.4
+      },
+      "css": {
+        "chars": 2719,
+        "overall": 45.7,
+        "highlighted": 24.8
+      },
+      "diff": {
+        "chars": 2808,
+        "overall": 84,
+        "highlighted": 81
+      },
+      "go": {
+        "chars": 3104,
+        "overall": 82.3,
+        "highlighted": 70.1
+      },
+      "html": {
+        "chars": 3582,
+        "overall": 98.2,
+        "highlighted": 97.3
+      },
+      "java": {
+        "chars": 4117,
+        "overall": 73.3,
+        "highlighted": 62
+      },
+      "javascript": {
+        "chars": 4004,
+        "overall": 93.4,
+        "highlighted": 90.2
+      },
+      "json": {
+        "chars": 1624,
+        "overall": 99.9,
+        "highlighted": 99.9
+      },
+      "jsx": {
+        "chars": 2884,
+        "overall": 81.6,
+        "highlighted": 69.2
+      },
+      "markdown": {
+        "chars": 1930,
+        "overall": 73.3,
+        "highlighted": 46.5
+      },
+      "python": {
+        "chars": 3391,
+        "overall": 89.1,
+        "highlighted": 80.3
+      },
+      "rust": {
+        "chars": 4152,
+        "overall": 80.1,
+        "highlighted": 69.2
+      },
+      "sql": {
+        "chars": 2851,
+        "overall": 82.4,
+        "highlighted": 74.2
+      },
+      "typescript": {
+        "chars": 4386,
+        "overall": 80,
+        "highlighted": 72.7
+      },
+      "yaml": {
+        "chars": 1931,
+        "overall": 20.6,
+        "highlighted": 14.2
+      },
+      "actions": {
+        "chars": 894,
+        "overall": 18.3,
+        "highlighted": 13.5
+      },
+      "ada": {
+        "chars": 1492,
+        "overall": 59.3,
+        "highlighted": 39.6
+      },
+      "apache": {
+        "chars": 1189,
+        "overall": 52.2,
+        "highlighted": 29.3
+      },
+      "asciidoc": {
+        "chars": 840,
+        "overall": 58.1,
+        "highlighted": 13.1
+      },
+      "assembly": {
+        "chars": 787,
+        "overall": 64.4,
+        "highlighted": 55.9
+      },
+      "astro": {
+        "chars": 960,
+        "overall": 70.8,
+        "highlighted": 56.1
+      },
+      "batch": {
+        "chars": 846,
+        "overall": 67.1,
+        "highlighted": 52.1
+      },
+      "clojure": {
+        "chars": 1426,
+        "overall": 67.1,
+        "highlighted": 46
+      },
+      "cmake": {
+        "chars": 1153,
+        "overall": 58.1,
+        "highlighted": 41
+      },
+      "coffeescript": {
+        "chars": 1078,
+        "overall": 60.5,
+        "highlighted": 40.7
+      },
+      "crystal": {
+        "chars": 1259,
+        "overall": 73,
+        "highlighted": 58.2
+      },
+      "csv": {
+        "chars": 1691,
+        "overall": 5.4,
+        "highlighted": 0
+      },
+      "d": {
+        "chars": 1330,
+        "overall": 82.1,
+        "highlighted": 63.7
+      },
+      "dart": {
+        "chars": 2044,
+        "overall": 84.5,
+        "highlighted": 73.9
+      },
+      "dockerfile": {
+        "chars": 2899,
+        "overall": 91.4,
+        "highlighted": 87.1
+      },
+      "elixir": {
+        "chars": 1762,
+        "overall": 66,
+        "highlighted": 54.7
+      },
+      "elm": {
+        "chars": 2005,
+        "overall": 65.7,
+        "highlighted": 28
+      },
+      "env": {
+        "chars": 1223,
+        "overall": 26.8,
+        "highlighted": 6.5
+      },
+      "erlang": {
+        "chars": 1404,
+        "overall": 76,
+        "highlighted": 60.5
+      },
+      "fish": {
+        "chars": 985,
+        "overall": 68.5,
+        "highlighted": 57.5
+      },
+      "fortran": {
+        "chars": 1415,
+        "overall": 65.1,
+        "highlighted": 51.1
+      },
+      "fsharp": {
+        "chars": 1658,
+        "overall": 53.7,
+        "highlighted": 32.4
+      },
+      "gitconfig": {
+        "chars": 776,
+        "overall": 40.9,
+        "highlighted": 10.4
+      },
+      "gleam": {
+        "chars": 1455,
+        "overall": 81.4,
+        "highlighted": 62.8
+      },
+      "graphql": {
+        "chars": 927,
+        "overall": 72.5,
+        "highlighted": 56.6
+      },
+      "groovy": {
+        "chars": 1715,
+        "overall": 59.4,
+        "highlighted": 40.9
+      },
+      "haml": {
+        "chars": 804,
+        "overall": 53.4,
+        "highlighted": 23
+      },
+      "handlebars": {
+        "chars": 623,
+        "overall": 78.8,
+        "highlighted": 60.6
+      },
+      "haskell": {
+        "chars": 1589,
+        "overall": 63.2,
+        "highlighted": 33.1
+      },
+      "hcl": {
+        "chars": 852,
+        "overall": 71.5,
+        "highlighted": 53.9
+      },
+      "http": {
+        "chars": 652,
+        "overall": 40.2,
+        "highlighted": 30.4
+      },
+      "ini": {
+        "chars": 681,
+        "overall": 53.2,
+        "highlighted": 31.1
+      },
+      "jinja": {
+        "chars": 924,
+        "overall": 79,
+        "highlighted": 54.4
+      },
+      "julia": {
+        "chars": 1117,
+        "overall": 87.6,
+        "highlighted": 78.5
+      },
+      "kotlin": {
+        "chars": 3514,
+        "overall": 77.1,
+        "highlighted": 64.9
+      },
+      "kubernetes": {
+        "chars": 950,
+        "overall": 17.4,
+        "highlighted": 8.9
+      },
+      "latex": {
+        "chars": 1264,
+        "overall": 50.5,
+        "highlighted": 6.7
+      },
+      "less": {
+        "chars": 772,
+        "overall": 38.9,
+        "highlighted": 20.5
+      },
+      "liquid": {
+        "chars": 779,
+        "overall": 82.5,
+        "highlighted": 61.6
+      },
+      "lisp": {
+        "chars": 1478,
+        "overall": 62.4,
+        "highlighted": 38
+      },
+      "lua": {
+        "chars": 1394,
+        "overall": 86.7,
+        "highlighted": 78.6
+      },
+      "makefile": {
+        "chars": 657,
+        "overall": 55.7,
+        "highlighted": 18.7
+      },
+      "matlab": {
+        "chars": 972,
+        "overall": 69.9,
+        "highlighted": 55.6
+      },
+      "nginx": {
+        "chars": 1314,
+        "overall": 76,
+        "highlighted": 58.8
+      },
+      "nim": {
+        "chars": 1380,
+        "overall": 78.9,
+        "highlighted": 62.7
+      },
+      "nix": {
+        "chars": 850,
+        "overall": 45.3,
+        "highlighted": 37.2
+      },
+      "objectivec": {
+        "chars": 2774,
+        "overall": 52,
+        "highlighted": 24.4
+      },
+      "ocaml": {
+        "chars": 1502,
+        "overall": 53.2,
+        "highlighted": 35.6
+      },
+      "odin": {
+        "chars": 1386,
+        "overall": 78.8,
+        "highlighted": 58.8
+      },
+      "org": {
+        "chars": 1116,
+        "overall": 47.9,
+        "highlighted": 4
+      },
+      "pascal": {
+        "chars": 1443,
+        "overall": 63.6,
+        "highlighted": 37.9
+      },
+      "perl": {
+        "chars": 1306,
+        "overall": 70.5,
+        "highlighted": 52.6
+      },
+      "php": {
+        "chars": 3306,
+        "overall": 77,
+        "highlighted": 67.7
+      },
+      "powershell": {
+        "chars": 1398,
+        "overall": 68,
+        "highlighted": 48.9
+      },
+      "prolog": {
+        "chars": 1326,
+        "overall": 65.8,
+        "highlighted": 47.3
+      },
+      "properties": {
+        "chars": 843,
+        "overall": 62.4,
+        "highlighted": 43.1
+      },
+      "protobuf": {
+        "chars": 862,
+        "overall": 87.1,
+        "highlighted": 83.3
+      },
+      "pug": {
+        "chars": 927,
+        "overall": 65.8,
+        "highlighted": 50.6
+      },
+      "r": {
+        "chars": 1197,
+        "overall": 93,
+        "highlighted": 86.5
+      },
+      "raku": {
+        "chars": 1111,
+        "overall": 73.8,
+        "highlighted": 51.9
+      },
+      "regex": {
+        "chars": 985,
+        "overall": 8.4,
+        "highlighted": 2.6
+      },
+      "rst": {
+        "chars": 794,
+        "overall": 44.1,
+        "highlighted": 3.7
+      },
+      "ruby": {
+        "chars": 3019,
+        "overall": 65.9,
+        "highlighted": 51
+      },
+      "scala": {
+        "chars": 1955,
+        "overall": 71.1,
+        "highlighted": 53.6
+      },
+      "scheme": {
+        "chars": 1433,
+        "overall": 71.9,
+        "highlighted": 43.6
+      },
+      "scss": {
+        "chars": 996,
+        "overall": 51.4,
+        "highlighted": 23.9
+      },
+      "smalltalk": {
+        "chars": 1154,
+        "overall": 57.5,
+        "highlighted": 25.5
+      },
+      "solidity": {
+        "chars": 1454,
+        "overall": 68.8,
+        "highlighted": 54.3
+      },
+      "stylus": {
+        "chars": 609,
+        "overall": 43.5,
+        "highlighted": 24.6
+      },
+      "svelte": {
+        "chars": 1232,
+        "overall": 73.4,
+        "highlighted": 51.8
+      },
+      "swift": {
+        "chars": 3116,
+        "overall": 77.6,
+        "highlighted": 62
+      },
+      "systemd": {
+        "chars": 1062,
+        "overall": 51.4,
+        "highlighted": 23.6
+      },
+      "tcl": {
+        "chars": 1223,
+        "overall": 68.4,
+        "highlighted": 46.4
+      },
+      "toml": {
+        "chars": 1830,
+        "overall": 87.9,
+        "highlighted": 79.7
+      },
+      "typst": {
+        "chars": 848,
+        "overall": 77.9,
+        "highlighted": 55.5
+      },
+      "v": {
+        "chars": 1332,
+        "overall": 81.7,
+        "highlighted": 65.9
+      },
+      "vb": {
+        "chars": 1501,
+        "overall": 70.8,
+        "highlighted": 50.3
+      },
+      "vue": {
+        "chars": 1568,
+        "overall": 56.9,
+        "highlighted": 37.9
+      },
+      "wasm": {
+        "chars": 1021,
+        "overall": 58.3,
+        "highlighted": 37
+      },
+      "xml": {
+        "chars": 3195,
+        "overall": 89.6,
+        "highlighted": 84.6
+      },
+      "zig": {
+        "chars": 1869,
+        "overall": 92.7,
+        "highlighted": 83.1
+      }
+    },
+    "real-world": {
+      "bash": {
+        "chars": 13021,
+        "overall": 55.1,
+        "highlighted": 52.8
+      },
+      "c": {
+        "chars": 6333,
+        "overall": 90.1,
+        "highlighted": 86.3
+      },
+      "cpp": {
+        "chars": 3880,
+        "overall": 88.3,
+        "highlighted": 82.3
+      },
+      "csharp": {
+        "chars": 7242,
+        "overall": 78.3,
+        "highlighted": 66.6
+      },
+      "css": {
+        "chars": 4929,
+        "overall": 77.6,
+        "highlighted": 74.9
+      },
+      "diff": {
+        "chars": 1231,
+        "overall": 81.1,
+        "highlighted": 72.4
+      },
+      "go": {
+        "chars": 3360,
+        "overall": 89,
+        "highlighted": 86.6
+      },
+      "html": {
+        "chars": 12626,
+        "overall": 95.4,
+        "highlighted": 91.9
+      },
+      "java": {
+        "chars": 6964,
+        "overall": 90.4,
+        "highlighted": 89.3
+      },
+      "javascript": {
+        "chars": 4584,
+        "overall": 95.3,
+        "highlighted": 94
+      },
+      "json": {
+        "chars": 7872,
+        "overall": 100,
+        "highlighted": 100
+      },
+      "jsx": {
+        "chars": 4065,
+        "overall": 81,
+        "highlighted": 73.5
+      },
+      "markdown": {
+        "chars": 4588,
+        "overall": 51.3,
+        "highlighted": 33.8
+      },
+      "python": {
+        "chars": 21421,
+        "overall": 97.9,
+        "highlighted": 97
+      },
+      "rust": {
+        "chars": 13519,
+        "overall": 88.8,
+        "highlighted": 84
+      },
+      "sql": {
+        "chars": 42697,
+        "overall": 69.5,
+        "highlighted": 61.5
+      },
+      "typescript": {
+        "chars": 9528,
+        "overall": 92.2,
+        "highlighted": 88.4
+      },
+      "yaml": {
+        "chars": 9899,
+        "overall": 71.5,
+        "highlighted": 70.9
+      }
+    }
+  }
+}

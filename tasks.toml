@@ -54,9 +54,24 @@ run = "biome check"
 [tasks.bench]
 run = "esdev bench/throughput.ts"
 
+# Character-level accuracy vs Shiki over the showcase and real-world corpora.
+# Rewrites bench/accuracy-baseline.json — commit it when scores improve.
+[tasks."bench:accuracy"]
+run = "esdev bench/accuracy.ts --update"
+
+# Fails if any language scores below bench/accuracy-baseline.json.
+[tasks."accuracy:check"]
+run = "esdev bench/accuracy.ts --check"
+
+[tasks."test:bench"]
+run = "esdev test bench"
+
+[tasks."typecheck:bench"]
+run = "tsc --noEmit -p bench"
+
 # ------------------------------------------------------------------ ci
 [tasks.check]
-deps = ["typecheck", "lint", "fmt:check", "test"]
+deps = ["typecheck", "typecheck:bench", "lint", "fmt:check", "test", "test:bench"]
 
 [tasks.ci]
-deps = ["typecheck", "lint", "fmt:check", "test", "build"]
+deps = ["typecheck", "typecheck:bench", "lint", "fmt:check", "test", "test:bench", "accuracy:check", "build"]
