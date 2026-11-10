@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 # Builds the website into website/dist on a fresh Linux or macOS host:
-# installs esdev from the latest release (or ESDEV_VERSION), builds the library
-# the site depends on, installs the site's packages, and runs its build.
+# installs esdev from the latest release (or ESDEV_VERSION), writes the site's
+# version badge from package.json, builds the library the site depends on,
+# installs the site's packages, and runs its build.
 # Written for Cloudflare Workers Builds:
 #
 #   Root directory      website
@@ -30,6 +31,9 @@ fi
 curl -fsSL https://esrun.opentechf.org/install.sh | bash -s -- --only=esdev
 export PATH="${ES_RUNTIME_INSTALL:-${ESRUN_INSTALL:-$HOME/.es-runtime}}/bin:$PATH"
 esdev --version
+
+# The navbar version badge comes from the library's package.json.
+(cd "$repo_root" && esdev scripts/site-version.mjs)
 
 # The site installs the library from this checkout
 # (`file:../packages/syntax-highlighter`), which copies its built dist/ — so

@@ -1,5 +1,7 @@
 import { defineDocsConfig } from "@opentf/afw-docs/config";
 
+import { version } from "./src/version.js";
+
 const GITHUB = "https://github.com/Open-Tech-Foundation/Syntax-Highlighter";
 
 export default defineDocsConfig({
@@ -8,7 +10,8 @@ export default defineDocsConfig({
   docs: {
     title: "Syntax Highlighter",
     description: "Renderer-agnostic semantic syntax highlighting.",
-    version: "v0.4.0",
+    // Generated from packages/syntax-highlighter/package.json (scripts/site-version.mjs).
+    version: `v${version}`,
     // Navbar search (static index built after prerendering, into dist/_search/).
     search: { provider: "afw" },
     // Per-page "Last updated" line, from the file's last git commit.

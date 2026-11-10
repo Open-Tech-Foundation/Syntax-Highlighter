@@ -378,6 +378,7 @@ pnpm install
 tsr demo           # demo workbench (esdev start in demo/)
 tsr dev:website    # documentation site on AFW (esdev start in website/)
 tsr build:website  # library + site production build → website/dist/
+tsr site:version   # website/src/version.js from package.json (run by build:website)
 tsr test           # library unit tests
 tsr test:all       # all workspaces
 tsr typecheck      # tsc --noEmit across workspaces

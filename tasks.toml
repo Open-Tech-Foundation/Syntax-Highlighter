@@ -18,10 +18,16 @@ dir = "demo"
 run = "esdev start"
 dir = "website"
 
-# The deploy build (library, then site) — what Cloudflare runs.
+# Writes website/src/version.js from the library's package.json (the navbar badge).
+[tasks."site:version"]
+run = "esdev scripts/site-version.mjs"
+
+# The deploy build: version badge and library first (deps), then the site —
+# the same steps scripts/build-site.sh runs on Cloudflare.
 [tasks."build:website"]
-run = "esdev build --lib src && cd ../../website && pnpm install --frozen-lockfile && pnpm run build"
-dir = "packages/syntax-highlighter"
+deps = ["site:version", "build"]
+run = "pnpm install --frozen-lockfile && pnpm run build"
+dir = "website"
 
 # ------------------------------------------------------------------ build
 [tasks.build]
