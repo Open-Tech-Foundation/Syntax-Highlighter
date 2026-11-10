@@ -138,6 +138,8 @@ const aliasToCanonical: Record<string, string> = {
   jsp: "java",
   golang: "go",
   rs: "rust",
+  rb: "ruby",
+  "org-mode": "org",
   pl: "perl",
   pm: "perl",
   rlang: "r",
@@ -413,31 +415,37 @@ export function registerLanguage(definition: LanguageDefinition): LanguageDefini
   return definition;
 }
 
+/**
+ * The built-in language a name or alias refers to, without loading anything,
+ * or `null`. A built-in definition's own `aliases` only register once it has
+ * loaded, so every one of them must also be listed in `aliasToCanonical` to
+ * resolve on a fresh page — the registry tests check that they are.
+ */
+export function resolveBuiltinName(name: string): string | null {
+  const key = name.toLowerCase();
+  if (builtinLoaders[key]) return key;
+  let canonical: string | undefined = aliasToCanonical[key];
+  const visited = new Set<string>();
+  // transitive: inifile -> conf -> ini etc.
+  while (canonical) {
+    if (visited.has(canonical)) break;
+    visited.add(canonical);
+    if (builtinLoaders[canonical]) return canonical;
+    canonical = aliasToCanonical[canonical];
+  }
+  return null;
+}
+
 export async function loadLanguage(name?: string): Promise<LanguageDefinition> {
   const key = String(name ?? "javascript").toLowerCase();
   const known = registered.get(key);
   if (known) return known;
 
-  let loader = builtinLoaders[key];
-  if (!loader) {
-    let canonical: string | undefined = aliasToCanonical[key];
-    const visited = new Set<string>();
-    // transitive: inifile -> conf -> ini etc.
-    while (canonical) {
-      if (visited.has(canonical)) break;
-      visited.add(canonical);
-      const nextLoader = builtinLoaders[canonical];
-      if (nextLoader) {
-        loader = nextLoader;
-        break;
-      }
-      canonical = aliasToCanonical[canonical];
-    }
-  }
-  if (!loader) {
+  const builtin = resolveBuiltinName(key);
+  if (!builtin) {
     throw new UnknownLanguageError(String(name ?? "unknown"));
   }
-  return registerLanguage(await loader());
+  return registerLanguage(await builtinLoaders[builtin]());
 }
 
 /**

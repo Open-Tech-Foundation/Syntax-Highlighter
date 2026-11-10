@@ -1,5 +1,10 @@
 import { assert, assertEquals, test } from "runtime:test";
-import { getRegisteredLanguages, loadLanguage, registerLanguage } from "../src/core/registry.ts";
+import {
+  getRegisteredLanguages,
+  loadLanguage,
+  registerLanguage,
+  resolveBuiltinName,
+} from "../src/core/registry.ts";
 
 function throws(fn) {
   try {
@@ -66,4 +71,25 @@ test("shell fence names used by docs sites resolve to bash", async () => {
   for (const alias of ["console", "shellscript", "shell-session"]) {
     assertEquals((await loadLanguage(alias)).name, "bash");
   }
+});
+
+test("every alias a built-in definition declares resolves before it loads", async () => {
+  // A definition's own aliases register only once it has loaded, so each must
+  // also be in the static alias table — `rb` and `org-mode` once were not.
+  const missing = [];
+  for (const name of getRegisteredLanguages()) {
+    const builtin = resolveBuiltinName(name);
+    if (!builtin) continue; // a custom language registered by another test
+    const definition = await loadLanguage(builtin);
+    for (const alias of definition.aliases ?? []) {
+      if (resolveBuiltinName(alias) !== builtin) missing.push(`${alias} → ${builtin}`);
+    }
+  }
+  assertEquals(missing, []);
+});
+
+test("rb and org-mode resolve to ruby and org", async () => {
+  assertEquals(resolveBuiltinName("rb"), "ruby");
+  assertEquals(resolveBuiltinName("org-mode"), "org");
+  assertEquals((await loadLanguage("RB")).name, "ruby");
 });
