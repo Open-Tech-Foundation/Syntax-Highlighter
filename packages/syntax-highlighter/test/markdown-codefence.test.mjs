@@ -194,3 +194,31 @@ test("markdown: combined emphasis stays on one line and has one semantic style",
   );
   assert(renderHTML(src, tokens).includes('class="sh-text-bold-italic"'));
 });
+
+test("markdown: link patterns still match after the linear-time rewrite", () => {
+  const src = "[a](u) ![i](p.png) [^1] [r][id] <https://x.y> <b>t</b>";
+  const found = new UnifiedTokenizer(markdown)
+    .tokenize(src)
+    .filter((t) => t.semantic)
+    .map((t) => `${t.semantic}:${src.slice(t.start, t.end)}`);
+  for (const expected of [
+    "markup.link:[a](u)",
+    "markup.image:![i](p.png)",
+    "markup.footnote:[^1]",
+    "markup.link:[r][id]",
+    "markup.link:<https://x.y>",
+    "markup.html:<b>",
+    "markup.html:</b>",
+  ]) {
+    assert(found.includes(expected), `expected ${expected}, got ${JSON.stringify(found)}`);
+  }
+});
+
+test("markdown: an unclosed bracket does not swallow a following link", () => {
+  const src = "[x [y](z)";
+  const links = new UnifiedTokenizer(markdown)
+    .tokenize(src)
+    .filter((t) => t.semantic === "markup.link")
+    .map((t) => src.slice(t.start, t.end));
+  assert(links.length === 1 && links[0] === "[y](z)", JSON.stringify(links));
+});

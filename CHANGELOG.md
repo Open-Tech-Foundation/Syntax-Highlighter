@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **HIGH:** Markdown and Diff now tokenize long lines in linear time (an 80 KB line went from 4.4 s to ~50 ms; a 300 KB line previously took about a minute). The line-start check rescanned the line for every token, and Markdown's link, image, footnote, autolink, and inline-HTML patterns scanned to end of line at each unclosed opener. Trade-off: a link destination containing `[` (such as an IPv6 host) is no longer highlighted as a link.
 - **HIGH:** HTML now highlights every `<script>` and `<style>` block, not just the first. The close-tag search ignored its start offset, so each later block matched an earlier block's close tag and its body rendered as plain text.
 - **HIGH:** Fixed zero-length string tokens around template interpolations: back-to-back interpolations (`` `${a}${b}` ``, Ruby `"#{a}#{b}"`) and an interpolation left open at end of input (`` `${ ``) produced an empty token, so `validateTokens`/`renderJSON` threw on valid JavaScript, TypeScript, JSX, and Ruby. Added a token-contract test that runs edge-case inputs through all 101 languages.
 - **LOW:** Prevented the Docs theme-control tooltip from creating horizontal overflow on documentation pages.

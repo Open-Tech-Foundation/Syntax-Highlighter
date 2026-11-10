@@ -253,6 +253,11 @@ function isAlpha(ch: string): boolean {
   return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z");
 }
 
+/** Whitespace exactly as `String.prototype.trim()` defines it. */
+function isTrimWhitespace(ch: string): boolean {
+  return ch.trim() === "";
+}
+
 function isWhitespaceChar(ch: string): boolean {
   return (
     ch === " " ||
@@ -383,6 +388,13 @@ export class Lexer {
   protected pos = 0;
   private parenControls: boolean[] = [];
   private lastClosedControlParen = false;
+  /**
+   * Forward-only cursor for {@link atLineStart}: everything before
+   * `lineScanPos` has been inspected, and `lineScanBlank` records whether only
+   * whitespace has appeared since the last newline.
+   */
+  private lineScanPos = 0;
+  private lineScanBlank = true;
 
   constructor(language: Partial<LanguageDefinition> = {}) {
     const lex = language.lex ?? {};
@@ -443,6 +455,8 @@ export class Lexer {
       pos: this.pos,
       parenControls: this.parenControls,
       lastClosedControlParen: this.lastClosedControlParen,
+      lineScanPos: this.lineScanPos,
+      lineScanBlank: this.lineScanBlank,
     };
     this.source = source;
     this.length = source.length;
@@ -451,6 +465,8 @@ export class Lexer {
     this.pos = 0;
     this.parenControls = [];
     this.lastClosedControlParen = false;
+    this.lineScanPos = 0;
+    this.lineScanBlank = true;
 
     try {
       if (this.shebang && source.startsWith("#!")) {
@@ -470,7 +486,34 @@ export class Lexer {
       this.pos = saved.pos;
       this.parenControls = saved.parenControls;
       this.lastClosedControlParen = saved.lastClosedControlParen;
+      this.lineScanPos = saved.lineScanPos;
+      this.lineScanBlank = saved.lineScanBlank;
     }
+  }
+
+  /**
+   * True when only whitespace precedes `this.pos` on its line. Equivalent to
+   * `source.slice(lineStart, pos).trim() === ""`, but amortized O(1): the scan
+   * only moves forward, so each character is inspected once per tokenize()
+   * rather than once per token (which was quadratic in line length).
+   */
+  protected atLineStart(): boolean {
+    const s = this.source;
+    if (this.pos < this.lineScanPos) {
+      // Position moved backwards (not expected) — recompute from scratch.
+      const lineStart = s.lastIndexOf("\n", this.pos - 1) + 1;
+      this.lineScanPos = lineStart;
+      this.lineScanBlank = true;
+    }
+    let blank = this.lineScanBlank;
+    for (let i = this.lineScanPos; i < this.pos; i++) {
+      const ch = s[i];
+      if (ch === "\n") blank = true;
+      else if (blank && !isTrimWhitespace(ch)) blank = false;
+    }
+    this.lineScanPos = this.pos;
+    this.lineScanBlank = blank;
+    return blank;
   }
 
   emit(type: RawTokenType, start: number, end: number, detail?: RawTokenDetail): void {
@@ -733,9 +776,7 @@ export class Lexer {
 
       // Code fence detection (markdown ```lang ... ```)
       if (this.codeFences.length > 0) {
-        const lineStart = s.lastIndexOf("\n", this.pos - 1) + 1;
-        const atLineStart = s.slice(lineStart, this.pos).trim().length === 0;
-        if (atLineStart) {
+        if (this.atLineStart()) {
           for (const fence of this.codeFences) {
             if (s.startsWith(fence.open, this.pos)) {
               // Find end of info string (rest of line after opening fence)
@@ -785,9 +826,7 @@ export class Lexer {
 
       // Line-prefix tokens (diff +/-, log levels, etc.)
       if (this.linePrefixes.size > 0 || this.linePrefixPatterns.length > 0) {
-        const lineStart = s.lastIndexOf("\n", this.pos - 1) + 1;
-        const atLineStart = s.slice(lineStart, this.pos).trim().length === 0;
-        if (atLineStart) {
+        if (this.atLineStart()) {
           // A complete paired delimiter such as `**bold**` takes precedence
           // over a single-character line marker such as Markdown's `*` list
           // prefix. Unterminated delimiters still fall through to the prefix.

@@ -56,15 +56,20 @@ const markdown: LanguageDefinition = {
       { open: "'", close: "'", escape: "\\", multiline: false },
     ],
     inlinePatterns: [
-      { pattern: /^!\[[^\]\n]*\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.image },
-      { pattern: /^\[\^[^\]\n]+\]/, type: "text", semantic: semantics.markup.footnote },
+      // Every inner class stops at a fresh opener (`[` or `<`): an unclosed
+      // construct then fails at the next position where a new attempt could
+      // start instead of scanning to end of line — otherwise long lines of
+      // `[`, `![`, `[a](`, or `<a` are quadratic. Trade-off: a destination
+      // containing `[` (e.g. an IPv6 host) is not highlighted as a link.
+      { pattern: /^!\[[^[\]\n]*\]\([^[)\n]*\)/, type: "text", semantic: semantics.markup.image },
+      { pattern: /^\[\^[^[\]\n]+\]/, type: "text", semantic: semantics.markup.footnote },
       { pattern: /^\[[xX]\]/, type: "text", semantic: semantics.markup.taskChecked },
       { pattern: /^\[ \]/, type: "text", semantic: semantics.markup.taskUnchecked },
-      { pattern: /^\[[^\]\n]+\]\([^)\n]*\)/, type: "text", semantic: semantics.markup.link },
-      { pattern: /^\[[^\]\n]+\]\[[^\]\n]*\]/, type: "text", semantic: semantics.markup.link },
-      { pattern: /^<https?:\/\/[^>\s]+>/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^\[[^[\]\n]+\]\([^[)\n]*\)/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^\[[^[\]\n]+\]\[[^[\]\n]*\]/, type: "text", semantic: semantics.markup.link },
+      { pattern: /^<https?:\/\/[^<>\s]+>/, type: "text", semantic: semantics.markup.link },
       { pattern: /^https?:\/\/[^\s<>()]+/, type: "text", semantic: semantics.markup.link },
-      { pattern: /^<\/?[A-Za-z][^>\n]*>/, type: "text", semantic: semantics.markup.html },
+      { pattern: /^<\/?[A-Za-z][^<>\n]*>/, type: "text", semantic: semantics.markup.html },
       { pattern: /^\\./, type: "text", semantic: semantics.syntax.escape },
     ],
     comments: [{ open: "<!--", close: "-->" }],
