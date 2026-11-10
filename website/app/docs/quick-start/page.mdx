@@ -9,13 +9,13 @@ import { Steps } from "@opentf/afw-docs";
 
 <Steps>
 
-## Install the package
+### Install the package
 
 ```sh
 npm install @opentf/syntax-highlighter
 ```
 
-## Highlight source to HTML
+### Highlight source to HTML
 
 ```ts
 import { createHighlighter, renderHTML } from "@opentf/syntax-highlighter";
@@ -29,7 +29,7 @@ const html = renderHTML(source, tokens);
 
 Wrap the result in your own `<pre><code>` and load a [theme](/docs/themes).
 
-## Try the other renderers
+### Try the other renderers
 
 ```ts
 import { renderANSI, renderJSON } from "@opentf/syntax-highlighter";
@@ -38,7 +38,7 @@ console.log(renderANSI(source, tokens)); // truecolor terminal output
 console.log(renderJSON(source, tokens)); // inspectable token stream
 ```
 
-## Go further
+### Go further
 
 - [Getting started](/docs/getting-started) explains tokens, languages, and custom definitions.
 - [Renderers](/docs/renderers) covers each output in depth.

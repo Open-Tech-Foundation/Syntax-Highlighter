@@ -1,11 +1,13 @@
 import BenchSection from "./bench-section.jsx";
 import DemoSection from "./demo-section.jsx";
+import { globalStyles } from "./global.js";
 import HeroTabs from "./hero-tabs.jsx";
 import { landingThemeStyles } from "./landing-theme.js";
 
 export default function Home() {
   return (
     <>
+      <style>{globalStyles}</style>
       <style>{landingThemeStyles}</style>
       <main class="marketing">
         <section class="hero-grid">
