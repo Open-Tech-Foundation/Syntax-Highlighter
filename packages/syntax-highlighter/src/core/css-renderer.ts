@@ -2,8 +2,12 @@ import { HIGHLIGHTABLE, tokenStyleName } from "./render-helpers.ts";
 import { type Token, WHITESPACE } from "./tokens.ts";
 export const HIGHLIGHT_PREFIX = "sh-";
 
-const instances = new Set<CSSHighlightRenderer>();
-const ownedHighlights = new Map<string, Highlight>();
+/**
+ * One `Highlight` per style name, shared by every renderer on the page. Each
+ * renderer adds and removes only its own ranges, so re-rendering one code
+ * block costs O(its ranges) rather than rebuilding every block's highlights.
+ */
+const shared = new Map<string, Highlight>();
 
 function highlightName(type: string): string {
   return `${HIGHLIGHT_PREFIX}${type}`;
@@ -20,7 +24,6 @@ export class CSSHighlightRenderer {
     this.textNode = null;
     this.supported =
       typeof CSS !== "undefined" && !!CSS.highlights && typeof globalThis.Highlight !== "undefined";
-    instances.add(this);
   }
 
   render(source: string, tokens: Token[]): void {
@@ -43,19 +46,15 @@ export class CSSHighlightRenderer {
       if (range) ranges.push(range);
     }
 
-    this.#ranges = byType;
-    this.#apply();
+    this.#replace(byType);
   }
 
   clear(): void {
-    this.#ranges = new Map();
-    this.#apply();
+    this.#replace(new Map());
   }
 
   dispose(): void {
-    instances.delete(this);
-    this.#ranges = new Map();
-    this.#apply();
+    this.#replace(new Map());
   }
 
   #setText(text: string): void {
@@ -68,28 +67,33 @@ export class CSSHighlightRenderer {
     this.textNode = node;
   }
 
-  #apply(): void {
-    if (!this.supported) return;
-
-    const merged = new Map<string, AbstractRange[]>();
-    for (const instance of instances) {
-      for (const [type, ranges] of instance.#ranges) {
-        const combined = merged.get(type);
-        if (combined) combined.push(...ranges);
-        else merged.set(type, [...ranges]);
+  /** Swap this renderer's ranges for `next` in the shared highlights. */
+  #replace(next: Map<string, AbstractRange[]>): void {
+    if (this.supported) {
+      for (const [style, ranges] of this.#ranges) {
+        const name = highlightName(style);
+        const highlight = shared.get(name);
+        if (!highlight) continue;
+        for (const range of ranges) highlight.delete(range);
+        if (highlight.size === 0) {
+          if (CSS.highlights.get(name) === highlight) CSS.highlights.delete(name);
+          shared.delete(name);
+        }
+      }
+      for (const [style, ranges] of next) {
+        if (ranges.length === 0) continue;
+        const name = highlightName(style);
+        let highlight = shared.get(name);
+        if (!highlight) {
+          highlight = new Highlight();
+          shared.set(name, highlight);
+        }
+        for (const range of ranges) highlight.add(range);
+        // Re-register if something else replaced the entry under our name.
+        if (CSS.highlights.get(name) !== highlight) CSS.highlights.set(name, highlight);
       }
     }
-
-    for (const [name, highlight] of ownedHighlights) {
-      if (CSS.highlights.get(name) === highlight) CSS.highlights.delete(name);
-      ownedHighlights.delete(name);
-    }
-    for (const [type, ranges] of merged) {
-      const name = highlightName(type);
-      const highlight = new Highlight(...ranges);
-      CSS.highlights.set(name, highlight);
-      ownedHighlights.set(name, highlight);
-    }
+    this.#ranges = next;
   }
 
   #range(start: number, end: number): AbstractRange | null {

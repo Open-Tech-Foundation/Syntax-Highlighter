@@ -1,9 +1,28 @@
 import { assert, assertEquals, test } from "runtime:test";
 import { CSSHighlightRenderer, HIGHLIGHT_PREFIX } from "../src/core/css-renderer.ts";
 
+/** Set-like, as the real `Highlight` is. */
 class FakeHighlight {
+  static operations = 0;
+  #set;
   constructor(...ranges) {
-    this.ranges = ranges;
+    FakeHighlight.operations += ranges.length;
+    this.#set = new Set(ranges);
+  }
+  add(range) {
+    FakeHighlight.operations++;
+    this.#set.add(range);
+    return this;
+  }
+  delete(range) {
+    FakeHighlight.operations++;
+    return this.#set.delete(range);
+  }
+  get size() {
+    return this.#set.size;
+  }
+  get ranges() {
+    return [...this.#set];
   }
 }
 
@@ -129,4 +148,44 @@ test("no setText() call is required", () => {
   assertEquals(el.child.textContent, "const x = 1;");
   assert(highlights.has(`${HIGHLIGHT_PREFIX}keyword`));
   renderer.dispose();
+});
+
+test("re-rendering one block leaves other blocks' ranges in place", () => {
+  const a = new CSSHighlightRenderer(element());
+  const b = new CSSHighlightRenderer(element());
+  a.render("let", [{ type: "keyword", start: 0, end: 3 }]);
+  b.render("var", [{ type: "keyword", start: 0, end: 3 }]);
+  const keyword = () => highlights.get(`${HIGHLIGHT_PREFIX}keyword`);
+  assertEquals(keyword().size, 2);
+  a.render("x", [{ type: "variable", start: 0, end: 1 }]);
+  assertEquals(keyword().size, 1, "b's keyword range must survive a's re-render");
+  b.dispose();
+  assert(!highlights.has(`${HIGHLIGHT_PREFIX}keyword`), "empty highlights are unregistered");
+  assert(highlights.has(`${HIGHLIGHT_PREFIX}variable`));
+  a.dispose();
+  assert(!highlights.has(`${HIGHLIGHT_PREFIX}variable`));
+});
+
+test("re-render cost is proportional to the block, not the page", () => {
+  const tokens = Array.from({ length: 50 }, (_, i) => ({ type: "keyword", start: i, end: i + 1 }));
+  const source = "x".repeat(50);
+  const blocks = Array.from({ length: 200 }, () => new CSSHighlightRenderer(element()));
+  for (const block of blocks) block.render(source, tokens);
+  FakeHighlight.operations = 0;
+  blocks[0].render(source, tokens);
+  // 50 deletes + 50 adds, regardless of the other 199 blocks.
+  assertEquals(FakeHighlight.operations, 100);
+  for (const block of blocks) block.dispose();
+  assert(!highlights.has(`${HIGHLIGHT_PREFIX}keyword`));
+});
+
+test("a highlight replaced under our name is re-registered on the next render", () => {
+  const r = new CSSHighlightRenderer(element());
+  r.render("let", [{ type: "keyword", start: 0, end: 3 }]);
+  const foreign = new FakeHighlight();
+  highlights.set(`${HIGHLIGHT_PREFIX}keyword`, foreign);
+  r.render("let", [{ type: "keyword", start: 0, end: 3 }]);
+  const ours = highlights.get(`${HIGHLIGHT_PREFIX}keyword`);
+  assert(ours !== foreign && ours.size === 1);
+  r.dispose();
 });

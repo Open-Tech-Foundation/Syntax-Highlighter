@@ -2,9 +2,24 @@ import { assert, assertEquals, test } from "runtime:test";
 import { HIGHLIGHT_PREFIX } from "../src/core/css-renderer.ts";
 import { highlightElement } from "../src/index.ts";
 
+/** Set-like, as the real `Highlight` is. */
 class FakeHighlight {
+  #set;
   constructor(...ranges) {
-    this.ranges = ranges;
+    this.#set = new Set(ranges);
+  }
+  add(range) {
+    this.#set.add(range);
+    return this;
+  }
+  delete(range) {
+    return this.#set.delete(range);
+  }
+  get size() {
+    return this.#set.size;
+  }
+  get ranges() {
+    return [...this.#set];
   }
 }
 

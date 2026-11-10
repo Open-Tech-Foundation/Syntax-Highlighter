@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **MEDIUM:** `CSSHighlightRenderer` updates the shared page highlights incrementally: a render adds and removes only that block's ranges instead of rebuilding every block's highlights, so a page with N code blocks no longer does O(N²) work as they render. Empty highlights are unregistered, and one replaced under our name is re-registered on the next render.
 - **HIGH:** Added JSX support. `jsx` was JavaScript under another name, so tags, attributes, and components came out as `variable`/`operator`. It now scans JSX in expression position: intrinsic tags are `tag`, components (`Card`, `ui.Button`) are `class`, attributes are `attribute`, text children are `text`, and `{…}` containers (including spreads and nested JSX) are highlighted as code. Added a `tsx` language (TypeScript plus JSX; previously an alias for plain TypeScript); TSX generic arrows `<T,>` / `<T extends U>` are left to TypeScript. Nesting beyond 128 levels is scanned as code so hostile input cannot overflow the stack. Real-world JSX accuracy (highlighted characters vs Shiki) rose from 73.5% to 95.2%.
 - **LOW:** Added `console`, `shellscript`, and `shell-session` as aliases for `bash`, the fence names docs sites commonly use for terminal snippets.
 - **MEDIUM:** TypeScript now recognizes a regex literal after expression keywords (`return /x+/g.test(s)`, `typeof /a/`, `throw /bad/`); it had no `regexKeywords`, so these lexed as division.
