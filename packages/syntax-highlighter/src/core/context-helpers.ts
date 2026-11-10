@@ -112,8 +112,17 @@ export function topCtx(ctx: HighlightState): Context | null {
 export function isParam(val: string, ctx: HighlightState): boolean {
   if (ctx.globalParams.has(val)) return true;
   if (ctx.pendingParams?.includes(val)) return true;
-  for (let i = ctx.contexts.length - 1; i >= 0; i--) {
-    if (ctx.contexts[i].params?.has(val)) return true;
+  // Only contexts that own params can match; walking all of `contexts`
+  // instead made every identifier O(nesting depth), so unclosed brackets
+  // turned highlighting quadratic.
+  const owners = ctx.paramContexts;
+  for (let i = owners.length - 1; i >= 0; i--) {
+    const c = owners[i];
+    if (ctx.contexts[c.stackIndex] !== c) {
+      owners.splice(i, 1); // popped since registration
+      continue;
+    }
+    if (c.params?.has(val)) return true;
   }
   return false;
 }

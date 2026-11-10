@@ -49,6 +49,8 @@ export interface Context {
   expectName: boolean;
   bindsNames: boolean;
   isFnParams: boolean;
+  /** Index in `HighlightState.contexts` while live; set by {@link contextParams}. */
+  stackIndex: number;
 }
 
 export function createContext(
@@ -62,6 +64,7 @@ export function createContext(
     expectName: false,
     bindsNames: false,
     isFnParams: false,
+    stackIndex: -1,
     ...props,
   };
 }
@@ -78,6 +81,12 @@ export interface HighlightState {
   lastClosedParams: boolean;
   pendingParams: string[] | null;
   afterTypeDecl: boolean;
+  /**
+   * Contexts that own a `params` set, so parameter lookups skip the (possibly
+   * very deep) rest of the stack. Entries popped off `contexts` are pruned
+   * lazily by `isParam`.
+   */
+  paramContexts: Context[];
 }
 
 export function createState(): HighlightState {
@@ -93,7 +102,22 @@ export function createState(): HighlightState {
     lastClosedParams: false,
     pendingParams: null,
     afterTypeDecl: false,
+    paramContexts: [],
   };
+}
+
+/**
+ * The `params` set of the context at `stackIndex`, created and registered in
+ * `paramContexts` on first use.
+ */
+export function contextParams(ctx: HighlightState, stackIndex: number): Set<string> {
+  const c = ctx.contexts[stackIndex];
+  if (!c.params) {
+    c.params = new Set();
+    c.stackIndex = stackIndex;
+    ctx.paramContexts.push(c);
+  }
+  return c.params;
 }
 
 export function pushCtx(ctx: HighlightState, c: Context): void {

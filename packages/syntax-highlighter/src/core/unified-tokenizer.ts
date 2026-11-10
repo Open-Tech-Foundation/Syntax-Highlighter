@@ -13,6 +13,7 @@ import type { LanguageDefinition, RawToken, TokenizerFeatures } from "./lexer.ts
 import { retroParams } from "./retroactive-params.ts";
 import {
   ContextKind,
+  contextParams,
   createContext,
   createState,
   Expectation,
@@ -532,9 +533,8 @@ export class UnifiedTokenizer {
         const kind = braceKind(ctx, ctx.previousToken, ctx.previousValue);
         pushCtx(ctx, createContext(kind));
         if (ctx.pendingParams) {
-          const top = topCtx(ctx);
-          if (top) {
-            const set = (top.params ??= new Set());
+          if (ctx.contexts.length > 0) {
+            const set = contextParams(ctx, ctx.contexts.length - 1);
             for (const n of ctx.pendingParams) set.add(n);
           }
           ctx.pendingParams = null;

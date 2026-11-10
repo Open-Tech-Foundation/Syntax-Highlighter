@@ -1,5 +1,5 @@
-import type { Context, HighlightState } from "./state.ts";
-import { ContextKind } from "./state.ts";
+import type { HighlightState } from "./state.ts";
+import { ContextKind, contextParams } from "./state.ts";
 import { type Token, TokenType, WHITESPACE } from "./tokens.ts";
 
 export function retroParams(out: Token[], ctx: HighlightState, src: string): void {
@@ -121,14 +121,14 @@ export function retroParams(out: Token[], ctx: HighlightState, src: string): voi
 }
 
 function addParams(ctx: HighlightState, names: string[]): void {
-  let target: Context | null = null;
+  let target = -1;
   for (let i = ctx.contexts.length - 1; i >= 0; i--) {
     const c = ctx.contexts[i].kind;
     if (c === ContextKind.FUNCTION || c === ContextKind.CLASS || c === ContextKind.BLOCK) {
-      target = ctx.contexts[i];
+      target = i;
       break;
     }
   }
-  const set = target ? (target.params ??= new Set()) : ctx.globalParams;
+  const set = target >= 0 ? contextParams(ctx, target) : ctx.globalParams;
   for (const n of names) set.add(n);
 }

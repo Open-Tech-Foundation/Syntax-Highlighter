@@ -3,7 +3,7 @@
  *
  * Server-side highlighting of user content makes any quadratic path a
  * denial-of-service vector: before these fixes one 300 KB Markdown line took
- * a minute.
+ * a minute, and 40 000 unclosed `(a` took two seconds in every language.
  *
  * Absolute timings vary by machine, so each case compares the cost of n
  * repetitions against 4n. Linear work grows ~4×, quadratic ~16×; the
@@ -34,6 +34,12 @@ const CASES = [
   ["markdown", "[", 10000, "unclosed link brackets"],
   ["markdown", "![", 10000, "unclosed image brackets"],
   ["markdown", "<a", 10000, "unclosed inline HTML"],
+  // Parameter lookup walked the whole context stack per identifier, so any
+  // unclosed bracket nesting was quadratic — in Markdown too.
+  ["markdown", "[a](", 10000, "unclosed link destinations"],
+  ["markdown", "[a][", 10000, "unclosed reference links"],
+  ["javascript", "(a ", 10000, "unclosed parentheses"],
+  ["python", "(a ", 10000, "unclosed parentheses"],
 ];
 
 for (const [language, unit, n, label] of CASES) {
