@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- **MEDIUM:** Website "Try it live" editor: selecting text hid the selected code, the selection and caret drifted further from the visible code the further down the file they were (about one line per 22 lines), and the last lines could not be scrolled into view. The painted code's `<code>` used a different monospace font from the editable textarea (the Tailwind preflight stack the AFW theme brought in), so line boxes were ~1px taller per line; the painted layer also had its own height limit and scrollbar, and omitted the trailing empty line the textarea shows. The layers now share one font, one fixed height, and one scroll range, and the selection is translucent so the code stays visible.
+
 ### Changed
 
 - **LOW:** Refreshed the website's throughput benchmark (`tsr bench`, generated `website/app/bench-data.js`) over the current 102 showcase samples: 1.42M tokens/s, 51 ms end to end, 13.7× faster than Shiki.

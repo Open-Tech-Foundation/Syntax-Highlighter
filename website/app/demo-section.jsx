@@ -124,11 +124,13 @@ export default function DemoSection() {
       const toks = h.highlight(nextSource);
       const out = renderHTML(nextSource, toks, { prefix: "token " });
       if (mySeq !== seq) return;
-      html = out;
+      // A <pre> ignores a single trailing newline that the textarea shows as an
+      // empty last line; one extra keeps both layers the same height.
+      html = `${out}\n`;
       tokenCount = toks.filter((t) => t.type !== WHITESPACE).length;
     } catch {
       if (mySeq !== seq) return;
-      html = esc(nextSource);
+      html = `${esc(nextSource)}\n`;
     }
   }
 

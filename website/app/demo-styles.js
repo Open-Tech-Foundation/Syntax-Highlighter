@@ -15,13 +15,13 @@ export const demoStyles = `
 .marketing .demo-tabright{display:flex;align-items:center;gap:.75rem}
 .marketing .demo-theme{background:#0e1526;border:1px solid #2a3552;color:#dbe4f5;border-radius:.5rem;padding:.3rem .5rem;font-size:.8rem;font-family:inherit;outline:none;cursor:pointer}
 .marketing .demo-count{color:#5f7194}
-.marketing .demo-editor{position:relative;flex:1;min-height:22rem;display:flex;align-items:stretch}
-.marketing .demo-gutter{flex:0 0 auto;min-width:2.75rem;max-width:3.5rem;margin:0;padding:1rem .5rem 1rem 1rem;max-height:26rem;overflow:hidden;text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;white-space:pre;color:#46587e;user-select:none}
+.marketing .demo-editor{position:relative;flex:none;height:26rem;min-height:0;display:flex;align-items:stretch}
+.marketing .demo-gutter{flex:0 0 auto;min-width:2.75rem;max-width:3.5rem;margin:0;padding:1rem .5rem 1rem 1rem;overflow:hidden;text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;white-space:pre;color:#46587e;user-select:none}
 .marketing .demo-codewrap{position:relative;flex:1;min-width:0;display:flex}
-.marketing .demo-code{margin:0;padding:1rem 1.1rem;flex:1;min-height:22rem;max-height:26rem;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;tab-size:2;white-space:pre;background:transparent}
-.marketing .demo-input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:1rem 1.1rem;border:0;resize:none;overflow:auto;scrollbar-width:none;background:transparent;color:transparent;caret-color:#7dd3fc;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;tab-size:2;white-space:pre;outline:none}
+.marketing .demo-code{margin:0;padding:1rem 1.1rem;flex:1;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;tab-size:2;white-space:pre;background:transparent}
+.marketing .demo-code code{font:inherit;letter-spacing:inherit}.marketing .demo-input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:1rem 1.1rem;border:0;resize:none;overflow:auto;scrollbar-width:none;background:transparent;color:transparent;caret-color:#7dd3fc;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.65;tab-size:2;white-space:pre;outline:none}
 .marketing .demo-input::-webkit-scrollbar{display:none}
-.marketing .demo-input::selection{background:#26406b}
+.marketing .demo-input::selection{background:rgba(96,141,255,.32);color:transparent}
 :root[data-theme="light"] .marketing .demo-head p{color:#55627a}
 :root[data-theme="light"] .marketing .demo-side,:root[data-theme="light"] .marketing .demo-main{border-color:#d5dbe7;background:#fff}
 :root[data-theme="light"] .marketing .demo-search{border-color:#d5dbe7;background:#f3f5f9;color:#28334a}
@@ -33,6 +33,6 @@ export const demoStyles = `
 :root[data-theme="light"] .marketing .demo-theme{background:#f3f5f9;border-color:#d5dbe7;color:#28334a}
 :root[data-theme="light"] .marketing .demo-count{color:#8b96ab}
 :root[data-theme="light"] .marketing .demo-input{caret-color:#2968bd}
-:root[data-theme="light"] .marketing .demo-input::selection{background:#c9dcff}
+:root[data-theme="light"] .marketing .demo-input::selection{background:rgba(41,104,189,.22);color:transparent}
 @media (max-width:56rem){.marketing .demo-grid{grid-template-columns:1fr}.marketing .demo-langs{max-height:12rem}.marketing .demo-gutter{min-width:2.25rem;max-width:2.75rem;padding:.75rem .35rem .75rem .6rem;font-size:.78rem}.marketing .demo-code,.marketing .demo-input{padding:.75rem .8rem;font-size:.78rem}}
 `;
